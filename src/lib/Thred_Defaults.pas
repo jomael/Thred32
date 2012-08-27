@@ -105,7 +105,6 @@ const
   );
 
   namloc: array[0..49] of Cardinal= (
-
     999,	//0
     1024,	//1
     2,		//2

@@ -200,7 +200,7 @@ begin
   begin
     x := b.x;
     y := b.y;
-    at := b.at;
+    //at := b.at;
   end;
 
 end;

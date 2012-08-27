@@ -1,5 +1,5 @@
 unit Stitch_rwTHR;
-//unit gmSwatch_rwACO;
+
 (* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/LGPL 2.1/GPL 2.0
  *
@@ -15,8 +15,8 @@ unit Stitch_rwTHR;
  *
  * The Initial Developer of the Original Code are
  *
- * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  * x2nie - Fathony Luthfillah  <x2nie@yahoo.com>
+ * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  *
  * Contributor(s):
  *
@@ -232,6 +232,7 @@ begin
   Stream.Read(c16, 64);
   LCollection.CustomColors := c16;
 
+  //THREAD SIZE (ON SCREEN)
 //#5803                        ReadFile(hFil,(TCHAR*)msgbuf,16,&red,0);
 //#5804                        tred+=red;
 //#5805                        if(red!=16){
@@ -244,16 +245,18 @@ begin
   if red <> 16 then
     Exit;
 
+//#5810                        for(ind=0;ind<16;ind++)
+//#5811                            thrdSiz[ind][0]=msgbuf[ind];
+//#5812                        formpnt=sthed.fpnt;
 
-//#5810                        for(ind=0;ind<16;ind++)                                                   
-//#5811                            thrdSiz[ind][0]=msgbuf[ind];                                               
-//#5812                        formpnt=sthed.fpnt;                                                   
-//#5813                        if(formpnt>MAXFORMS)                                                   
-//#5814                            formpnt=MAXFORMS;                                               
-//#5815                        inf=0;ing=0,inh=0;                                                   
-//#5816                        if(formpnt){                                                   
-//#5817                                                                           
-//#5818                            ind=fltad=satkad=clpad=0;                                               
+//#5813                        if(formpnt>MAXFORMS)
+//#5814                            formpnt=MAXFORMS;
+//#5815                        inf=0;ing=0,inh=0;
+
+  //FORM
+//#5816                        if(formpnt){
+//#5817
+//#5818                            ind=fltad=satkad=clpad=0;
 //#5819                            msgbuf[0]=0;                                               
 //#5820                            if(vervar<2){                                               
 //#5821                                                                           
@@ -275,29 +278,37 @@ begin
 //#5837                                    formpnt=red/sizeof(FRMHED);                                       
 //#5838                                    setMap(BADFIL);                                       
 //#5839                                }                                           
-//#5840                            }                                               
-//#5841    //                        ind=SetFilePointer(hFil,0,0,FILE_CURRENT);  //bug                                               
-//#5842                            ReadFile(hFil,(FLPNT*)flts,sthed.fcnt*sizeof(FLPNT),&red,0);                                               
+//#5840                            }
+
+
+  //form points
+//#5842                            ReadFile(hFil,(FLPNT*)flts,sthed.fcnt*sizeof(FLPNT),&red,0);
 //#5843                            if(red!=sizeof(FLPNT)*sthed.fcnt){                                               
 //#5844                                                                           
-//#5845                                fltad=red/sizeof(FLPNT);                                           
+//#5845                                fltad=red/sizeof(FLPNT);
 //#5846                                for(ind=fltad;ind<sthed.fcnt;ind++)                                           
 //#5847                                    flts[ind].x=flts[ind].y=0;                                       
 //#5848                                setMap(BADFIL);                                           
 //#5849                            }
 
+
+  //dline data count
 //#5850                            ReadFile(hFil,(SATCON*)satks,sthed.scnt*sizeof(SATCON),&red,0);                                               
 //#5851                            if(red!=sthed.scnt*sizeof(SATCON)){
 //#5852                                                                           
 //#5853                                satkad=red/sizeof(SATCON);                                           
 //#5854                                setMap(BADFIL);                                           
-//#5855                            }                                               
+//#5855                            }
+
+  //points to clipboard data                                               
 //#5856                            ReadFile(hFil,(FLPNT*)clps,sthed.ecnt*sizeof(FLPNT),&red,0);
 //#5857                            if(red!=sthed.ecnt*sizeof(FLPNT)){                                               
 //#5858                                                                           
 //#5859                                clpad=red/sizeof(FLPNT);                                           
 //#5860                                setMap(BADFIL);                                           
 //#5861                            }
+
+  //textured fill point count
 //#5862                            ReadFile(hFil,(TXPNT*)txpnts,hedx.txcnt*sizeof(TXPNT),&red,0);                                               
 //#5863                            txad=red/sizeof(TXPNT);                                               
 //#5864                            if(rstMap(BADFIL))                                               
@@ -305,8 +316,11 @@ begin
 //#5866                            for(ind=0;ind<formpnt;ind++){                                               
 //#5867                                                                           
 //#5868                                formlst[ind].flt=adflt(formlst[ind].sids);                                           
-//#5869                                if(formlst[ind].typ==SAT){                                           
-//#5870                                                                           
+//#5869                                if(formlst[ind].typ==SAT){
+
+  //SATIN
+  //SACANG = satin guidlines or angle clipboard fill angle
+  //STPT = number of satin guidlines
 //#5871                                    if(formlst[ind].stpt)                                       
 //#5872                                        formlst[ind].sacang.sac=adsatk(formlst[ind].stpt);                                   
 //#5873                                }                                           
@@ -316,7 +330,7 @@ begin
 //#5877                                    formlst[ind].clp=adclp(formlst[ind].nclp);                                       
 //#5878                            }                                               
 //#5879                            setfchk();                                               
-//#5880                        }                                                   
+//#5880                        }
 //#5881                    }                                                       
 //#5882                    else                                                       
 //#5883                        tabmsg(IDS_NOTHR);
@@ -334,7 +348,9 @@ begin
   begin
     x := b.x;
     y := b.y;
-    at := b.at;
+    //at := b.at;
+    ColorIndex := b.at and COLMSK;
+    LayerStackIndex := (b.at and LAYMSK) shr LAYSHFT; 
   end;
 
 end;

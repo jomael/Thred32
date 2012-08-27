@@ -49,9 +49,12 @@ type
 
   TStitchItem = class(TCollectionItem)
   private
-    Fat: Cardinal;
+    //Fat: Cardinal;
     Fy: Single;
     Fx: Single;
+    FColorIndex: Byte;
+    FLayerStackIndex: Byte;
+
 
   protected
     FDisplayName     : string;
@@ -67,7 +70,9 @@ type
     property DisplayName;// read GetDisplayName write SetDisplayName;
 	  property x : Single read Fx write Fx;
 	  property y : Single read Fy write Fy;
-	  property at: Cardinal read Fat write Fat;
+	  //property at: Cardinal read Fat write Fat;
+    property ColorIndex : Byte read FColorIndex write FColorIndex;
+    property LayerStackIndex: Byte read FLayerStackIndex write FLayerStackIndex; 
   end;
 
 

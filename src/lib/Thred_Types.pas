@@ -15,13 +15,13 @@ type
   TSTRHED = packed record 		//structure thred file header
     led : Cardinal;
     len : Cardinal;	//length of strhed + length of stitch data
-    stchs,	//number of stitches
-    hup,	//size of hup
-    fpnt,	//number of forms
+    stchs,	        //number of stitches
+    hup,	  //size of hup
+    fpnt,	  //number of forms
     fpnts,	//points to form points
-    fcnt,	//number of form points
+    fcnt,	  //number of form points
     spnts,	//points to dline data
-    scnt,	//dline data count
+    scnt,	  //dline data count
     epnts,	//points to clipboard data
     ecnt : WORD;	//clipboard data count
   end; //STRHED

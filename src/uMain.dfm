@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
   Left = 257
   Top = 157
-  Width = 962
+  Width = 679
   Height = 585
   Caption = 'frmMain'
   Color = clBtnFace
@@ -23,13 +23,13 @@ object frmMain: TfrmMain
   object spl1: TSplitter
     Left = 0
     Top = 483
-    Width = 950
+    Width = 667
     Height = 3
     Cursor = crVSplit
     Align = alBottom
   end
   object lstCustomColor: TListBox
-    Left = 456
+    Left = 208
     Top = 24
     Width = 105
     Height = 409
@@ -62,7 +62,7 @@ object frmMain: TfrmMain
     OnDrawItem = lstCustomColorDrawItem
   end
   object lst2: TListBox
-    Left = 568
+    Left = 320
     Top = 24
     Width = 105
     Height = 409
@@ -95,7 +95,7 @@ object frmMain: TfrmMain
     OnDrawItem = lst2DrawItem
   end
   object lst3: TListBox
-    Left = 680
+    Left = 432
     Top = 24
     Width = 105
     Height = 409
@@ -128,7 +128,7 @@ object frmMain: TfrmMain
     OnDrawItem = lst3DrawItem
   end
   object lst4: TListBox
-    Left = 792
+    Left = 544
     Top = 24
     Width = 105
     Height = 409
@@ -161,7 +161,7 @@ object frmMain: TfrmMain
     OnDrawItem = lst4DrawItem
   end
   object lst5: TListBox
-    Left = 344
+    Left = 96
     Top = 24
     Width = 105
     Height = 409
@@ -231,7 +231,7 @@ object frmMain: TfrmMain
   object pgscrlr1: TPageScroller
     Left = 0
     Top = 486
-    Width = 950
+    Width = 667
     Height = 45
     Align = alBottom
     Control = swa1
@@ -1075,7 +1075,7 @@ object frmMain: TfrmMain
     end
   end
   object dlgOpen1: TOpenDialog
-    Left = 504
+    Left = 256
     Top = 16
   end
   object swlCustom: TgmSwatchList

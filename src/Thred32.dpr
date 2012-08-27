@@ -8,7 +8,8 @@ uses
   uResourceString in 'uResourceString.pas' {Form3},
   Thred_h in 'Thred_h.pas',
   Thred_Constants in 'lib\Thred_Constants.pas',
-  Thred_Defaults in 'lib\Thred_Defaults.pas';
+  Thred_Defaults in 'lib\Thred_Defaults.pas',
+  gmSwatch_rwPAL in 'lib\gmSwatch_rwPAL.pas';
 
 {$R *.res}
 

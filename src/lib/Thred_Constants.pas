@@ -5,7 +5,52 @@ interface
 
 const
   OLD_NUM = 4; // number of old filenames saved on file menu (thred.h #105)
+
+  //stitch mask //thred.h 831
+  COLMSK		= $0000000f; //COLOR MASK
+  NCOLMSK		= $fffffff0;
+  COLSMSK		= $0000ffff;
+
+  FRMSK		  = $00003ff0;
+  NFRMSK		= $ffffc00f;
+  UFRMSK		= $80003ff0;
+  FRMSHFT		= 4;
+
+  TYPFMSK		= $20003ff0;
+  TYPBMSK		= $40003ff0;
+  TYPAPMSK	= $60003ff0;
+
+  LAYMSK		= $0e000000;  //LAYER
+  NLAYMSK		= $f1ffffff;
+  LAYSHFT		= 25;
   
+  TYPMSK		= $60000000;
+  TYPFRM		= $20000000;
+  TYPBRD		= $40000000;
+  NTYPMSK		= $9fffffff;
+  TYPSHFT		= 29;
+  USMSK		  = $80000000;
+  USHFT		  = 31;
+  ATMSK		  = $7fffffff;
+  NFRM_NTYP	= $9fffc00f;
+  TYPATMSK	= $20000000;
+  LASTMSK		= $20003ff0;
+  WLKMSK		= $00200000;
+  WLKFMSK		= $00203ff0;
+  CWLKMSK		= $00100000;
+  CWLKFMSK	= $00103ff0;
+  UNDMSK		= $00400000;
+  WUNDMSK		= $00600000;
+  UNDFMSK		= $00403ff0;
+  KNOTMSK		= $00800000;
+  NKNOTMSK	= $ff7fffff;
+  FTHMSK		= $01000000;
+  DELMSK		= $61e03ff0;
+  ALTYPMSK	= $61f00000;
+  //SRTMSK		= $e0603fff;
+  SRTMSK		= $61f03fff;
+  SRTYPMSK	= $61700000;
+  NOTFRM		= $00080000;
 
 resourcestring
     IDS_FSELB                = 'No border stiches';
