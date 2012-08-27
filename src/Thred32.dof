@@ -134,6 +134,9 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
+[Excluded Packages]
+C:\Program Files (x86)\Borland\Delphi7\Bin\dclOffice2k70.bpl=Microsoft Office 2000 Sample Automation Server Wrapper Components
+c:\program files (x86)\borland\delphi7\Projects\Bpl\ip4000word2000vcl7.bpl=Woll2Woll InfoPower 4000 RichEdit for MSWord
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
@@ -144,8 +147,9 @@ Item1=..\source
 Item2=$(DELPHI)\source
 Item3=..\lib
 [HistoryLists\hlUnitOutputDirectory]
-Count=1
+Count=2
 Item0=..\units
+Item1=units
 [HistoryLists\hlOutputDirectorry]
 Count=1
 Item0=..\bin

@@ -1,8 +1,8 @@
 object frmMain: TfrmMain
-  Left = 195
-  Top = 143
-  Width = 922
-  Height = 477
+  Left = 257
+  Top = 157
+  Width = 962
+  Height = 585
   Caption = 'frmMain'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -20,9 +20,246 @@ object frmMain: TfrmMain
   OnMouseUp = FormMouseUp
   PixelsPerInch = 96
   TextHeight = 13
+  object spl1: TSplitter
+    Left = 0
+    Top = 483
+    Width = 950
+    Height = 3
+    Cursor = crVSplit
+    Align = alBottom
+  end
+  object lstCustomColor: TListBox
+    Left = 456
+    Top = 24
+    Width = 105
+    Height = 409
+    Style = lbOwnerDrawFixed
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindow
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ItemHeight = 24
+    Items.Strings = (
+      '1'
+      '2'
+      '3'
+      '4'
+      '5'
+      '6'
+      '7'
+      '8'
+      '9'
+      '10'
+      '11'
+      '12'
+      '13'
+      '14'
+      '15'
+      '16')
+    ParentFont = False
+    TabOrder = 0
+    OnDrawItem = lstCustomColorDrawItem
+  end
+  object lst2: TListBox
+    Left = 568
+    Top = 24
+    Width = 105
+    Height = 409
+    Style = lbOwnerDrawFixed
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindow
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ItemHeight = 24
+    Items.Strings = (
+      '1'
+      '2'
+      '3'
+      '4'
+      '5'
+      '6'
+      '7'
+      '8'
+      '9'
+      '10'
+      '11'
+      '12'
+      '13'
+      '14'
+      '15'
+      '16')
+    ParentFont = False
+    TabOrder = 1
+    OnDrawItem = lst2DrawItem
+  end
+  object lst3: TListBox
+    Left = 680
+    Top = 24
+    Width = 105
+    Height = 409
+    Style = lbOwnerDrawFixed
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindow
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ItemHeight = 24
+    Items.Strings = (
+      '1'
+      '2'
+      '3'
+      '4'
+      '5'
+      '6'
+      '7'
+      '8'
+      '9'
+      '10'
+      '11'
+      '12'
+      '13'
+      '14'
+      '15'
+      '16')
+    ParentFont = False
+    TabOrder = 2
+    OnDrawItem = lst3DrawItem
+  end
+  object lst4: TListBox
+    Left = 792
+    Top = 24
+    Width = 105
+    Height = 409
+    Style = lbOwnerDrawFixed
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindow
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ItemHeight = 24
+    Items.Strings = (
+      '1'
+      '2'
+      '3'
+      '4'
+      '5'
+      '6'
+      '7'
+      '8'
+      '9'
+      '10'
+      '11'
+      '12'
+      '13'
+      '14'
+      '15'
+      '16')
+    ParentFont = False
+    TabOrder = 3
+    OnDrawItem = lst4DrawItem
+  end
+  object lst5: TListBox
+    Left = 344
+    Top = 24
+    Width = 105
+    Height = 409
+    Style = lbOwnerDrawFixed
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindow
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ItemHeight = 24
+    Items.Strings = (
+      '1'
+      '2'
+      '3'
+      '4'
+      '5'
+      '6'
+      '7'
+      '8'
+      '9'
+      '10'
+      '11'
+      '12'
+      '13'
+      '14'
+      '15'
+      '16')
+    ParentFont = False
+    TabOrder = 4
+    OnDrawItem = lst5DrawItem
+  end
+  object swaDefault: TgmSwatchListView
+    Left = 0
+    Top = 0
+    Width = 30
+    Height = 483
+    Align = alLeft
+    SwatchList = swlDefault
+    ThumbWidth = 30
+    ThumbHeight = 20
+    ParentShowHint = False
+    Scale = 1.000000000000000000
+    ScaleMode = smNormal
+    ShowHint = True
+    TabOrder = 5
+    CellBorderStyle = borContrasGrid
+    FrameColor = clSilver
+  end
+  object swa2: TgmSwatchListView
+    Left = 30
+    Top = 0
+    Width = 33
+    Height = 483
+    Align = alLeft
+    SwatchList = swlCustom
+    ThumbWidth = 30
+    ThumbHeight = 20
+    ParentShowHint = False
+    PopupMenu = pmSwa
+    Scale = 1.000000000000000000
+    ScaleMode = smNormal
+    ShowHint = True
+    TabOrder = 6
+    CellBorderStyle = borContrasGrid
+    FrameColor = clSilver
+  end
+  object pgscrlr1: TPageScroller
+    Left = 0
+    Top = 486
+    Width = 950
+    Height = 45
+    Align = alBottom
+    Control = swa1
+    TabOrder = 7
+    object swa1: TgmSwatchListView
+      Left = 0
+      Top = 0
+      Width = 950
+      Height = 45
+      Align = alLeft
+      AutoSize = True
+      GrowFlow = NHeight2Right
+      SwatchList = swlCustom
+      ThumbWidth = 16
+      ThumbHeight = 16
+      ParentShowHint = False
+      PopupMenu = pmSwa
+      Scale = 1.000000000000000000
+      ScaleMode = smNormal
+      ShowHint = True
+      TabOrder = 0
+      CellBorderStyle = borContrasGrid
+      FrameColor = clGray
+    end
+  end
   object mm1: TMainMenu
-    Left = 224
-    Top = 216
+    Left = 552
+    Top = 224
     object TMenuItem
       Caption = '&file'
       object mnu_FILE_NEW1: TMenuItem
@@ -836,5 +1073,47 @@ object frmMain: TfrmMain
     object mnu_HLP: TMenuItem
       Caption = '&help'
     end
+  end
+  object dlgOpen1: TOpenDialog
+    Left = 504
+    Top = 16
+  end
+  object swlCustom: TgmSwatchList
+    Left = 64
+    Top = 56
+  end
+  object pmSwa: TPopupMenu
+    Left = 216
+    Top = 40
+    object Select1: TMenuItem
+      Caption = 'Select'
+      Default = True
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object EditColor1: TMenuItem
+      Caption = '&Edit'
+      OnClick = EditColor1Click
+    end
+    object LoadColorfromfile1: TMenuItem
+      Caption = '&Load'
+      OnClick = LoadColorfromfile1Click
+    end
+    object Savecolorstofile1: TMenuItem
+      Caption = '&Save'
+    end
+  end
+  object swlDefault: TgmSwatchList
+    Left = 64
+    Top = 104
+  end
+  object dlgOpenSwa: TOpenSwatchDialog
+    Left = 240
+    Top = 168
+  end
+  object dlgColor1: TColorDialog
+    Left = 128
+    Top = 88
   end
 end

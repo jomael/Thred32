@@ -4,7 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Menus, XPMan;
+  Dialogs, Menus, XPMan,
+  Thred_Types, stitch_Items,
+  StdCtrls, gmGridBased_List, gmSwatch_List, GR32_Image,
+  gmGridBased_ListView, gmSwatch_ListView, gmGridBased_FileDlg,
+  gmSwatch_FileDlgs, ComCtrls, JvExComCtrls, JvPageScroller, ExtCtrls;
 
 type
   TfrmMain = class(TForm)
@@ -232,6 +236,27 @@ type
     mnu_L3: TMenuItem;
     mnu_L4: TMenuItem;
     mnu_HLP: TMenuItem;
+    dlgOpen1: TOpenDialog;
+    lstCustomColor: TListBox;
+    lst2: TListBox;
+    lst3: TListBox;
+    lst4: TListBox;
+    lst5: TListBox;
+    swaDefault: TgmSwatchListView;
+    swlCustom: TgmSwatchList;
+    pmSwa: TPopupMenu;
+    Select1: TMenuItem;
+    LoadColorfromfile1: TMenuItem;
+    Savecolorstofile1: TMenuItem;
+    swa2: TgmSwatchListView;
+    swlDefault: TgmSwatchList;
+    dlgOpenSwa: TOpenSwatchDialog;
+    N1: TMenuItem;
+    dlgColor1: TColorDialog;
+    EditColor1: TMenuItem;
+    swa1: TgmSwatchListView;
+    spl1: TSplitter;
+    pgscrlr1: TPageScroller;
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
@@ -244,11 +269,35 @@ type
     procedure FormCreate(Sender: TObject);
     procedure mnu_FILE_OPEN1Click(Sender: TObject);
     procedure mnu_FILE_NEW1Click(Sender: TObject);
+    procedure lstCustomColorDrawItem(Control: TWinControl; Index: Integer;
+      Rect: TRect; State: TOwnerDrawState);
+    procedure lst2DrawItem(Control: TWinControl; Index: Integer;
+      Rect: TRect; State: TOwnerDrawState);
+    procedure lst3DrawItem(Control: TWinControl; Index: Integer;
+      Rect: TRect; State: TOwnerDrawState);
+    procedure lst4DrawItem(Control: TWinControl; Index: Integer;
+      Rect: TRect; State: TOwnerDrawState);
+    procedure lst5DrawItem(Control: TWinControl; Index: Integer;
+      Rect: TRect; State: TOwnerDrawState);
+    procedure LoadColorfromfile1Click(Sender: TObject);
+    procedure EditColor1Click(Sender: TObject);
   private
+    filnam : TFileName;
+    FIni: TThredIniFile;
+    FStitchs : TStitchCollection;
+
+    useCol,
+    custCol,
+    bakCust,
+    bakBit : T16Colors;
+
     procedure redini;
+    procedure nuFil();
+    procedure defpref;
     { Private declarations }
   public
     { Public declarations }
+    property ini : TThredIniFile read FIni;// write FIni;
   end;
 
 var
@@ -256,7 +305,12 @@ var
 
 implementation
 
+uses Thred_Constants, Thred_Defaults,
+  gmSwatch_rwTHR, gmSwatch_rwACO, gmSwatch_rwSWA, 
+  Stitch_FileDlg, Stitch_rwTHR, Stitch_rwPCS;
+
 {$R *.dfm}
+
 //#1    #include <windows.h>                                                                       
 //#2    #include <stdio.h>                                                                       
 //#3    #include <math.h>
@@ -5870,8 +5924,10 @@ end;
 //#5596        for(ind=0;ind<formpnt;ind++)                                                                   
 //#5597            MoveMemory(&formlst[ind],&frmlstx[ind],sizeof(FRMHEDO));                                                               
 //#5598    }                                                                       
-//#5599                                                                           
-//#5600    void nuFil(){                                                                       
+//#5599
+procedure TfrmMain.nuFil();
+
+//#5600    void nuFil(){
 //#5601                                                                           
 //#5602        unsigned        siz,stind;                                                           
 //#5603        unsigned        vervar;                                                           
@@ -5887,7 +5943,10 @@ end;
 //#5613        FLRCT            strct;                                                       
 //#5614        FRMHEDO*        frmlstx;                                                           
 //#5615        long            tred;                                                       
-//#5616                                                                           
+//#5616
+var
+  tchr : string;
+  hFil : file;                                                     
 //#5617    #if PESACT                                                                       
 //#5618                                                                           
 //#5619        unsigned        ine;                                                           
@@ -5900,8 +5959,11 @@ end;
 //#5626        unsigned        pabind;                                                           
 //#5627        double            locof;                                                       
 //#5628    #endif                                                                       
-//#5629                                                                           
-//#5630        if(rstMap(REDOLD)||GetOpenFileName(&ofn)){                                                                   
+//#5629
+begin
+//#5630        if(rstMap(REDOLD)||GetOpenFileName(&ofn)){
+  if dlgOpen1.execute then
+  begin
 //#5631                                                                           
 //#5632            fnamtabs();                                                               
 //#5633            untrace();                                                               
@@ -5962,7 +6024,8 @@ end;
 //#5688                rstMap(BAKWRAP);                                                           
 //#5689                zumFct=1;                                                           
 //#5690                setMap(RESTCH);                                                           
-//#5691                defNam(filnam);                                                           
+//#5691                defNam(filnam);
+    filnam := dlgOpen1.filename;
 //#5692                selCnt=0;                                                           
 //#5693                if(rstMap(WASPAT))                                                           
 //#5694                    DestroyWindow(hSped);                                                       
@@ -5981,7 +6044,8 @@ end;
 //#5707                    strcat(filnam,".thr");                                                       
 //#5708                    pext=strrchr(filnam,'.')+1;                                                       
 //#5709                }                                                           
-//#5710                tchr=tolower(pext[0]);                                                           
+//#5710                tchr=tolower(pext[0]);
+    tchr := ExtractFileExt(filnam);                                                           
 //#5711                if(tchr=='t'){                                                           
 //#5712                                                                           
 //#5713                    ReadFile(hFil,(STRHED*)&sthed,sizeof(STRHED),&red,NULL);                                                       
@@ -6396,8 +6460,10 @@ end;
 //#6122            }                                                               
 //#6123            lodchk();                                                               
 //#6124        }                                                                   
-//#6125    }                                                                       
-//#6126                                                                           
+//#6125    }
+  end;
+//#6126
+end;                                                                           
 //#6127    void clrfbuf(unsigned siz){                                                                       
 //#6128                                                                           
 //#6129        _asm{                                                                   
@@ -12926,8 +12992,31 @@ end;
 //#12652    }                                                                       
 //#12653
 procedure TfrmMain.mnu_FILE_OPEN1Click(Sender: TObject);
+var i : Integer;
 begin
+  with TOpenStitchsDialog.Create(Self) do
+  begin
+    if Execute then
+    FStitchs.LoadFromFile(FileName);
+    Caption := IntToStr(FStitchs.Count);
+//    FStitchs.Header.
+  //  Caption := Caption +
+    //    self.Color := FStitchs.BgColor;
+    for i := 0 to 15 do
+    begin
+      if swlCustom.Count < i +1 then
+        swlCustom.Add;
+      swlCustom[i].Color := FStitchs.Colors[i];
+    end;
+    swa2.Changed;
 
+
+
+
+    lstCustomColor.Invalidate;
+
+    Free;
+  end;
 
 //#21158            case ID_FILE_OPEN1:
 //#21159
@@ -13028,7 +13117,9 @@ end;
 //#12743        }                                                                   
 //#12744                                                                           
 //#12745    }                                                                       
-//#12746                                                                           
+//#12746
+procedure TfrmMain.defpref();
+begin
 //#12747    void defpref(){                                                                       
 //#12748                                                                           
 //#12749        unsigned ind;                                                                   
@@ -13036,7 +13127,11 @@ end;
 //#12751        umap=0;                                                                   
 //#12752        for(ind=0;ind<16;ind++){                                                                   
 //#12753                                                                           
-//#12754            useCol[ind]=defUseCol[ind];                                                               
+//#12754            useCol[ind]=defUseCol[ind];
+  Fini.StitchColors :=  defUseCol;
+  custCol := defCustCol;
+  bakCust := defBakCust;
+  bakBit  := defBakBit;
 //#12755            custCol[ind]=defCustCol[ind];                                                               
 //#12756            bakCust[ind]=defBakCust[ind];                                                               
 //#12757            bakBit[ind]=defBakBit[ind];                                                               
@@ -13044,8 +13139,9 @@ end;
 //#12759        dazdef();                                                                   
 //#12760        apcol=15;                                                                   
 //#12761        brdwid=BRDWID;                                                                   
-//#12762        bfclen=IBFCLEN;                                                                   
-//#12763        ini.chspac=CHSDEF;                                                                   
+//#12762        bfclen=IBFCLEN;
+//#12763        ini.chspac=CHSDEF;
+//  ini.ChainSpace := CHSDEF;
 //#12764        ini.chrat=CHRDEF;                                                                   
 //#12765        ini.angl=DEFANG;                                                                   
 //#12766        rstu(SQRFIL);                                                                   
@@ -13096,7 +13192,8 @@ end;
 //#12811        ini.txtwid=ITXWID;                                                                   
 //#12812        ini.txtspac=(float)ITXSPAC;                                                                   
 //#12813    }                                                                       
-//#12814                                                                           
+//#12814
+end;                                                                           
 //#12815    void dumrk(double pntx,double pnty){                                                                       
 //#12816                                                                           
 //#12817        if(rstMap(GMRK))                                                                   
@@ -21938,12 +22035,17 @@ end;
 //#21635                    strcat(filnam,__argv[ind]);                                                       
 //#21636                }                                                           
 //#21637                setMap(REDOLD);                                                           
-//#21638                nuFil();                                                           
+//#21638                nuFil();
 //#21639            }                                                               
 //#21640        }                                                                   
 //#21641    }                                                                       
 //#21642
 procedure TfrmMain.redini();
+var 
+  LFileHandle: Integer;
+  LFileName  : string;
+  LReadBytes : Cardinal;
+
 begin                                                                           
 //#21643    void redini(){
 //#21644
@@ -21958,15 +22060,32 @@ begin
 //#21653        duhom();
 //#21654        strcpy(iniNam,homdir);
 //#21655        strcat(iniNam,"thred.ini");
+  LFileName := ChangeFileExt(Application.ExeName,'.ini');
+  LFileHandle := CreateFile(PAnsiChar(LFileName), GENERIC_READ, 0, nil, OPEN_EXISTING,
+                            0, 0);
+  try
+
+  finally
+    FileClose(LFileHandle);
+  end;
+
 //#21656        hIni=CreateFile(iniNam,GENERIC_READ,0,NULL,
 //#21657                    OPEN_EXISTING,0,NULL);
 //#21658        if(hIni==INVALID_HANDLE_VALUE)
+  if not FileExists(LFileName) then
 //#21659            defpref();
+    defpref()
+  else
+  begin
 //#21660        else{
 //#21661
 //#21662            ReadFile(hIni,&ini,sizeof(ini),&wrot,0);
+    ReadFile(LFileHandle, Fini, SizeOf(ini), LReadBytes, nil);
 //#21663            if(wrot<2061)
+//    if LReadBytes < 2061 then
+//      Fini.FormBoxPixels := DEFBPIX;
 //#21664                ini.frmbpix=DEFBPIX;
+
 //#21665            strcpy(defDir,ini.defDir);
 //#21666            strcpy(defbmp,ini.defDir);
 //#21667            for(ind=0;ind<16;ind++){
@@ -22083,6 +22202,7 @@ begin
 //#21778            zum0.y=ini.hupy;
 //#21779            picspac=ini.picspac;
 //#21780        }
+  end;
 //#21781        if(!ini.grdbak)
 //#21782            ini.grdbak=DEFGRD;
 //#21783        CloseHandle(hIni);
@@ -23893,7 +24013,12 @@ end;
 //#23585
 
 procedure TfrmMain.FormCreate(Sender: TObject);
+var i : integer;
 begin
+  FStitchs := TStitchCollection.Create(Self) ;
+
+
+
 //#23586    int APIENTRY WinMain(HINSTANCE hInstance,                                                                       
 //#23587                         HINSTANCE hPrevInstance,                                                                       
 //#23588                         LPSTR     lpCmdLine,                                                                       
@@ -23928,6 +24053,18 @@ begin
 //#23617        if(RegisterClassEx(&wc)){
 //#23618
 //#23619            redini();
+  redini;
+  FStitchs.Colors := ini.StitchColors;
+   for i := 0 to 15 do
+    begin
+      swlCustom.Add;
+      swlCustom[i].Color := FStitchs.Colors[i];
+
+      swlDefault.Add;
+      swlDefault[i].Color := defCol[i];
+    end;
+    swa2.Changed;
+    swaDefault.Changed;
 //#23620            if(ini.irct.right){
 //#23621
 //#23622                hWnd=CreateWindow(
@@ -24021,5 +24158,77 @@ begin
 //#21238                break;
 end;
 
+
+procedure TfrmMain.lstCustomColorDrawItem(Control: TWinControl; Index: Integer;
+  Rect: TRect; State: TOwnerDrawState);
+begin
+  if lstCustomColor.Items[Index] <> ColorToString(FStitchs.Colors[Index]) then
+    lstCustomColor.Items[Index] := ColorToString(FStitchs.Colors[Index]);
+  lstCustomColor.Canvas.Brush.Color :=  FStitchs.Colors[Index];
+  lstCustomColor.Canvas.FillRect(Rect);
+  lstCustomColor.Canvas.TextOut(Rect.Left, Rect.Top, lstCustomColor.Items[index]);
+
+end;
+
+procedure TfrmMain.lst2DrawItem(Control: TWinControl; Index: Integer;
+  Rect: TRect; State: TOwnerDrawState);
+begin
+  if lst2.Items[Index] <> ColorToString(bakBit[Index]) then
+    lst2.Items[Index] := ColorToString(bakBit[Index]);
+  lst2.Canvas.Brush.Color :=  bakBit[Index];
+  lst2.Canvas.FillRect(Rect);
+  lst2.Canvas.TextOut(Rect.Left, Rect.Top, lst2.Items[index]);
+end;
+
+procedure TfrmMain.lst3DrawItem(Control: TWinControl; Index: Integer;
+  Rect: TRect; State: TOwnerDrawState);
+begin
+  if lst3.Items[Index] <> ColorToString(custCol[Index]) then
+    lst3.Items[Index] := ColorToString(custCol[Index]);
+  lst3.Canvas.Brush.Color :=  custCol[Index];
+  lst3.Canvas.FillRect(Rect);
+  lst3.Canvas.TextOut(Rect.Left, Rect.Top, lst3.Items[index]);
+
+end;
+
+procedure TfrmMain.lst4DrawItem(Control: TWinControl; Index: Integer;
+  Rect: TRect; State: TOwnerDrawState);
+begin
+  if lst4.Items[Index] <> ColorToString(bakCust[Index]) then
+    lst4.Items[Index] := ColorToString(bakCust[Index]);
+  lst4.Canvas.Brush.Color :=  bakCust[Index];
+  lst4.Canvas.FillRect(Rect);
+  lst4.Canvas.TextOut(Rect.Left, Rect.Top, lst4.Items[index]);
+end;
+
+procedure TfrmMain.lst5DrawItem(Control: TWinControl; Index: Integer;
+  Rect: TRect; State: TOwnerDrawState);
+begin
+  with TListBox(Control) do
+  begin
+    if Items[Index] <> ColorToString(defCol[Index]) then
+      Items[Index] := ColorToString(defCol[Index]);
+    Canvas.Brush.Color :=  defCol[Index];
+    Canvas.FillRect(Rect);
+    Canvas.TextOut(Rect.Left, Rect.Top, Items[index]);
+
+  end;  
+end;
+
+procedure TfrmMain.LoadColorfromfile1Click(Sender: TObject);
+begin
+  if dlgOpenSwa.Execute then
+
+    swlCustom.LoadFromFile(dlgOpenSwa.FileName);
+end;
+
+procedure TfrmMain.EditColor1Click(Sender: TObject);
+var i : Integer;
+begin
+  dlgColor1.CustomColors.Clear;
+  for i := 0 to swlCustom.Count - 1 do
+    dlgColor1.CustomColors.Add(Format('Color%s=%s',[chr(64+i),IntToHex(swlCustom[i].Color, 8) ]));
+  dlgColor1.Execute;
+end;
 
 end.

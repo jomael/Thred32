@@ -1,6 +1,11 @@
-unit Thred_rc;
+unit Thred_Constants;
 
 interface
+
+
+const
+  OLD_NUM = 4; // number of old filenames saved on file menu (thred.h #105)
+  
 
 resourcestring
     IDS_FSELB                = 'No border stiches';
@@ -326,7 +331,14 @@ resourcestring
     IDS_DATREP               = 'Data Repaired';
     IDS_UNAM                 = 'Uknown Designer';
 
-
 implementation
 
 end.
+
+
+
+
+
+
+
+

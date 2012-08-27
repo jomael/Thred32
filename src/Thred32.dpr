@@ -5,7 +5,10 @@ uses
   uMain in 'uMain.pas' {frmMain},
   uMenu in 'uMenu.pas' {Form2},
   Thred_rc in 'Thred_rc.pas',
-  uResourceString in 'uResourceString.pas' {Form3};
+  uResourceString in 'uResourceString.pas' {Form3},
+  Thred_h in 'Thred_h.pas',
+  Thred_Constants in 'lib\Thred_Constants.pas',
+  Thred_Defaults in 'lib\Thred_Defaults.pas';
 
 {$R *.res}
 
