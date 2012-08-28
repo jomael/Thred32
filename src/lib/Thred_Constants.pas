@@ -7,7 +7,9 @@ const
 // compile switches (thred.h #1)
   // TODO: maybe these should be defined in a *.inc file.
   PESACT     = 0;		// compile pes code
+
   BUGBAK     = 0;		// turn bakseq off
+  //MAXFORMS	=1024;	//maximum number of forms (thred.h #81)
 
   TRCMTH     = 1;		// 0=brightness compard, 1=color compare
 

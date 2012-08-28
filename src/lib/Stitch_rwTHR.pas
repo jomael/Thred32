@@ -61,8 +61,11 @@ type
 implementation
 
 uses
-  Thred_Types, Thred_Constants;
-//  GR32, GR32_LowLevel;
+  Math,
+  Thred_Types, Thred_Constants,
+  GR32
+  //, GR32_LowLevel
+  ;
 { TgmConverter }
 
 constructor TStitchTHRConverter.Create;
@@ -77,6 +80,7 @@ procedure TStitchTHRConverter.LoadFromStream(Stream: TStream;
 var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data
+  formpnt,
   vervar,i,red : Integer;
   sthed : TSTRHED;
   item  : TSHRTPNT;
@@ -85,7 +89,25 @@ var
   c : TColor;
   c16 : T16Colors;
   buf : array[0..17] of Char;
+  Bytes : T16Byte;
 
+  Lflts,
+  Lclps : TArrayOfFloatPoint;//array of TFLPNT;
+  Lsatks :array of  TSATCON;
+  Ltxpnts : array of TTXPNT;
+  Lfrmlstx : array of TFRMHEDO;
+  Lformlst : array of TFRMHED;
+
+  procedure xofrm();
+  var ind : Cardinal;
+  begin
+    //frmlstx=(FRMHEDO*)&bseq;
+    SetLength(Lformlst, Length(Lfrmlstx));
+    //FillMemory(&bseq,0,sizeof(FRMHED)*formpnt);
+    FillChar(Lformlst[0], SizeOf(TFRMHED) * formpnt, 0);
+    for ind :=0 to formpnt -1 do
+      Move(Lformlst[ind], Lfrmlstx[ind],sizeof(TFRMHEDO));
+  end;
 begin
   LCollection := TStitchCollection(ACollection);
   LCollection.Clear;
@@ -166,7 +188,7 @@ begin
 //#5759                            return;
 //#5760                        }
 
-    end;
+  end;
 
 //#5761                        zRct.bottom=zRct.left=0;
 //#5762                        zRct.right=zum0.x=ini.hupx;
@@ -240,38 +262,60 @@ begin
 //#5807                            prtred();
 //#5808                            return;
 //#5809                        }
-  red := Stream.Read(buf[0],16);
-  LCollection.BName := buf;
+  red := Stream.Read(Bytes[0],16);
+  //LCollection.BName := Bytes;
   if red <> 16 then
     Exit;
 
+
+  for i := 0 to 15 do
+  begin
+     Bytes[i] := Bytes[i] * 10;
+  end;
+  LCollection.ThreadSize := Bytes;
 //#5810                        for(ind=0;ind<16;ind++)
 //#5811                            thrdSiz[ind][0]=msgbuf[ind];
-//#5812                        formpnt=sthed.fpnt;
 
+
+//#5812                        formpnt=sthed.fpnt;
 //#5813                        if(formpnt>MAXFORMS)
 //#5814                            formpnt=MAXFORMS;
 //#5815                        inf=0;ing=0,inh=0;
+  formpnt := min(sthed.fpnts, MAXFORMS);
 
   //FORM
 //#5816                        if(formpnt){
+  if formpnt > 0 then
+  begin
 //#5817
 //#5818                            ind=fltad=satkad=clpad=0;
 //#5819                            msgbuf[0]=0;                                               
-//#5820                            if(vervar<2){                                               
+//#5820                            if(vervar<2){
+
+    //OLD FORM HEADER
+    if vervar < 2 then
+    begin
 //#5821                                                                           
-//#5822                                frmlstx=(FRMHEDO*)&bseq;                                           
-//#5823                                ReadFile(hFil,(FRMHEDO*)frmlstx,formpnt*sizeof(FRMHEDO),&red,0);                                           
+//#5822                                frmlstx=(FRMHEDO*)&bseq;
+      SetLength(Lfrmlstx, formpnt);
+      Stream.Read(Lfrmlstx[0], SizeOf(TFRMHEDO) * formpnt);
+//#5823                                ReadFile(hFil,(FRMHEDO*)frmlstx,formpnt*sizeof(FRMHEDO),&red,0);
 //#5824                                if(red!=formpnt*sizeof(FRMHEDO)){                                           
 //#5825                                                                           
 //#5826                                    formpnt=red/sizeof(FRMHEDO);                                       
 //#5827                                    setMap(BADFIL);
 //#5828                                }                                           
-//#5829                                xofrm();                                           
-//#5830                            }                                               
+//#5829                                xofrm();
+      xofrm();                                      
+//#5830                            }
+    end
+    else
+    begin  //VER 2 FORM HEADER
 //#5831                            else{                                               
 //#5832
-//#5833                                ReadFile(hFil,(FRMHED*)formlst,formpnt*sizeof(FRMHED),&red,0);                                           
+      SetLength(Lformlst, formpnt);
+      Stream.Read(Lformlst[0], SizeOf(TFRMHED)* formpnt);
+//#5833                                ReadFile(hFil,(FRMHED*)formlst,formpnt*sizeof(FRMHED),&red,0);
 //#5834                                rstMap(BADFIL);                                           
 //#5835                                if(red!=formpnt*sizeof(FRMHED)){                                           
 //#5836                                                                           
@@ -279,9 +323,12 @@ begin
 //#5838                                    setMap(BADFIL);                                       
 //#5839                                }                                           
 //#5840                            }
+    end;
 
 
   //form points
+    SetLength(Lflts, sthed.fcnt);
+    Stream.Read(Lflts[0], SizeOf(TFLPNT) * sthed.fcnt);
 //#5842                            ReadFile(hFil,(FLPNT*)flts,sthed.fcnt*sizeof(FLPNT),&red,0);
 //#5843                            if(red!=sizeof(FLPNT)*sthed.fcnt){                                               
 //#5844                                                                           
@@ -293,6 +340,8 @@ begin
 
 
   //dline data count
+    SetLength(Lsatks, sthed.fcnt);
+    Stream.Read(Lsatks[0], SizeOf(TSATCON) * sthed.scnt);
 //#5850                            ReadFile(hFil,(SATCON*)satks,sthed.scnt*sizeof(SATCON),&red,0);                                               
 //#5851                            if(red!=sthed.scnt*sizeof(SATCON)){
 //#5852                                                                           
@@ -301,6 +350,8 @@ begin
 //#5855                            }
 
   //points to clipboard data                                               
+    SetLength(Lclps, sthed.fcnt);
+    Stream.Read(Lclps[0], SizeOf(TFLPNT) * sthed.scnt);
 //#5856                            ReadFile(hFil,(FLPNT*)clps,sthed.ecnt*sizeof(FLPNT),&red,0);
 //#5857                            if(red!=sthed.ecnt*sizeof(FLPNT)){                                               
 //#5858                                                                           
@@ -309,28 +360,45 @@ begin
 //#5861                            }
 
   //textured fill point count
+    SetLength(Ltxpnts, sthed.fcnt);
+    Stream.Read(Ltxpnts[0], SizeOf(TTXPNT) * sthed.scnt);
 //#5862                            ReadFile(hFil,(TXPNT*)txpnts,hedx.txcnt*sizeof(TXPNT),&red,0);                                               
 //#5863                            txad=red/sizeof(TXPNT);                                               
-//#5864                            if(rstMap(BADFIL))                                               
-//#5865                                bfilmsg();                                           
-//#5866                            for(ind=0;ind<formpnt;ind++){                                               
-//#5867                                                                           
-//#5868                                formlst[ind].flt=adflt(formlst[ind].sids);                                           
+//#5864                            if(rstMap(BADFIL))
+//#5865                                bfilmsg();
+
+
+
+//#5866                            for(ind=0;ind<formpnt;ind++){
+    for i := 0 to formpnt -1 do
+    begin
+      //Lformlst[i].flt :=
+//#5867
+//#5868                                formlst[ind].flt=adflt(formlst[ind].sids);
 //#5869                                if(formlst[ind].typ==SAT){
 
   //SATIN
   //SACANG = satin guidlines or angle clipboard fill angle
   //STPT = number of satin guidlines
-//#5871                                    if(formlst[ind].stpt)                                       
-//#5872                                        formlst[ind].sacang.sac=adsatk(formlst[ind].stpt);                                   
-//#5873                                }                                           
-//#5874                                if(isclp(ind))                                           
-//#5875                                    formlst[ind].angclp.clp=adclp(formlst[ind].flencnt.nclp);                                       
-//#5876                                if(iseclpx(ind))                                           
-//#5877                                    formlst[ind].clp=adclp(formlst[ind].nclp);                                       
-//#5878                            }                                               
-//#5879                            setfchk();                                               
+//#5871                                    if(formlst[ind].stpt)
+//#5872                                        formlst[ind].sacang.sac=adsatk(formlst[ind].stpt);
+//#5873                                }
+
+  //HAS CLIPBOARD?
+//#5874                                if(isclp(ind))
+//#5875                                    formlst[ind].angclp.clp=adclp(formlst[ind].flencnt.nclp);
+//#5876                                if(iseclpx(ind))
+//#5877                                    formlst[ind].clp=adclp(formlst[ind].nclp);
+//#5878                            }
+    end;
+
+
+
+
+
+//#5879                            setfchk();
 //#5880                        }
+  end;
 //#5881                    }                                                       
 //#5882                    else                                                       
 //#5883                        tabmsg(IDS_NOTHR);

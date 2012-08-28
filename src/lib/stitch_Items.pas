@@ -84,6 +84,7 @@ type
     FBgColor: TColor;
     FColors: T16Colors;
     FCustomColors: T16Colors;
+    FThreadSize: T16Byte;
   protected
     procedure Update(Item: TCollectionItem); override;
   
@@ -122,6 +123,7 @@ type
     property OnChange             : TNotifyEvent    read FOnChange        write FOnChange;
     property Header : TSTRHED read FHeader write FHeader;
     property BName : string read FBName write FBName;
+    property ThreadSize : T16Byte read FThreadSize write FThreadSize;  
     property BgColor : TColor read FBgColor write FBgColor;
     property Colors : T16Colors read FColors write FColors;
     property CustomColors : T16Colors read FCustomColors write FCustomColors; 

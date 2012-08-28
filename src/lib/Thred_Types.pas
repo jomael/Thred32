@@ -5,12 +5,25 @@ interface
 uses
 { Standard }
   Windows, Graphics,
+  GR32,
 { Thred32 }
   Thred_Constants;
 
 type
   TOldNameCharArray = array [0..OLDNUM - 1, 0..MAX_PATH - 1] of Char;
   T16Colors = array [0..15] of TColor;
+  T16Byte   = array [0..15] of Byte;
+
+  TFLPNT = type TFloatPoint;
+  TFLRCT = type TFloatRect;
+  
+  TBSEQPNT = packed record
+    x,
+    y : Single;
+    attr: Byte;
+  end;//BSEQPNT;
+
+
 
   TSTRHED = packed record 		//structure thred file header
     led : Cardinal;
@@ -31,7 +44,13 @@ type
     y : Single;
     at: Cardinal;
   end;
-  
+
+  TTXPNT = packed record		//textured fill point
+    y : Single;
+    lin : SmallInt;
+  end; //TXPNT;
+
+
   //thred v1.0 file header extension
   TSTREX = packed record
     xhup,		//hoop size x dimension
@@ -149,6 +168,127 @@ type
     ClipboardFillSpacing       : Single;                           // clipboard fill spacing    {clpspc;}
     DesignerName               : array [0..49] of Char;            // designer name    {desnam[50];}
   end;
+
+
+TFTHED =packed record
+	fthtyp,	//feather fill type
+	fthup,	//feather up count
+	fthdwn,	//feather down count
+	fthcol: Byte;	//feather blend col
+	fthrat,	//feather ratio
+	fthflr: single;	//feather floor
+	fthnum: Word; //feather fill psg granularity
+end; //FTHED;
+
+TTXHED = packed record
+	lins: SmallInt ;
+	ind,
+	cnt: word;
+	hi : Single;
+end; //TXHED;
+
+TTFHED = packed record
+	fth : TFTHED;
+	txt : TTXHED;
+end;//TFHED;
+
+TSATCON = packed record
+	strt,
+	fin : Word; //finish
+end; //SATCON;
+
+TFANGCLP = packed record
+	fang : Single;
+	clp : TFLPNT;
+	sat : TSATCON;
+end; //FANGCLP;
+
+TFLENCNT = packed record
+	flen : Single;
+	nclp : Cardinal;
+end; //FLENCNT;
+
+TSACANG = packed record
+	sac : TSATCON;
+	ang : Single; //anle
+end; //SACANG;
+
+{
+	fill	elen	espac	esiz	nclp	picspac		crnrsiz		brdend
+
+	EGLIN	elen
+	EGBLD	elen
+	EGCLP							nclp
+	EGSAT	elen	espac	esiz									at
+	EGAP	elen	espac	esiz									at
+	EGPRP	elen	espac	esiz									at
+	EGHOL	elen	espac	esiz						nclp,res
+	EGPIC	elen			esiz	nclp	espac		res		
+}
+
+ TFRMHED = packed record
+    at : Byte;		//attribute
+    sids : Word;	//number of sides
+    typ : Byte;	//type
+    fcol : byte;	//fill color
+    bcol : Byte;	//border color
+    nclp : Word;	//number of border clipboard entries
+    flt : TFloatPoint ;	//points
+    sacang : TSACANG;	//satin guidlines or angle clipboard fill angle
+    clp : TFloatPoint;	//border clipboard data
+    stpt : Word;	//number of satin guidlines
+    wpar : Word;	//word parameter
+    rct : TFloatRect;	//rectangle
+    ftyp : Byte;	//fill type
+    etyp : Byte;	//edge type
+    fspac : Single;	//fill spacing
+    flencnt : TFLENCNT ;//fill stitch length or clpboard count
+    angclp : TFANGCLP;	//fill angle or clpboard data pointer
+    esiz,	//border size
+    espac,	//edge spacing
+    elen : TFloat;	//edge stitch length
+    res : word;	//pico length
+
+    xat: Cardinal;	//attribute extension
+    fmax,	//maximum fill stitch length
+    fmin,	//minimum fill stitch length
+    emax,	//maximum border stitch length
+    emin: Single;	//minimum border stitch length
+    dhx : TTFHED;	//feather/texture info
+    strt,	//fill strt point
+    endp : Word;	//fill end point {end}
+    uspac,//underlay spacing
+    ulen,	//underlay stitch length
+    uang,	//underlay stitch angle
+    wind,	//underlay/edge walk indent
+    txof : Single;	//gradient end density
+    ucol,	//underlay color
+    cres : Byte	//reserved
+  end; //FRMHED;
+
+  TFRMHEDO = packed record // #995
+    at : Byte;		//attribute
+    sids : Word;	//number of sides
+    typ : Byte;	//type
+    fcol : byte;	//fill color
+    bcol : Byte;	//border color
+    nclp : Word;	//number of border clipboard entries
+    flt : TFloatPoint ;	//points
+    sacang : TSACANG;	//satin guidlines or angle clipboard fill angle
+    clp : TFloatPoint;	//border clipboard data
+    stpt : Word;	//number of satin guidlines
+    wpar : Word;	//word parameter
+    rct : TFloatRect;	//rectangle
+    ftyp : Byte;	//fill type
+    etyp : Byte;	//edge type
+    fspac : Single;	//fill spacing
+    flencnt : TFLENCNT ;//fill stitch length or clpboard count
+    angclp : TFANGCLP;	//fill angle or clpboard data pointer
+    esiz,	//border size
+    espac,	//edge spacing
+    elen : TFloat;	//edge stitch length
+    res : word;	//pico length
+  end;//FRMHEDO;
 
 implementation
 
