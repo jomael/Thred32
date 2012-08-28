@@ -4,7 +4,175 @@ interface
 
 
 const
-  OLD_NUM = 4; // number of old filenames saved on file menu (thred.h #105)
+// compile switches (thred.h #1)
+  // TODO: maybe these should be defined in a *.inc file.
+  PESACT     = 0;		// compile pes code
+  BUGBAK     = 0;		// turn bakseq off
+
+  TRCMTH     = 1;		// 0=brightness compard, 1=color compare
+
+  RUTVALID   = 1;
+	COMVALID   = 2;
+  REGVALID   = 4;
+
+	RUTSED     = 1232323232;
+  COMSED     = 1323232323;
+  TIMSED     = 1313131313;
+  TIMSIG     = 2211221122;          // time signature for trial operation
+  DAY1	     = 864000000000;	      // file time ticks in a day
+  DAY31	     = 26784000000000;	    // file time ticks in 31 days
+  DAY400     = 345600000000000;	    // file time ticks in 400 days
+  TRILIM     = 100;			      	    // expired trial clipboard limit
+  SRTIM	     = 20000000;		        // sort time limit in 100 ns intervals
+// end of trial version codes
+
+// daisy codes
+  DAZPETS    = 5;		                // petals
+  DAZCNT	   = 10;		              // petal points
+  DAZICNT	   = 2;		                // petal inner points
+  DAZLEN     = 15;		              // diameter
+  DAZPLEN	   = 20;		              // petal length
+  DAZHLEN	   = 5;		                // hole size
+  DAZTYP	   = 5;		                // border type
+  DAZMCNT    = 7;		                // mirror count
+//end of daisy codes
+
+  TXTRAT     = 0.95;               	// texture fill clipboard shrink/grow ratio
+  MAXMSK     = $FFFF0000;	          // for checking for greater than 65536
+  MAXSEQ     = 65536;	              // maximum number of points in the sequence list
+
+  DEFBPIX	   = 4;		                // default form box pixels
+  MAXWLK	   = 54;		              // max underlay/edge walk stitch length
+  MINWLK	   = 2.4;		              // max underlay/edge walk stitch length
+  DEFULEN	   = 12;		              // default underlay stitch length
+  DEFUSPAC   = 6;		                // default underlay stitch spacing
+
+  IWAVPNTS   = 36;		              // default wave points
+  IWAVSTRT   = 10;		              // default wave start
+  IWAVEND	   = 26;		              // default wave end
+  IWAVS	     = 5;		                // default wave lobes
+  THRLED0	   = $746872;             // lead dword value for thred file v 1.0
+  THRLED1	   = $1746872;	          // lead dword value for thred file v 1.1
+  MAXFLT	   = 65536;	              // maximum number of floating point items, form & clipboard points
+  ZUMFCT	   = 0.65;	              // zoom factor
+  PAGSCROL   = 0.9;		              // page scroll factor
+  LINSCROL   = 0.05;	              // line scroll factor
+  TXTSIDS	   = 6;		                // extra pixels in a text box
+  MAXPCS	   = 131072;	            // maximum possible stiches in a pcs file*2
+  MAXCHNG	   = 10000;	              // maximum number of color changes
+  SHUPX		   = 480;		              // small hoop x size
+  SHUPY	     = 480;		              // small hoop y size
+  LHUPX	     = 719;		              // large hoop x size
+  LHUPY	     = 690;		              // large hoop y size
+  HUP100XY   = 600;		              // 100 millimeter hoop size
+  PFGRAN     = 6;		                // pfaf "pixels" per millimeter
+  TSIZ30     = 0.3;		              // #30 thread size in millimeters
+  TSIZ40     = 0.2;		              // #40 thread size in millimeters
+  TSIZ60     = 0.05;	              // #60 thread size in millimeters
+  SCROLSIZ   = 12;		              // width of a scroll bar
+  COLSIZ     = 12;		              // width of the color bar
+  RIGHTSIZ   = 24;		              // SCROLSIZ+COLSIZ
+  CLOSENUF   = 10;		              // mouse click region for select
+  ZMARGIN	   = 1.25;	              // zoom margin for select zooms
+  SMALSIZ	   = 0.25;	              // default small stitch size
+  MINSIZ     = 0.1;		              // default minimum stitch size
+  USESIZ     = 3.5;		              // user preferred size
+  MAXSIZ     = 9.0;		              // default maximum stitch size
+  PFAFGRAN   = 6;		                // pfaf stitch points per millimeter
+  RMAPSIZ	   = 65536;	              // a bit for each stitch
+  RMAPBITS   = (RMAPSIZ shl 5);	    // a bit for each stitch
+  MINZUM     = 5;	                  // minimum zoom in stitch points
+  MAXZLEV	   = 9;		                // maximum levels of zoom
+  SHOPNTS	   = 0.00;	              // show stitch points when zoom below this
+  STCHBOX	   = 0.4226;	            // show stitch boxes when zoom below this
+  BITCOL	   = $FFFF00;             // default bitmap color
+  MAXFORMS   = 1024;	              // maximum number of forms
+  FORMFCT	   = 0.05;	              // new forms part of screen
+  MAXDELAY   = 600;		              // maximum movie delay
+  MINDELAY   = 1;		                // minimum movie delay
+  MOVITIM	   = 12;		              // default movie time
+  DEFSPACE   = 0.45;	              // default stitch spacing
+  JMPSPACE   = 13;		              // default jump stitch spacing
+  DEFANG	   = 0.785398163397448;   // default fill angle, 45 degrees
+  MAXFRMLINS = 20000;	              // maximum lines in a form
+  MSGSIZ     = 8192;	              // size of the message buffer
+  PI         = 3.1415926535898;
+  PI2	       = 6.2831853071796;
+  MAXSTCH	   = 54;		              // maximum permitted stitch length for pfaf in pfaf "stitch pixels"
+  USPAC	     = 15;		              // underlay fill spacing
+  APSPAC     = 10.8;	              // applique border spacing
+  OSEQLEN	   = 262144;             	// output sequence length
+  BSEQLEN	   = (OSEQLEN shl 1);	    // reverse sequence length
+  MAXRAT	   = 3;		                // maximum number of stitches in one place in satin border
+  URAT       = 0.75;	              // ratio of underlay stitch to satin border size
+  PURAT	     = 0.6;		              // for perp satin corners
+  DIURAT     = 0.125;	              // (1-URAT)/2
+  DOURAT     = 0.8125;	            // (1-URAT)/2+URAT
+  MINRCT     = 12;		              // minimum dimension of a form select rectangle
+  OLDNUM     = 4;	                 	// number of old filenames saved on file menu
+  OLDVER     = 4;		                // number of old file versions kept
+  TINY       = 1e-6;	              // tiny number for floating point stuff
+  SPEDLIN	   = 30;		              // speed change for line message on speed scroll bar
+  SPEDPAG	   = 120;		              // speed change for page message on speed scroll bar
+  KNOTLEN	   = 54;		              // set knots for stitches longer than this
+  MAXFRMPNTS = 65536;	              // maximum total form points
+  MAXCLPNTS	 = 65536;	              // maximum total cliboard storage in forms
+  MAXSAC     = 10000;             	// maximum number of satin guidlins
+  MAXKNOTS   = 16384;	              // maximum nuber of knots
+  IBFCLEN	   = 4 * PFGRAN;          // initial buttonhole fill corner length
+  IPICSPAC   = 6;		                // initial picot border space
+  PRFLINS	   = 28;		              // number of lines on the prefernece menu
+  EDGETYPS   = 12;		              // number of border fill types
+  SEED       = 3037000499;          // pseudo-random-sequence seed
+  FSED       = 1340007303;          // feather seqence seed
+  NAMSED     = 2222222222;          // trial version psg seed
+  DSTRAT     = 0.8333333333333333;	// ratio of dst stitch points to PFAFF stitch points
+  HUPS       = 5;	                	// number of hoops the user can select
+  NORDSED	   = $5A5A5A5A;	          // name order seed
+  NCODSED	   = $73EF5A7E;	          // name encoding seed
+  NCODOF     = 80;			            // name encoding offset
+  CLPMIN     = 0.5;		              // if clipboard data less wide, then don't fill
+  CLPMINAUT	 = 1.2;		              // for skinny vertical clips
+  BRDWID     = 18;		              // default sating border size
+  SNPLEN     = 0.15;	              // default snap together length size
+  STARAT     = 0.4;		              // default star ratio
+  SPIRWRAP   = 1.52;	              // default spiral wrap
+  BALNORM	   = $80;			            // normal balarad stitch
+  BALJUMP	   = $81;			            // balarad jump stitch
+  BALSTOP	   = 0;				            // balarad stop
+  COLVER     = $776874;	            // color file version
+  PESCMSK	   = $3F;		              // pes color mask
+  REDCOL     = $FF;	        	      // code for the color red
+  GRNCOL     = $FF00;	       	      // code for the color green
+  BLUCOL     = $FF0000;	            // code for the color blue
+  REDMSK     = $FFFF00;	            // mask for the color red
+  GRNMSK     = $FF00FF;	            // mask for the color green
+  BLUMSK     = $00FFFF;	            // mask for the color blue
+  TRACLEN	   = 1;			              // initial trace length
+  TRACRAT	   = 1.00001;		          // initial trace ratio
+  CHSDEF	   = 24;			            // default chain stitch length
+  CHRDEF     = 0.25;		            // default chain stitch ratio
+  NUGINI     = 2;			              // default nudge step
+  DEFPIX     = 2;			              // default nudge pixels
+  DEFEGRAT   = 1.5;			            // default egg ratio
+  DEFPNTPIX	 = 4;			              // default form and stitch point pixels
+  HBUFSIZ	   = 1024;	       	      // help buffer size
+  HIGRD	     = $FFFFFF;	            // grid high color
+  MEDGRD     = $404040;	            // grid medium color
+  DEFGRD     = $202020;	            // grid default color
+  REDGRD     = $ff2020;	            // grid red color
+  BLUGRD     = $20ff20;	            // grid green color
+  GRNGRD     = $2020FF;	            // grid blue color
+  FDEFRAT	   = 0.6;			            // default feather ratio
+  FDEFUP     = 10;		      	      // default feather up count
+  FDEFDWN	   = 5;			              // default feather down count
+  FDEFFLR	   = 9;			              // default feather floor
+  FDEFNUM	   = 10;		      	      // default feather number
+  FDEFTYP	   = 4;                   // default feather type (FTHPSG in TFeatherFillTypes enum)
+  ITXHI	     = 9 * PFGRAN;  	      // default texture editor heigth
+  ITXWID     = 9 * PFGRAN;	        // default texture editor width
+  ITXSPAC	   = 0.40 * PFGRAN;	      // default texture editor spacing
+  ITXPIX     = 5;
 
   //stitch mask //thred.h 831
   COLMSK		= $0000000f; //COLOR MASK

@@ -9,7 +9,7 @@ uses
   Thred_Constants;
 
 type
-  TOldNameCharArray = array [0..OLD_NUM - 1, 0..MAX_PATH - 1] of Char;
+  TOldNameCharArray = array [0..OLDNUM - 1, 0..MAX_PATH - 1] of Char;
   T16Colors = array [0..15] of TColor;
 
   TSTRHED = packed record 		//structure thred file header
@@ -53,6 +53,14 @@ type
     fCols : T16Colors;
     stchs : Word;
   end; //HED;
+
+  // thred.h #668
+  TFeatherFillTypes = ( FTHSIN=1,  // sine
+                        FTHSIN2,	 // half sine
+                        FTHLIN,	   // line
+                        FTHPSG,	   // psuedo-random sequence
+                        FTHRMP,	   // sawtooth
+                        FTHFAZ );  // phase
 
   // ini file structure (INIFIL in thred.h, #691)
   TThredIniFile = packed record
