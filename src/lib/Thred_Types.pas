@@ -233,9 +233,9 @@ end; //SACANG;
     fcol : byte;	//fill color
     bcol : Byte;	//border color
     nclp : Word;	//number of border clipboard entries
-    flt : TFloatPoint ;	//points
+    flt : PArrayOfFloatPoint ;	//points*
     sacang : TSACANG;	//satin guidlines or angle clipboard fill angle
-    clp : TFloatPoint;	//border clipboard data
+    clp : PArrayOfFloatPoint;	//border clipboard data*
     stpt : Word;	//number of satin guidlines
     wpar : Word;	//word parameter
     rct : TFloatRect;	//rectangle
@@ -273,9 +273,9 @@ end; //SACANG;
     fcol : byte;	//fill color
     bcol : Byte;	//border color
     nclp : Word;	//number of border clipboard entries
-    flt : TFloatPoint ;	//points
+    flt : PArrayOfFloatPoint ;	//points*
     sacang : TSACANG;	//satin guidlines or angle clipboard fill angle
-    clp : TFloatPoint;	//border clipboard data
+    clp : PArrayOfFloatPoint;	//border clipboard data*
     stpt : Word;	//number of satin guidlines
     wpar : Word;	//word parameter
     rct : TFloatRect;	//rectangle

@@ -281,7 +281,7 @@ begin
 //#5813                        if(formpnt>MAXFORMS)
 //#5814                            formpnt=MAXFORMS;
 //#5815                        inf=0;ing=0,inh=0;
-  formpnt := min(sthed.fpnts, MAXFORMS);
+  formpnt := min(sthed.fpnt, MAXFORMS);
 
   //FORM
 //#5816                        if(formpnt){
