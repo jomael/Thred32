@@ -35,8 +35,12 @@ type
     grd1: TStringGrid;
     btn1: TButton;
     grd2: TStringGrid;
+    btn2: TButton;
+    btn3: TButton;
     procedure btn1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure btn2Click(Sender: TObject);
+    procedure btn3Click(Sender: TObject);
   private
     { Private declarations }
     FFrmHed01 : TFRMHEDO;
@@ -187,6 +191,26 @@ begin
     if a.flt[y].Y <> b.flt[y].Y then
       Result := falSe;
   end;
+end;
+
+procedure TForm1.btn2Click(Sender: TObject);
+begin
+  if SizeOf(FFrmHed01.flt) = SizeOf(TFloatPoint) then
+    MessageDlg('SizeOf(FFrmHed01.flt) = SizeOf(TFloatPoint)',mtInformation, [mbOK],0)
+  else
+    MessageDlg('SizeOf(FFrmHed01.flt) <> SizeOf(TFloatPoint)'#13 +
+    Format('SizeOf(FFrmHed01.flt)=%d SizeOf(TFloatPoint)=%d',[SizeOf(FFrmHed01.flt), SizeOf(TFloatPoint)]),mtError, [mbOK],0);
+
+end;
+
+procedure TForm1.btn3Click(Sender: TObject);
+begin
+  if SizeOf(TArrayOfFloatPoint) = SizeOf(TFloatPoint) then
+    MessageDlg('SizeOf(TArrayOfFloatPoint) = SizeOf(TFloatPoint)',mtInformation, [mbOK],0)
+  else
+    MessageDlg('SizeOf(TArrayOfFloatPoint) <> SizeOf(TFloatPoint)'#13 +
+    Format('SizeOf(TArrayOfFloatPoint)=%d SizeOf(TFloatPoint)=%d',[SizeOf(TArrayOfFloatPoint), SizeOf(TFloatPoint)]) ,mtError, [mbOK],0);
+
 end;
 
 end.

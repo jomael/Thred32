@@ -45,4 +45,22 @@ object Form1: TForm1
     FixedRows = 0
     TabOrder = 2
   end
+  object btn2: TButton
+    Left = 320
+    Top = 232
+    Width = 75
+    Height = 25
+    Caption = 'btn2'
+    TabOrder = 3
+    OnClick = btn2Click
+  end
+  object btn3: TButton
+    Left = 320
+    Top = 280
+    Width = 75
+    Height = 25
+    Caption = 'btn3'
+    TabOrder = 4
+    OnClick = btn3Click
+  end
 end
