@@ -85,6 +85,9 @@ type
     FColors: T16Colors;
     FCustomColors: T16Colors;
     FThreadSize: T16Byte;
+    FForms: TArrayOfTFRMHED;
+    FStitchs: TArrayOfTSHRTPNT;
+    FHeaderEx: TSTREX;
   protected
     procedure Update(Item: TCollectionItem); override;
   
@@ -121,12 +124,16 @@ type
     
 
     property OnChange             : TNotifyEvent    read FOnChange        write FOnChange;
+
     property Header : TSTRHED read FHeader write FHeader;
+    property HeaderEx : TSTREX read FHeaderEx write FHeaderEx;
     property BName : string read FBName write FBName;
-    property ThreadSize : T16Byte read FThreadSize write FThreadSize;  
+    property ThreadSize : T16Byte read FThreadSize write FThreadSize;
     property BgColor : TColor read FBgColor write FBgColor;
     property Colors : T16Colors read FColors write FColors;
-    property CustomColors : T16Colors read FCustomColors write FCustomColors; 
+    property CustomColors : T16Colors read FCustomColors write FCustomColors;
+    property Forms : TArrayOfTFRMHED read FForms write FForms;
+    property Stitchs : TArrayOfTSHRTPNT read FStitchs write Fstitchs; 
 
 
   end;

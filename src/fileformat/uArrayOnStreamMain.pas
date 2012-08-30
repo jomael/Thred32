@@ -199,7 +199,7 @@ begin
     MessageDlg('SizeOf(FFrmHed01.flt) = SizeOf(TFloatPoint)',mtInformation, [mbOK],0)
   else
     MessageDlg('SizeOf(FFrmHed01.flt) <> SizeOf(TFloatPoint)'#13 +
-    Format('SizeOf(FFrmHed01.flt)=%d SizeOf(TFloatPoint)=%d',[SizeOf(FFrmHed01.flt), SizeOf(TFloatPoint)]),mtError, [mbOK],0);
+    Format('SizeOf(FFrmHed01.flt)=%d SizeOf(TFloatPoint)=%d',[SizeOf(FFrmHed01.flt) , SizeOf(TFloatPoint)]),mtError, [mbOK],0);
 
 end;
 

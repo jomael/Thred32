@@ -63,7 +63,7 @@ implementation
 uses
   Math,
   Thred_Types, Thred_Constants,
-  GR32
+  GR32, GR32_Polygons
   //, GR32_LowLevel
   ;
 { TgmConverter }
@@ -85,18 +85,22 @@ var
   sthed : TSTRHED;
   item  : TSHRTPNT;
   hedx : TSTREX;
-  LCollection : TStitchCollection;
+  LDesign : TStitchCollection;
   c : TColor;
   c16 : T16Colors;
   buf : array[0..17] of Char;
   Bytes : T16Byte;
+  zum0 : TPoint;
+  zRct : TRect; 
 
+  LTempstchs, Lstchs : TArrayOfTSHRTPNT;
   Lflts,
   Lclps : TArrayOfFloatPoint;//array of TFLPNT;
-  Lsatks :array of  TSATCON;
+  Lsatks :TArrayOfTSATCON;
   Ltxpnts : array of TTXPNT;
   Lfrmlstx : array of TFRMHEDO;
-  Lformlst : array of TFRMHED;
+  Lformlst : TArrayOfTFRMHED;
+  clpad,satkad,fltad : Integer;
 
   procedure xofrm();
   var ind : Cardinal;
@@ -108,9 +112,52 @@ var
     for ind :=0 to formpnt -1 do
       Move(Lformlst[ind], Lfrmlstx[ind],sizeof(TFRMHEDO));
   end;
+
+  function adflt(cnt: Cardinal): TArrayOfFloatPoint;
+  var ind : Cardinal;
+  begin
+	  ind := fltad;
+    if(fltad+cnt>MAXFLT) then
+      raise Exception.Create(IDS_FRMOVR);
+    Inc(fltad,cnt);
+    Result := TArrayOfFloatPoint(@Lflts[ind]);
+  end;
+
+  function adsatk(cnt: Cardinal) : TArrayOfTSATCON;
+  var ind : Cardinal;
+  begin
+	  ind:=satkad;
+    Inc(satkad, cnt);
+    result := TArrayOfTSATCON(@Lsatks[ind]);
+  end;
+
+  function isclp(find: Cardinal):Boolean;
+  begin
+  	Result :=((1 shl Lformlst[find].ftyp) and clpmap) <> 0;
+  end;
+
+  function iseclp(find: Cardinal): Boolean;
+  begin
+    result := (Lformlst[find].etyp=EGCLP) or (Lformlst[find].etyp= EGPIC) or (Lformlst[find].etyp=EGCLPX);
+  end;
+
+  function iseclpx(find: Cardinal): boolean;
+  begin
+	  result := iseclp(find) and (Lformlst[find].nclp <> 0);
+  end;
+
+  function adclp(cnt: Cardinal): TArrayOfFloatPoint;
+  var ind : Cardinal;
+  begin
+	  ind:=clpad;
+
+    Inc(clpad,cnt);
+    result := TArrayOfFloatPoint(@Lclps[ind]);
+  end;
+
 begin
-  LCollection := TStitchCollection(ACollection);
-  LCollection.Clear;
+  LDesign := TStitchCollection(ACollection);
+  LDesign.Clear;
   
   //here we go!
   //validation of stream is already done.
@@ -121,7 +168,7 @@ begin
 //  red := Stream.Read(buf[0],SizeOf(buf));
 
   Stream.Read(sthed,SizeOf(TSTRHED) );
-  LCollection.Header := sthed;
+  LDesign.Header := sthed;
   if sthed.led and $ffffff <> $746872 then                   //#5714                    if((sthed.led&0xffffff)==0x746872){
         raise Exception.Create({IDS_SHRTF} IDS_NOTHR);        //#5717
 
@@ -141,6 +188,19 @@ begin
 //#5724                        case 0:
     0 :
     begin
+      FillChar(hedx, SizeOf(TSTREX),0);
+      if sthed.hup = SMALHUP then
+      begin
+        hedx.xhup := SHUPX;
+        hedx.yhup := SHUPY;
+      end
+      else
+      begin
+        hedx.xhup := LHUPX;
+        hedx.yhup := SHUPY;
+        sthed.hup := LARGHUP;
+      end;  
+
 
 //#5725
 //#5726                            if(hed.hup==SMALHUP){
@@ -159,6 +219,7 @@ begin
 //#5739                            strcpy(hedx.modnam,ini.desnam);
 //#5740                            break;
 //#5741
+
     end;
 
 //#5742                        case 1:
@@ -175,6 +236,8 @@ begin
 //#5750                            }
 //#5751                            ini.hupx=zum0.x=hedx.xhup;
 //#5752                            ini.hupy=zum0.y=hedx.yhup;
+      zum0.X := Round(hedx.xhup);
+      zum0.Y := Round(hedx.yhup);
 //#5753                            redfnam(fildes);
 //#5754                            break;
     end
@@ -190,17 +253,31 @@ begin
 
   end;
 
+  LDesign.HeaderEx := hedx;
+
 //#5761                        zRct.bottom=zRct.left=0;
 //#5762                        zRct.right=zum0.x=ini.hupx;
 //#5763                        zRct.top=zum0.y=ini.hupy;
+  zRct := MakeRect(0,0, zum0.X, zum0.Y);
+  
 //#5764                        hed.stchs=sthed.stchs;
 //#5765                        ReadFile(hFil, (SHRTPNT*)stchs, hed.stchs*sizeof(SHRTPNT), &red, NULL);
-  for i := 0 to sthed.stchs -1 do
+  SetLength(Lstchs, sthed.stchs);
+  //SetLength(LTempstchs, sthed.stchs);
+
+  Stream.Read(Lstchs[0], sthed.stchs * SizeOf(TSHRTPNT));
+  for i := 0 to sthed.stchs do
   begin
-    //Stream.Read(item,red); 
+    Lstchs[i].y := hedx.yhup - Lstchs[i].y;
+  end;
+
+  LDesign.Stitchs := Lstchs;
+  {for i := 0 to sthed.stchs -1 do
+  begin
+    //Stream.Read(item,red);
     //if red = SizeOf(item) then
     LoadItemFromStream(Stream, LCollection.Add);
-  end;
+  end;}
 
 //#5766                        if(red!=hed.stchs*sizeof(SHRTPNT)){
 //#5767
@@ -218,7 +295,7 @@ begin
 //#5778                            return;
 //#5779                        }
   red := Stream.Read(buf[0],16);
-  LCollection.BName := buf;
+  LDesign.BName := buf;
 //  if red <> 16 then    Exit;
 
 //#5780                        ReadFile(hFil,(COLORREF*)&stchBak,4,&red,0);
@@ -230,7 +307,7 @@ begin
 //#5786                            return;
 //#5787                        }
   Stream.Read(c,4);
-  LCollection.BgColor := c;
+  LDesign.BgColor := c;
 //#5788                        hStchBak=CreateSolidBrush(stchBak);
 
 
@@ -242,7 +319,7 @@ begin
 //#5794                            return;
 //#5795                        }
   Stream.Read(c16[0], 64);
-  LCollection.Colors := c16;
+  LDesign.Colors := c16;
 
 //#5796                        ReadFile(hFil,(COLORREF*)custCol,64,&red,0);
 //#5797                        tred+=red;
@@ -252,7 +329,7 @@ begin
 //#5801                            return;
 //#5802                        }
   Stream.Read(c16, 64);
-  LCollection.CustomColors := c16;
+  LDesign.CustomColors := c16;
 
   //THREAD SIZE (ON SCREEN)
 //#5803                        ReadFile(hFil,(TCHAR*)msgbuf,16,&red,0);
@@ -272,7 +349,7 @@ begin
   begin
      Bytes[i] := Bytes[i] * 10;
   end;
-  LCollection.ThreadSize := Bytes;
+  LDesign.ThreadSize := Bytes;
 //#5810                        for(ind=0;ind<16;ind++)
 //#5811                            thrdSiz[ind][0]=msgbuf[ind];
 
@@ -289,6 +366,9 @@ begin
   begin
 //#5817
 //#5818                            ind=fltad=satkad=clpad=0;
+    fltad := 0;
+    satkad := 0;
+    clpad := 0;
 //#5819                            msgbuf[0]=0;                                               
 //#5820                            if(vervar<2){
 
@@ -372,8 +452,9 @@ begin
 //#5866                            for(ind=0;ind<formpnt;ind++){
     for i := 0 to formpnt -1 do
     begin
-      //Lformlst[i].flt :=
-//#5867
+      Lformlst[i].flt := adflt(Lformlst[i].sids);
+      if Lformlst[i].typ = SAT then
+      begin
 //#5868                                formlst[ind].flt=adflt(formlst[ind].sids);
 //#5869                                if(formlst[ind].typ==SAT){
 
@@ -382,11 +463,19 @@ begin
   //STPT = number of satin guidlines
 //#5871                                    if(formlst[ind].stpt)
 //#5872                                        formlst[ind].sacang.sac=adsatk(formlst[ind].stpt);
+        if LFormlst[i].stpt > 0 then
+          lformlst[i].sacang.sac := adsatk(Lformlst[i].stpt);
 //#5873                                }
+      end;
 
   //HAS CLIPBOARD?
+      if isclp(i) then
+        Lformlst[i].angclp.clp := adclp(lformlst[i].flencnt.nclp);
 //#5874                                if(isclp(ind))
 //#5875                                    formlst[ind].angclp.clp=adclp(formlst[ind].flencnt.nclp);
+
+      if iseclpx(i) then
+        Lformlst[i].clp := adclp(lformlst[i].nclp);
 //#5876                                if(iseclpx(ind))
 //#5877                                    formlst[ind].clp=adclp(formlst[ind].nclp);
 //#5878                            }
@@ -399,6 +488,7 @@ begin
 //#5879                            setfchk();
 //#5880                        }
   end;
+  LDesign.Forms := lformlst;
 //#5881                    }                                                       
 //#5882                    else                                                       
 //#5883                        tabmsg(IDS_NOTHR);

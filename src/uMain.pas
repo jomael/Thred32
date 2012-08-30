@@ -6,7 +6,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, XPMan,
   Thred_Types, stitch_Items,
-  StdCtrls, gmGridBased_List, gmSwatch_List, GR32_Image,
+  StdCtrls, gmGridBased_List, gmSwatch_List,
+  GR32_Image, GR32,
   gmGridBased_ListView, gmSwatch_ListView, gmGridBased_FileDlg,
   gmSwatch_FileDlgs, ComCtrls, JvExComCtrls, JvPageScroller, ExtCtrls;
 
@@ -257,6 +258,7 @@ type
     swa1: TgmSwatchListView;
     spl1: TSplitter;
     pgscrlr1: TPageScroller;
+    pb: TPaintBox32;
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
@@ -281,6 +283,8 @@ type
       Rect: TRect; State: TOwnerDrawState);
     procedure LoadColorfromfile1Click(Sender: TObject);
     procedure EditColor1Click(Sender: TObject);
+    procedure mnu_HLPClick(Sender: TObject);
+    procedure pbPaintBuffer(Sender: TObject);
   private
     filnam : TFileName;
     FIni: TThredIniFile;
@@ -925,7 +929,7 @@ uses Thred_Constants, Thred_Defaults,
 //#612    FLRCT                chkhuprct;        //for checking the hoop size                                               
 //#613    unsigned            daz;            //days untill a merchant key expires                                               
 //#614    BALSTCH*            pbal;            //balarad stitch pointer                                               
-//#615    FLPNT                balof;            //balarad offset                                           
+//#615    FLPNT                balof;            //balarad offset
 //#616    unsigned            clpmap=MCLPF|MVCLPF|MHCLPF|MANGCLPF; //for checking if a fill is a clipboard fill                                                           
 //#617    unsigned            bakstch=0;        //stitch count for last message                                                   
 //#618    SHRTPNT*            stchsr;            //rotated stitches for rotate and save                                               
@@ -13014,6 +13018,7 @@ begin
 
 
     lstCustomColor.Invalidate;
+    pb.Invalidate;
 
     Free;
   end;
@@ -24212,7 +24217,7 @@ begin
     Canvas.FillRect(Rect);
     Canvas.TextOut(Rect.Left, Rect.Top, Items[index]);
 
-  end;  
+  end;
 end;
 
 procedure TfrmMain.LoadColorfromfile1Click(Sender: TObject);
@@ -24229,6 +24234,45 @@ begin
   for i := 0 to swlCustom.Count - 1 do
     dlgColor1.CustomColors.Add(Format('Color%s=%s',[chr(64+i),IntToHex(swlCustom[i].Color, 8) ]));
   dlgColor1.Execute;
+end;
+
+procedure TfrmMain.mnu_HLPClick(Sender: TObject);
+begin
+//  with TgmColorDialog.create(self) do
+end;
+
+procedure TfrmMain.pbPaintBuffer(Sender: TObject);
+var i : Integer;
+  zRat : TFloatPoint;
+begin
+
+  if Length(FStitchs.Stitchs) > 0 then
+  begin
+    zRat.X := (pb.Width / FStitchs.HeaderEx.xhup );
+    zRat.Y := (pb.Height / FStitchs.HeaderEx.yhup );
+    if zRat.X < zRat.Y then
+      zRat.Y := zRat.X
+    else
+      zRat.X := zRat.Y;
+
+    pb.Buffer.Clear(clWhite32);
+    pb.Buffer.FillRectTS(MakeRect(FloatRect(0,0, FStitchs.HeaderEx.xhup * zRat.X, FStitchs.HeaderEx.yhup * zRat.Y)), Color32(FStitchs.BgColor));
+    for i := 0 to High(FStitchs.stitchs) do
+    begin
+      pb.Buffer.PenColor:= clBlack32;
+      with FStitchs.stitchs[i] do
+      begin
+        pb.Buffer.PenColor := Color32( FStitchs.Colors[ at and $0F] );
+        if i = 0 then
+          pb.Buffer.MoveToF(x * zRat.X, y * zRat.Y)
+        else
+          pb.Buffer.LineToFS(x * zRat.X, y * zRat.Y);
+      end;
+    end;
+
+
+
+  end;  
 end;
 
 end.

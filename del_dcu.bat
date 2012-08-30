@@ -9,9 +9,9 @@ del *.identcache %DEL_PARAMS%
 del *.stat %DEL_PARAMS%
 del *.bak %DEL_PARAMS%
 del *.pas.bak %DEL_PARAMS%
-del *.dsk %DEL_PARAMS%
+rem ;del *;.dsk %DEL_PARAMS%
 del *.drc %DEL_PARAMS%
-rem del *.cfg %DEL_PARAMS%
+rem del *;.cfg %DEL_PARAMS%
 del *.tvsconfig %DEL_PARAMS%
 del *.groupproj.local %DEL_PARAMS%
 

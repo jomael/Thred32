@@ -11,6 +11,30 @@ const
   BUGBAK     = 0;		// turn bakseq off
   //MAXFORMS	=1024;	//maximum number of forms (thred.h #81)
 
+//form types enum
+	LIN   =1;
+	POLI  =2;
+	RPOLI =3;
+	STAR  =4;
+	SPIR  =5;
+	SAT   =6;
+	HART  =7;
+	LENS  =8;
+	EGG   =9;
+	TEAR  =10;
+	ZIG   =11;
+	WAV   =12;
+	DASY  =13;
+
+  // enum{thred.ha #346}
+
+	SETCUST =1;		//set the custom hoop
+	SMALHUP =2;		//pfaf code for small hoop
+	LARGHUP =3;		//pfaf code for large hoop
+	HUP100  =4;			//100 millimeter hoop
+	CUSTHUP =5;		//user defined hoop size
+
+
   TRCMTH     = 1;		// 0=brightness compard, 1=color compare
 
   RUTVALID   = 1;
@@ -221,6 +245,49 @@ const
   SRTMSK		= $61f03fff;
   SRTYPMSK	= $61700000;
   NOTFRM		= $00080000;
+
+  //#1556
+  //edge fill types enum{
+
+	EGLIN =1;
+	EGBLD =2;
+	EGCLP =3;
+	EGSAT =4;
+	EGAP  =5;
+	EGPRP =6;
+	EGHOL =7;
+	EGPIC =8;
+	EGDUB =9;
+	EGCHNL  =10;
+	EGCHNH  =11;
+	EGCLPX  =12;
+
+
+  //#1632
+  //fill types enum{
+
+	VRTF  =1;
+	HORF  =2;
+	ANGF  =3;
+	SATF  =4;
+	CLPF  =5;
+	CONTF =6;
+	VCLPF =7;
+	HCLPF =8;
+	ANGCLPF =9;
+	FTHF    =10;
+	TXVRTF  =11;
+	TXHORF  =12;
+	TXANGF  =13;
+
+  //#1648
+  MCLPF		  =1 shl CLPF;
+  MVCLPF		=1 shl VCLPF;
+  MHCLPF		=1 shl HCLPF;
+  MANGCLPF	=1 shl ANGCLPF;
+
+  //#616    unsigned
+  clpmap : Cardinal = MCLPF or MVCLPF or MHCLPF or MANGCLPF; //for checking if a fill is a clipboard fill                                                           
 
 resourcestring
     IDS_FSELB                = 'No border stiches';

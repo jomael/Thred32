@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 257
-  Top = 157
+  Left = 279
+  Top = 253
   Width = 679
   Height = 585
   Caption = 'frmMain'
@@ -59,6 +59,7 @@ object frmMain: TfrmMain
       '16')
     ParentFont = False
     TabOrder = 0
+    Visible = False
     OnDrawItem = lstCustomColorDrawItem
   end
   object lst2: TListBox
@@ -92,6 +93,7 @@ object frmMain: TfrmMain
       '16')
     ParentFont = False
     TabOrder = 1
+    Visible = False
     OnDrawItem = lst2DrawItem
   end
   object lst3: TListBox
@@ -125,6 +127,7 @@ object frmMain: TfrmMain
       '16')
     ParentFont = False
     TabOrder = 2
+    Visible = False
     OnDrawItem = lst3DrawItem
   end
   object lst4: TListBox
@@ -158,6 +161,7 @@ object frmMain: TfrmMain
       '16')
     ParentFont = False
     TabOrder = 3
+    Visible = False
     OnDrawItem = lst4DrawItem
   end
   object lst5: TListBox
@@ -191,6 +195,7 @@ object frmMain: TfrmMain
       '16')
     ParentFont = False
     TabOrder = 4
+    Visible = False
     OnDrawItem = lst5DrawItem
   end
   object swaDefault: TgmSwatchListView
@@ -256,6 +261,15 @@ object frmMain: TfrmMain
       CellBorderStyle = borContrasGrid
       FrameColor = clGray
     end
+  end
+  object pb: TPaintBox32
+    Left = 63
+    Top = 0
+    Width = 604
+    Height = 483
+    Align = alClient
+    TabOrder = 8
+    OnPaintBuffer = pbPaintBuffer
   end
   object mm1: TMainMenu
     Left = 552
@@ -1072,6 +1086,7 @@ object frmMain: TfrmMain
     end
     object mnu_HLP: TMenuItem
       Caption = '&help'
+      OnClick = mnu_HLPClick
     end
   end
   object dlgOpen1: TOpenDialog

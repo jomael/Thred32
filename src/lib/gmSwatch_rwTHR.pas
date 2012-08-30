@@ -1,5 +1,4 @@
 unit gmSwatch_rwTHR;
-//unit gmSwatch_rwACO;
 (* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/LGPL 2.1/GPL 2.0
  *
@@ -15,15 +14,10 @@ unit gmSwatch_rwTHR;
  *
  * The Initial Developer of the Original Code are
  *
- * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  * x2nie - Fathony Luthfillah  <x2nie@yahoo.com>
+ * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  *
  * Contributor(s):
- *
- * Lab to RGB color conversion is using RGBCIEUtils.pas under mbColorLib library
- * developed by Marko Binic' marko_binic [at] yahoo [dot] com
- * or mbinic [at] gmail [dot] com.
- * forums : http://mxs.bergsoft.net/forums
  *
  *
  * Alternatively, the contents of this file may be used under the terms of

@@ -25,6 +25,19 @@ type
 
 
 
+  TSHRTPNT = packed  record //thred stitch structure
+    x, y : Single;
+    at: Cardinal; //attribute
+  end;
+
+  TArrayOfTSHRTPNT = array of TSHRTPNT;
+
+
+  TTXPNT = packed record		//textured fill point
+    y : Single;
+    lin : SmallInt;
+  end; //TXPNT;
+
   TSTRHED = packed record 		//structure thred file header
     led : Cardinal;
     len : Cardinal;	//length of strhed + length of stitch data
@@ -38,18 +51,6 @@ type
     epnts,	//points to clipboard data
     ecnt : WORD;	//clipboard data count
   end; //STRHED
-
-  TSHRTPNT = packed  record //thred stitch structure
-    x,
-    y : Single;
-    at: Cardinal;
-  end;
-
-  TTXPNT = packed record		//textured fill point
-    y : Single;
-    lin : SmallInt;
-  end; //TXPNT;
-
 
   //thred v1.0 file header extension
   TSTREX = packed record
@@ -192,16 +193,21 @@ TTFHED = packed record
 	txt : TTXHED;
 end;//TFHED;
 
-TSATCON = packed record
+TSATCON = record
 	strt,
 	fin : Word; //finish
 end; //SATCON;
 
+PArrayOfTSATCON = ^TArrayOfTSATCON;
+TArrayOfTSATCON = array of TSATCON;
+
+
 TFANGCLP = packed record
 	fang : Single;
-	clp : TFLPNT;
+	clp : TArrayOfFloatPoint;
 	sat : TSATCON;
 end; //FANGCLP;
+
 
 TFLENCNT = packed record
 	flen : Single;
@@ -209,9 +215,11 @@ TFLENCNT = packed record
 end; //FLENCNT;
 
 TSACANG = packed record
-	sac : TSATCON;
+	sac : TArrayOfTSATCON;
 	ang : Single; //anle
 end; //SACANG;
+
+TArrayOfTSACANG = array of TSACANG;
 
 {
 	fill	elen	espac	esiz	nclp	picspac		crnrsiz		brdend
@@ -233,9 +241,9 @@ end; //SACANG;
     fcol : byte;	//fill color
     bcol : Byte;	//border color
     nclp : Word;	//number of border clipboard entries
-    flt : PArrayOfFloatPoint ;	//points*
+    flt : TArrayOfFloatPoint ;	//points*
     sacang : TSACANG;	//satin guidlines or angle clipboard fill angle
-    clp : PArrayOfFloatPoint;	//border clipboard data*
+    clp : TArrayOfFloatPoint;	//border clipboard data*
     stpt : Word;	//number of satin guidlines
     wpar : Word;	//word parameter
     rct : TFloatRect;	//rectangle
@@ -265,6 +273,8 @@ end; //SACANG;
     ucol,	//underlay color
     cres : Byte	//reserved
   end; //FRMHED;
+
+  TArrayOfTFRMHED = array of TFRMHED;
 
   TFRMHEDO = packed record // #995
     at : Byte;		//attribute
