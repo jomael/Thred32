@@ -87,6 +87,10 @@ type
     property Filter stored IsFilterStored;
   end;
 
+  TSaveStitchsDialog = class(TOpenStitchsDialog)
+  protected
+    function IsSaveDialog : boolean; override;
+  end;
 
 implementation
 
@@ -286,5 +290,12 @@ begin
   Result := SPictureLabel;
 end;}
 
+
+{ TSaveStitchsDialog }
+
+function TSaveStitchsDialog.IsSaveDialog: boolean;
+begin
+  Result := True;
+end;
 
 end.

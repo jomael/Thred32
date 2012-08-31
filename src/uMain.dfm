@@ -304,6 +304,7 @@ object frmMain: TfrmMain
       end
       object mnu_FILE_SAVE2: TMenuItem
         Caption = 'Save (^S, F7)'
+        OnClick = mnu_FILE_SAVE2Click
       end
       object mnu_FILE_SAVE3: TMenuItem
         Caption = 'Save As (F8)'

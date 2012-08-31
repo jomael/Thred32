@@ -285,6 +285,7 @@ type
     procedure EditColor1Click(Sender: TObject);
     procedure mnu_HLPClick(Sender: TObject);
     procedure pbPaintBuffer(Sender: TObject);
+    procedure mnu_FILE_SAVE2Click(Sender: TObject);
   private
     filnam : TFileName;
     FIni: TThredIniFile;
@@ -298,6 +299,7 @@ type
     procedure redini;
     procedure nuFil();
     procedure defpref;
+    procedure save;
     { Private declarations }
   public
     { Public declarations }
@@ -311,7 +313,7 @@ implementation
 
 uses Thred_Constants, Thred_Defaults,
   gmSwatch_rwTHR, gmSwatch_rwACO, gmSwatch_rwSWA, 
-  Stitch_FileDlg, Stitch_rwTHR, Stitch_rwPCS;
+  Stitch_FileDlg, Stitch_rwTHR, Stitch_rwPCS, Stitch_rwPES;
 
 {$R *.dfm}
 
@@ -5953,7 +5955,7 @@ var
   hFil : file;                                                     
 //#5617    #if PESACT                                                                       
 //#5618                                                                           
-//#5619        unsigned        ine;                                                           
+//#5619        unsigned        ine;
 //#5620        PESHED*            peshed;                                                       
 //#5621        TCHAR*            peschr;                                                       
 //#5622        unsigned        pecof;                                                           
@@ -6869,7 +6871,9 @@ end;
 //#6525        }                                                                   
 //#6526        return 0;                                                                   
 //#6527    }                                                                       
-//#6528                                                                           
+//#6528
+procedure TfrmMain.save();
+begin
 //#6529    void sav(){                                                                       
 //#6530                                                                           
 //#6531        unsigned        ind,stind;                                                           
@@ -7131,8 +7135,9 @@ end;
 //#6787            CloseHandle(hPcs);                                                               
 //#6788            if(chku(ROTAUX))                                                               
 //#6789                filnopn(IDS_FILROT,auxnam);                                                           
-//#6790        }                                                                   
-//#6791    }                                                                       
+//#6790        }
+//#6791    }
+end;
 //#6792                                                                           
 //#6793    void savAs(){                                                                       
 //#6794                                                                           
@@ -7179,8 +7184,22 @@ end;
 //#6835            }                                                               
 //#6836        }                                                                   
 //#6837    }                                                                       
-//#6838                                                                           
-//#6839    void save(){                                                                       
+//#6838
+
+procedure TfrmMain.mnu_FILE_SAVE2Click(Sender: TObject);
+begin
+  with TSaveStitchsDialog.Create(Self) do
+  begin
+    if Execute then
+    FStitchs.SaveToFile(FileName);
+    
+
+    Free;
+  end;
+
+
+
+//#6839    void save(){
 //#6840                                                                           
 //#6841        TCHAR*    pchr;                                                               
 //#6842        TCHAR    tchr;                                                               
@@ -7202,7 +7221,9 @@ end;
 //#6858        }                                                                   
 //#6859        else                                                                   
 //#6860            savAs();                                                               
-//#6861    }                                                                       
+//#6861    }
+end;
+                                                                      
 //#6862                                                                           
 //#6863    COLORREF nuCol(COLORREF init){                                                                       
 //#6864                                                                           
@@ -13006,7 +13027,7 @@ begin
 //    FStitchs.Header.
   //  Caption := Caption +
     //    self.Color := FStitchs.BgColor;
-    for i := 0 to 15 do
+    for i := 0 to High(FStitchs.Colors) do
     begin
       if swlCustom.Count < i +1 then
         swlCustom.Add;
@@ -21623,7 +21644,7 @@ end;
 //#21205                setMap(RESTCH);                                                           
 //#21206                break;                                                           
 //#21207                                                                           
-//#21208            case ID_FILE_SAVE2:                                                               
+//#21208            case ID_FILE_SAVE2:
 //#21209                                                                           
 //#21210                colchk();                                                           
 //#21211                save();                                                           
@@ -24019,6 +24040,7 @@ end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 var i : integer;
+  LColors : TArrayOfTColor;
 begin
   FStitchs := TStitchCollection.Create(Self) ;
 
@@ -24059,15 +24081,18 @@ begin
 //#23618
 //#23619            redini();
   redini;
-  FStitchs.Colors := ini.StitchColors;
+  //FStitchs.Colors := ini.StitchColors;
+  SetLength(Lcolors,16);
    for i := 0 to 15 do
     begin
+      LColors[i] := ini.StitchColors[i];
       swlCustom.Add;
-      swlCustom[i].Color := FStitchs.Colors[i];
+      swlCustom[i].Color := LColors[i];
 
       swlDefault.Add;
       swlDefault[i].Color := defCol[i];
     end;
+  FStitchs.Colors := LColors;// ini.StitchColors;
     swa2.Changed;
     swaDefault.Changed;
 //#23620            if(ini.irct.right){
@@ -24244,6 +24269,7 @@ end;
 procedure TfrmMain.pbPaintBuffer(Sender: TObject);
 var i : Integer;
   zRat : TFloatPoint;
+  C :Cardinal;
 begin
 
   if Length(FStitchs.Stitchs) > 0 then
@@ -24262,7 +24288,10 @@ begin
       pb.Buffer.PenColor:= clBlack32;
       with FStitchs.stitchs[i] do
       begin
-        pb.Buffer.PenColor := Color32( FStitchs.Colors[ at and $0F] );
+        c := at and $FF;
+        if c > High(FStitchs.colors) then
+          c := at and $0F;
+        pb.Buffer.PenColor := Color32( FStitchs.Colors[ c ] );
         if i = 0 then
           pb.Buffer.MoveToF(x * zRat.X, y * zRat.Y)
         else
@@ -24274,5 +24303,7 @@ begin
 
   end;  
 end;
+
+
 
 end.

@@ -52,7 +52,7 @@ type
     procedure LoadFromStream(Stream: TStream; ACollection: TCollection); override;
     //procedure LoadItemFromString(Item :TgmSwatchItem; S : string);
     procedure LoadItemFromStream(Stream: TStream; AItem: TCollectionItem); virtual;
-    //procedure SaveToStream(Stream: TStream; ACollection: TCollection); override;
+    procedure SaveToStream(Stream: TStream; ACollection: TCollection); override;
     //procedure SaveItemToStream(Stream: TStream; AItem: TCollectionItem); virtual; abstract;
     class function WantThis(AStream: TStream): Boolean; override;
     //constructor Create; virtual;
@@ -88,6 +88,7 @@ var
   LDesign : TStitchCollection;
   c : TColor;
   c16 : T16Colors;
+  LColors : TArrayOfTColor;
   buf : array[0..17] of Char;
   Bytes : T16Byte;
   zum0 : TPoint;
@@ -197,7 +198,7 @@ begin
       else
       begin
         hedx.xhup := LHUPX;
-        hedx.yhup := SHUPY;
+        hedx.yhup := LHUPY;
         sthed.hup := LARGHUP;
       end;  
 
@@ -263,8 +264,6 @@ begin
 //#5764                        hed.stchs=sthed.stchs;
 //#5765                        ReadFile(hFil, (SHRTPNT*)stchs, hed.stchs*sizeof(SHRTPNT), &red, NULL);
   SetLength(Lstchs, sthed.stchs);
-  //SetLength(LTempstchs, sthed.stchs);
-
   Stream.Read(Lstchs[0], sthed.stchs * SizeOf(TSHRTPNT));
   for i := 0 to sthed.stchs do
   begin
@@ -318,8 +317,14 @@ begin
 //#5793                            prtred();
 //#5794                            return;
 //#5795                        }
+  SetLength(LColors, 16);
   Stream.Read(c16[0], 64);
-  LDesign.Colors := c16;
+  for i := 0 to 15 do
+  begin
+    LColors[i] := c16[i];
+  end;
+
+  LDesign.Colors := LColors;
 
 //#5796                        ReadFile(hFil,(COLORREF*)custCol,64,&red,0);
 //#5797                        tred+=red;
@@ -328,8 +333,8 @@ begin
 //#5800                            prtred();
 //#5801                            return;
 //#5802                        }
-  Stream.Read(c16, 64);
-  LDesign.CustomColors := c16;
+  Stream.Read(c16[0], 64);
+//  LDesign.CustomColors := LColors;
 
   //THREAD SIZE (ON SCREEN)
 //#5803                        ReadFile(hFil,(TCHAR*)msgbuf,16,&red,0);
@@ -408,13 +413,14 @@ begin
 
   //form points
     SetLength(Lflts, sthed.fcnt);
-    Stream.Read(Lflts[0], SizeOf(TFLPNT) * sthed.fcnt);
+    red := Stream.Read(Lflts[0], SizeOf(TFLPNT) * sthed.fcnt);
 //#5842                            ReadFile(hFil,(FLPNT*)flts,sthed.fcnt*sizeof(FLPNT),&red,0);
 //#5843                            if(red!=sizeof(FLPNT)*sthed.fcnt){                                               
 //#5844                                                                           
 //#5845                                fltad=red/sizeof(FLPNT);
 //#5846                                for(ind=fltad;ind<sthed.fcnt;ind++)                                           
-//#5847                                    flts[ind].x=flts[ind].y=0;                                       
+//#5847                                    flts[ind].x=flts[ind].y=0;
+
 //#5848                                setMap(BADFIL);                                           
 //#5849                            }
 
@@ -510,6 +516,13 @@ begin
     ColorIndex := b.at and COLMSK;
     LayerStackIndex := (b.at and LAYMSK) shr LAYSHFT; 
   end;
+
+end;
+
+procedure TStitchTHRConverter.SaveToStream(Stream: TStream;
+  ACollection: TCollection);
+begin
+  inherited;
 
 end;
 

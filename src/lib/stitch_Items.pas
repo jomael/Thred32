@@ -82,8 +82,8 @@ type
     FHeader: TSTRHED;
     FBName: string;
     FBgColor: TColor;
-    FColors: T16Colors;
-    FCustomColors: T16Colors;
+    FColors: TArrayOfTColor;
+    FCustomColors: TArrayOfTColor;
     FThreadSize: T16Byte;
     FForms: TArrayOfTFRMHED;
     FStitchs: TArrayOfTSHRTPNT;
@@ -130,8 +130,8 @@ type
     property BName : string read FBName write FBName;
     property ThreadSize : T16Byte read FThreadSize write FThreadSize;
     property BgColor : TColor read FBgColor write FBgColor;
-    property Colors : T16Colors read FColors write FColors;
-    property CustomColors : T16Colors read FCustomColors write FCustomColors;
+    property Colors : TArrayOfTColor read FColors write FColors;
+    property CustomColors : TArrayOfTColor read FCustomColors write FCustomColors;
     property Forms : TArrayOfTFRMHED read FForms write FForms;
     property Stitchs : TArrayOfTSHRTPNT read FStitchs write Fstitchs; 
 

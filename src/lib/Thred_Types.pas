@@ -11,6 +11,7 @@ uses
 
 type
   TOldNameCharArray = array [0..OLDNUM - 1, 0..MAX_PATH - 1] of Char;
+  TArrayOfTColor = array of TColor;
   T16Colors = array [0..15] of TColor;
   T16Byte   = array [0..15] of Byte;
 
@@ -73,6 +74,32 @@ type
     fCols : T16Colors;
     stchs : Word;
   end; //HED;
+
+  //pes
+  TPESLED = packed record
+      ver : array[0..7] of Char;
+      pec : Cardinal;
+    end;//PESLED;
+
+  //pes ver 1
+  TPESHED = packed record
+    led : array[0..7] of Char;  //#PES0001
+    off : array[0..2] of Byte;  //PEC offset [3byte]
+    m1 : array[0..12] of Byte;
+    ce : array[0..5] of Byte;
+    m2 : array[0..46] of Byte;
+    xsiz,
+    ysiz : Word;
+    m3 : array[0..15] of Byte;
+    cs : array[0..5] of Byte;
+    m4 : array[0..2] of Byte;
+    scol : Byte;
+    m5 : array[0..2] of Byte;
+  end; //PESHED;
+
+  TPESTCH = record
+    x, y : Word;
+  end;//PESTCH;
 
   // thred.h #668
   TFeatherFillTypes = ( FTHSIN=1,  // sine

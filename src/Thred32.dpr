@@ -10,7 +10,8 @@ uses
   Thred_Constants in 'lib\Thred_Constants.pas',
   Thred_Defaults in 'lib\Thred_Defaults.pas',
   gmSwatch_rwPAL in 'lib\gmSwatch_rwPAL.pas',
-  Stitch_rwTHR in 'lib\Stitch_rwTHR.pas';
+  Stitch_rwTHR in 'lib\Stitch_rwTHR.pas',
+  Stitch_rwPES in 'lib\Stitch_rwPES.pas';
 
 {$R *.res}
 

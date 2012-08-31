@@ -16,8 +16,8 @@ unit Stitch_rwPCS;
  *
  * The Initial Developer of the Original Code are
  *
- * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  * x2nie - Fathony Luthfillah  <x2nie@yahoo.com>
+ * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  *
  * Contributor(s):
  *
@@ -113,7 +113,7 @@ begin
   if not ( (sthed.ledIn = $32) and (sthed.fColCnt = 16)) then
         raise Exception.Create(IDS_SHRTF);
 
-  LCollection.Colors := sthed.fCols;
+//  LCollection.Colors := sthed.fCols;
 
 
                                                
