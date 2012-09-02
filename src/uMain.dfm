@@ -1,8 +1,8 @@
 object frmMain: TfrmMain
-  Left = 279
-  Top = 253
-  Width = 679
-  Height = 585
+  Left = 87
+  Top = 44
+  Width = 721
+  Height = 681
   Caption = 'frmMain'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -22,8 +22,8 @@ object frmMain: TfrmMain
   TextHeight = 13
   object spl1: TSplitter
     Left = 0
-    Top = 483
-    Width = 667
+    Top = 579
+    Width = 709
     Height = 3
     Cursor = crVSplit
     Align = alBottom
@@ -202,7 +202,7 @@ object frmMain: TfrmMain
     Left = 0
     Top = 0
     Width = 30
-    Height = 483
+    Height = 579
     Align = alLeft
     SwatchList = swlDefault
     ThumbWidth = 30
@@ -219,7 +219,7 @@ object frmMain: TfrmMain
     Left = 30
     Top = 0
     Width = 33
-    Height = 483
+    Height = 579
     Align = alLeft
     SwatchList = swlCustom
     ThumbWidth = 30
@@ -235,8 +235,8 @@ object frmMain: TfrmMain
   end
   object pgscrlr1: TPageScroller
     Left = 0
-    Top = 486
-    Width = 667
+    Top = 582
+    Width = 709
     Height = 45
     Align = alBottom
     Control = swa1
@@ -265,8 +265,8 @@ object frmMain: TfrmMain
   object pb: TPaintBox32
     Left = 63
     Top = 0
-    Width = 604
-    Height = 483
+    Width = 646
+    Height = 579
     Align = alClient
     TabOrder = 8
     OnPaintBuffer = pbPaintBuffer
@@ -308,6 +308,7 @@ object frmMain: TfrmMain
       end
       object mnu_FILE_SAVE3: TMenuItem
         Caption = 'Save As (F8)'
+        OnClick = mnu_FILE_SAVE3Click
       end
       object mnu_LODBIT: TMenuItem
         Caption = 'Load Bitmap'
@@ -1130,6 +1131,13 @@ object frmMain: TfrmMain
   end
   object dlgColor1: TColorDialog
     Left = 128
+    Top = 88
+  end
+  object grdlst1: TgmGradientList
+    Gradients = <>
+    ForegroundColor = clBlack
+    BackgroundColor = clWhite
+    Left = 480
     Top = 88
   end
 end

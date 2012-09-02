@@ -88,6 +88,8 @@ type
     FForms: TArrayOfTFRMHED;
     FStitchs: TArrayOfTSHRTPNT;
     FHeaderEx: TSTREX;
+    FCurrentStreamFileName : TFileName;
+    FFileName: TFilename;
   protected
     procedure Update(Item: TCollectionItem); override;
   
@@ -133,7 +135,8 @@ type
     property Colors : TArrayOfTColor read FColors write FColors;
     property CustomColors : TArrayOfTColor read FCustomColors write FCustomColors;
     property Forms : TArrayOfTFRMHED read FForms write FForms;
-    property Stitchs : TArrayOfTSHRTPNT read FStitchs write Fstitchs; 
+    property Stitchs : TArrayOfTSHRTPNT read FStitchs write Fstitchs;
+    property FileName : TFilename read FFileName write FFileName;
 
 
   end;
@@ -307,7 +310,9 @@ procedure TStitchCollection.SaveToFile(const FileName: string);
 var
   LStream: TStream;
 begin
-  LStream := TFileStream.Create(FileName, fmCreate);
+  FCurrentStreamFileName := ExpandFileName(FileName); //some reader/writer always accept; sadly sometime they wrong. we anticipate this accident
+
+  LStream := TFileStream.Create(FCurrentStreamFileName, fmCreate);
   try
     SaveToStream(LStream);
   finally
@@ -316,8 +321,52 @@ begin
 end;
 
 procedure TStitchCollection.SaveToStream(Stream: TStream);
+var
+  //LFileHeader         : TgmGradientFileHeader;
+  LFirstStreamPosition: Int64;
+  i                   : Integer;
+  LWriter             : TgmConverter;
+  LWriterClass        : TgmConverterClass;
+  LWriters            : TgmFileFormatsList;
+  LWriterAccepted     : Boolean;
+  //SelfClass           : TStitchCollectionClass;
 begin
+  //BeginUpdate;
+  try
+    //In case current stream position is not zero, we remember the position.
+    LFirstStreamPosition := Stream.Position;
 
+
+    // Because many reader has same MagicWord as their signature,
+    // we make a beauty contest: the way to choose a queen quickly.
+    // when we anyone dealed to eat the rest of stream, this ceremony closed. :)
+    // So, be carefull when make order list of "uses" unit of "stitch_rwXXX," !
+
+
+    LWriters := GetFileWriters;
+
+    //LEVEL 1, find the extention
+    if FCurrentStreamFileName <> '' then
+    begin
+      LWriterClass  := LWriters.FindExt(ExtractFileExt(FCurrentStreamFileName));
+      if Assigned(LWriterClass) then
+      begin
+        LWriter := LWriterClass.Create;
+        try
+          LWriter.SaveToStream(Stream,Self);
+        finally
+          LWriter.Free;
+        end;
+      end;
+    end;
+    { TODO -ox2nie -cmedium : 
+Until now, we cant make sure wether first selected TWriter is as same as user prever to used.
+Perhap we must integrated te Writers with the TSaveDialog }
+
+  finally
+    //EndUpdate;
+    //Changed;    
+  end;
 end;
 
 procedure TStitchCollection.Update(Item: TCollectionItem);

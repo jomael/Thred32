@@ -11,7 +11,8 @@ uses
   Thred_Defaults in 'lib\Thred_Defaults.pas',
   gmSwatch_rwPAL in 'lib\gmSwatch_rwPAL.pas',
   Stitch_rwTHR in 'lib\Stitch_rwTHR.pas',
-  Stitch_rwPES in 'lib\Stitch_rwPES.pas';
+  Stitch_rwPES in 'lib\Stitch_rwPES.pas',
+  Stitch_Lines32 in 'lib\Stitch_Lines32.pas';
 
 {$R *.res}
 

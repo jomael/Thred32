@@ -82,14 +82,15 @@ var
   sthed : THED;
   item  : SHRTPNT;
   hedx : TSTREX;
-  LCollection : TStitchCollection;
+  LColors : tarrayoftcolor;
+  LDesign : TStitchCollection;
   c : TColor;
   c16 : T16Colors;
   buf : array[0..17] of Char;
 
 begin
-  LCollection := TStitchCollection(ACollection);
-  LCollection.Clear;
+  LDesign := TStitchCollection(ACollection);
+  LDesign.Clear;
   
   //here we go!
   //validation of stream is already done.
@@ -113,7 +114,16 @@ begin
   if not ( (sthed.ledIn = $32) and (sthed.fColCnt = 16)) then
         raise Exception.Create(IDS_SHRTF);
 
-//  LCollection.Colors := sthed.fCols;
+  SetLength(LColors, 16);
+  Stream.Read(c16[0], 64);
+  for i := 0 to 15 do
+  begin
+    LColors[i] := c16[i];
+  end;
+
+  LDesign.Colors := LColors;
+
+  //LCollection.Colors := sthed.fCols;
 
 
                                                

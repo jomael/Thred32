@@ -39,10 +39,12 @@ unit Stitch_rwPES;
  * the terms of any one of the MPL, the GPL or the LGPL.
  * ***** END LICENSE BLOCK ***** *)
 
+{$DEFINE COLORREMAP}
 interface
 uses Classes,SysUtils, Graphics,
-  gmFileFormatList, Stitch_items, 
-  Thred_Constants, Thred_Types ;
+  GR32,
+  gmFileFormatList,
+  Stitch_items, Thred_Constants, Thred_Types ;
 
 type
 
@@ -54,11 +56,13 @@ type
     function ReadInt16:SmallInt;
     function ReadByte:Byte;
     function getPesDefaultColors: TArrayOfTColor;
+    function ColorFromIndex(index: Integer): TColor;
+    procedure hupfn(ADesign: TStitchCollection; chkhuprct: TFloatRect);
   public
     constructor Create; override;
     procedure LoadFromStream(Stream: TStream; ACollection: TCollection); override;
     //procedure LoadItemFromString(Item :TgmSwatchItem; S : string);
-    procedure LoadItemFromStream(Stream: TStream; AItem: TCollectionItem); virtual;
+    //procedure LoadItemFromStream(Stream: TStream; AItem: TCollectionItem); virtual;
     procedure SaveToStream(Stream: TStream; ACollection: TCollection); override;
     //procedure SaveItemToStream(Stream: TStream; AItem: TCollectionItem); virtual; abstract;
     class function WantThis(AStream: TStream): Boolean; override;
@@ -68,8 +72,7 @@ type
 implementation
 
 uses
-  Windows,
-  GR32;
+  Windows, math;
 //  GR32, GR32_LowLevel;
 { TgmConverter }
 
@@ -102,6 +105,7 @@ var
 //#5621        TCHAR*            peschr;                                                       
 //#5622        unsigned        pecof;
   pcolcnt   : Byte;
+  usedColors: TArrayOfTColor;
   pescols   : array Of TColor;
   colorList : array{[0..255]} of byte;
 
@@ -128,38 +132,95 @@ var
                  LColorNum : integer;
   colorIndex : byte;
   Lstchs : TArrayOfTSHRTPNT;
+  LBytes : T16Byte;
+  chkhuprct : TfloatRect;
 
   function getIndexFromOrder(order: integer): Integer;
   begin
     Result := colorList[order];
   end;
+{$IFDEF COLORREMAP}
+  //the rest methods below is for correction of colors mapping of pes to be used by thred.
+  function RegisterNewIndex(pes66index: byte): byte;
+    var target : TColor;
+    newsize : byte;
+  begin
+    newsize := length(usedColors) +1;
+    setlength(usedColors, newsize);
+    result := newsize -1;
+    usedColors[ result ] := ColorFromIndex(pes66index);
 
+  end;
+
+  function RegisteredIndex(pes66index : byte): integer ;
+    var target : TColor;
+    i : integer;
+  begin
+    result := -1;
+    target := ColorFromIndex(pes66index);
+    for i := 0 to length(usedColors) -1 do
+    begin
+      if usedColors[i] = Target then
+      begin
+        result := i;
+        break;
+      end;
+    end;
+  end;
+
+  procedure RegisterDistinct(var pes66index : byte);
+  var result : integer;
+  begin
+    result :=  RegisteredIndex(pes66index);
+    if result < 0 then
+      result :=  RegisterNewIndex(pes66index);
+
+    pes66index := result;
+  end;
+
+  procedure RegisterUntil16Used;
+  var pes66index,new : integer;
+  begin
+    pes66index := 0;
+    while length(usedColors) < 16 do
+    begin
+      new := RegisteredIndex(pes66index);
+      if new < 0 then  //not yet found.
+        RegisterNewIndex(pes66index);
+      inc(pes66index);
+      if pes66index > 66 then
+        break;
+    end;
+  end;
+{$ENDIF}  
 
 begin
-  FStream := Stream;
+  FStream := Stream;
   LDesign := TStitchCollection(ACollection);
   LDesign.Clear;
   SetLength(Lstchs,0);
-  prevX := 00665;
-  prevY := 00376;
+  SetLength(usedColors,0);
+  prevX := 0;// 00665;
+  prevY := 0;// 00376;
   maxX := 0;
   minX := 0;
   maxY := 0;
   minY := 0;
   LColorNum := 0;
+  chkhuprct := floatRect(0,0,0,0);
 
 //#5967    #if PESACT                                                                       
 //#5968                        else{                                                   
 //#5969
   Stream.Read(peshed, SizeOf(TPESHED));
-  if peshed.led <> '#PES0001' then
+  if peshed.led <> '#PES00' then
     raise Exception.Create('Not a PES file');
 
 //#5970                            ReadFile(hFil,(BSEQPNT*)&bseq,sizeof(bseq),&red,0);                                               
 //#5971                            peshed=(PESHED*)&bseq;                                               
 //#5972                            peschr=(TCHAR*)&bseq;                                               
 //#5973                            if(strncmp(peshed->led,"#PES00",6)){                                               
-//#5974                                                                           
+//#5974
 //#5975                                sprintf(msgbuf,"Not a PES file: %s\n",filnam);
 //#5976                                shoMsg(msgbuf);                                           
 //#5977                                return;                                           
@@ -207,7 +268,7 @@ begin
   while True do
   begin
 
-//#6006                                                                           
+
 //#6007                                if(pestch[ind]==0xff&&pestch[ind+1]==0)                                           
 //#6008                                    break;
       val1 := ReadByte();
@@ -252,6 +313,9 @@ begin
           }
           Inc(LColorNum);
           colorIndex := getIndexFromOrder(LColorNum);
+          {$IFDEF COLORREMAP}
+          RegisterDistinct(colorIndex);
+          {$ENDIF}
           //curBlock.colorIndex = colorIndex;
           //pb.Buffer.PenColor := Color32(getColorFromIndex(colorIndex));
           //read useless(?) byte
@@ -297,6 +361,17 @@ begin
                   deltaX := deltaX - 128;
               end;
           end;
+//#6028                                    locof*=0.6;
+//#6029                                    if(toglMap(FILDIR)){
+//#6030
+//#6031                                        loc.y-=locof;
+//#6032                                        stchs[ine].x=loc.x;
+//#6033                                        stchs[ine].y=loc.y;
+//#6034                                        stchs[ine].at=tcol;
+//#6035                                        ine++;
+//#6036                                    }
+//#6037                                    else
+//#6038                                        loc.x+=locof;
 
           if ((val2 and 128) = 128) then//$80
           begin
@@ -319,20 +394,43 @@ begin
           end;                                                                   
           //tempStitches.Add(new Point(prevX + deltaX, prevY + deltaY));
 
+          //deltaX := deltaX * 0.6;
+          //deltaY := deltaY * 0.6;
+          
           SetLength(Lstchs,Length(Lstchs)+1);
           with Lstchs[High(lstchs)] do
           begin
-            x := (prevX + deltaX) * 0.6;
-            y :=  (prevY + deltaY) * 0.6;
+            x := (prevX + deltaX);// * 0.6;
+            y :=  (prevY + deltaY);// * 0.6;
+
+            //BUGFIX: HAPPEN WHEN IS THE FIRST TIME AND NO COLOR YET DETECTED.
+            if (colorIndex = 0) and (length(usedColors)=0) then
+            begin
+              {$IFDEF COLORREMAP}
+              RegisterDistinct(colorIndex);
+              {$ENDIF}
+            end;
             at := colorIndex;
           end;
-
           //pb.Buffer.LineToXS(Fixed((prevX + deltaX)/3),Fixed(( prevY + deltaY)/3));
+          
           prevX := prevX + deltaX;
           prevY := prevY + deltaY;
 
+          with chkhuprct do
+          begin
+            right := max(prevX,right);
+            left := min(prevX,left);
+            bottom := max(prevY,bottom);
+            top := min(prevY,top);
+          end;
 
-          if (prevX > maxX) then
+          {maxX := max(prevX,MaxX);
+          minX := min(prevX,minX);
+          maxY := max(prevY,maxY);
+          minY := min(prevY,minY);
+
+          {if (prevX > maxX) then
           begin
               maxX := prevX;
           end
@@ -348,66 +446,172 @@ begin
           else if (prevY < minY) then
           begin
               minY := prevY;
-          end;
+          end;}
 
       end;
-  end;
+//#6039                                }
+//#6040                                ind++;
+//#6041                            } //while
+  end; //while
 
   LDesign.Stitchs := Lstchs;
+  //PSTRHED(LDesign.Header)^.stchs := length(Lstchs);
 
-//#6028                                    locof*=0.6;
-//#6029                                    if(toglMap(FILDIR)){                                       
-//#6030
-//#6031                                        loc.y-=locof;                                   
-//#6032                                        stchs[ine].x=loc.x;                                   
-//#6033                                        stchs[ine].y=loc.y;                                   
-//#6034                                        stchs[ine].at=tcol;                                   
-//#6035                                        ine++;                                   
-//#6036                                    }                                       
-//#6037                                    else                                       
-//#6038                                        loc.x+=locof;                                   
-//#6039                                }                                           
-//#6040                                ind++;                                           
-//#6041                            }                                               
-//#6042                            hed.stchs=ine;                                               
-//#6043                            //ini.auxfil=AUXPES;                                               
-//#6044                            hupfn();                                               
-//#6045                        }                                                   
-//#6046    #endif
   LDesign.BgColor := clWhite;
   FillChar(hedx, SizeOf(hedx), 0);
         hedx.xhup := LHUPX;
         hedx.yhup := LHUPY;
 
+  for i := 0 to 15 do
+  begin
+     LBytes[i] :=40;
+  end;
+  LDesign.ThreadSize := LBytes;
+
+  {$IFDEF COLORREMAP}
+  RegisterUntil16Used; //correction.
+  LDesign.Colors := usedColors;//getPesDefaultColors;
+  {$ELSE}
   LDesign.Colors := getPesDefaultColors;
+  {$ENDIF}
   LDesign.HeaderEx := hedx;
-
-
+//#6042                            hed.stchs=ine;
+//#6043                            //ini.auxfil=AUXPES;                                               
+//#6044                            hupfn();
+  hupfn(LDesign,chkhuprct);
+//#6045                        }                                                   
+//#6046    #endif //endif IFDEF PESACT
 end;
 
-procedure TStitchPESConverter.LoadItemFromStream(Stream: TStream;
-  AItem: TCollectionItem);
-var d : integer;
-  b : tSHRTPNT;
+procedure TStitchPESConverter.hupfn(ADesign : TStitchCollection; chkhuprct: TFloatRect);
+//#11687    void hupfn(){
+var
+//#11688
+  ind : integer;
+//#11689        unsigned    ind;
+  hupcntr : TFloatPoint;
+//#11690        DUBPNT        hupcntr;
+  descntr : TFloatPoint;
+//#11691        DUBPNT        descntr;
+//#11692        DUBPNT        tsiz;
+  tsiz : TFloatPoint;
+//#11693        DUBPNT        dif;
+  dif : TFloatPoint;
+//#11694
+
+  inihup : TFloatPoint;
+
+  scale : TFloat;
 
 begin
-  Stream.Read(b,SizeOf(tSHRTPNT));
+  scale := 0.4;
+  with chkhuprct do
+  begin
+    left := left * scale;
+    right := right * scale;
+    top := top * scale;
+    bottom := bottom * scale;
+  end;
+//#11695        rstMap(HUPCHNG);                                                                   
+//#11696        stchsr=stchs;                                                                   
+//#11697        sizstch(&chkhuprct);                                                                   
+//#11698        if(formpnt){                                                                   
+//#11699                                                                           
+//#11700            if(!hed.stchs){                                                               
+//#11701                                                                           
+//#11702                chkhuprct.bottom=chkhuprct.top=flt[0].y;                                                           
+//#11703                chkhuprct.left=chkhuprct.right=flt[0].x;                                                           
+//#11704            }                                                               
+//#11705            for(ind=0;ind<fltad;ind++){                                                               
+//#11706                                                                           
+//#11707                if(flts[ind].x<chkhuprct.left)                                                           
+//#11708                    chkhuprct.left=flts[ind].x;                                                       
+//#11709                if(flts[ind].x>chkhuprct.right)                                                           
+//#11710                    chkhuprct.right=flts[ind].x;                                                       
+//#11711                if(flts[ind].y<chkhuprct.bottom)                                                           
+//#11712                    chkhuprct.bottom=flts[ind].y;                                                       
+//#11713                if(flts[ind].y>chkhuprct.top)                                                           
+//#11714                    chkhuprct.top=flts[ind].y;                                                       
+//#11715            }                                                               
+//#11716        }
 
+  if length(ADesign.Stitchs) > 0 then
+  begin
+//#11717        if(hed.stchs||fltad||chkMap(HUPEX)){
+//#11718
+//#11719            if(    chkhuprct.left<0||
+//#11720                chkhuprct.right>ini.hupx||
+//#11721                chkhuprct.bottom<0||
+//#11722                chkhuprct.top>ini.hupy){
+//#11723
+//#11724                setMap(HUPEX);
+//#11725            }
+//#11726            if(chkMap(HUPEX)){
+//#11727
+    tsiz.X := chkhuprct.right-chkhuprct.left;
+    tsiz.Y := chkhuprct.Bottom-chkhuprct.Top;
+//#11728                tsiz.x=chkhuprct.right-chkhuprct.left;
+//#11729                tsiz.y=chkhuprct.top-chkhuprct.bottom;
+//#11730                if(tsiz.x>ini.hupx){
+//#11731
+    inihup.X := tsiz.X;
+//#11732                    ini.hupx=tsiz.x;
+//#11733                    setMap(HUPCHNG);
+//#11734                }
+//#11735                if(tsiz.y>ini.hupy){
+//#11736
+    inihup.Y := tsiz.Y;
+//#11737                    ini.hupy=tsiz.y;
+//#11738                    setMap(HUPCHNG);
+//#11739                }
+    descntr.X := tsiz.X / 2 + chkhuprct.Left;
+    descntr.Y := tsiz.Y / 2 + chkhuprct.Top;
+//#11740                descntr.x=tsiz.x/2+chkhuprct.left;
+//#11741                descntr.y=tsiz.y/2+chkhuprct.bottom;
+    hupcntr.X := inihup.X /2;
+    hupcntr.Y := inihup.Y /2;
+//#11742                hupcntr.x=ini.hupx/2;
+//#11743                hupcntr.y=ini.hupy/2;
+    dif.X := hupcntr.X - descntr.X;
+    dif.Y := hupcntr.Y - descntr.Y;
+//#11744                dif.x=hupcntr.x-descntr.x;
+//#11745                dif.y=hupcntr.y-descntr.y;
 
-end;
-{
-function TPesFile.ReadByte: Byte;
-begin
+    for ind := 0 to length(Adesign.Stitchs) -1 do
+    begin
+      with Adesign.Stitchs[ind] do
+      begin
+        x := x * scale + dif.X;
+        y := y * scale + dif.Y;
+      end;
+    end;
+//#11746                for(ind=0;ind<hed.stchs;ind++){
+//#11747
+//#11748                    stchs[ind].x+=dif.x;
+//#11749                    stchs[ind].y+=dif.y;
+//#11750                }
+//#11751                for(ind=0;ind<fltad;ind++){
+//#11752
+//#11753                    flts[ind].x+=dif.x;
+//#11754                    flts[ind].y+=dif.y;
+//#11755                }
+//#11756                for(ind=0;ind<formpnt;ind++){
+//#11757
+//#11758                    formlst[ind].rct.left+=dif.x;
+//#11759                    formlst[ind].rct.right+=dif.x;
+//#11760                    formlst[ind].rct.top+=dif.y;
+//#11761                    formlst[ind].rct.bottom+=dif.y;
+//#11762                }
+//#11763                zum0.x=ini.hupx;
+//#11764                zum0.y=ini.hupy;
+//#11765                zumflor=(double)MINZUM/zum0.x;
+//#11766                zumhom();
+//#11767            }
+//#11768        }
+  end;
+//#11769    }
 end;
 
-function TPesFile.ReadInt16: SmallInt;
-begin
-end;
-
-function TPesFile.ReadInt32: LongInt;
-begin
-end;
-}
 function TStitchPESConverter.ReadByte: Byte;
 begin
   FStream.Read(Result,1)
@@ -531,8 +735,7 @@ begin
 //#6731    #endif
 end;
 
-function TStitchPESConverter.getPesDefaultColors(): TArrayOfTColor;
-    function ColorFromIndex(index : Integer): TColor;
+    function TStitchPESConverter.ColorFromIndex(index : Integer): TColor;
     begin
     case index of
       1:
@@ -730,6 +933,7 @@ function TStitchPESConverter.getPesDefaultColors(): TArrayOfTColor;
                       result := clWhite;
       end;
     end;
+function TStitchPESConverter.getPesDefaultColors(): TArrayOfTColor;
 var i : Integer;
 begin
   SetLength(Result, 65);
@@ -749,7 +953,7 @@ var
   red : Integer;
 begin
   aStream.Read(peshed, SizeOf(TPESHED));
-  Result := peshed.led = '#PES0001' ;
+  Result := peshed.led = '#PES00' ;
 
 end;
 

@@ -52,8 +52,8 @@ type
 
   TOpenStitchsDialog = class(TOpenDialog)
   private
-    FGridPanel     : TPanel;
-    FGridLabel     : TLabel;
+    //FGridPanel     : TPanel;
+    //FGridLabel     : TLabel;
     FSavedFilename : string;
 
     //procedure SetStitchsCollection(const AValue: TStitchsCollection);
@@ -80,6 +80,7 @@ type
     //property GridLabel         : TLabel               read FGridLabel;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     function Execute: Boolean; override;
 
     //property StitchsCollection : TStitchsCollection read GetStitchsCollection write SetStitchsCollection;
@@ -112,7 +113,7 @@ begin
   FStitchsList := TStitchCollection.Create(Self);
   Filter         := GetFilter();
 
-  FGridPanel := TPanel.Create(Self);
+  {FGridPanel := TPanel.Create(Self);
   with FGridPanel do
   begin
     Name        := 'GridPanel';
@@ -158,8 +159,8 @@ begin
         ItemList := FStitchsList;
         SetThumbSize(32, 32);
       end;
-    end;}
-  end;
+    end;
+  end;}
 end;
 
 {procedure TOpenStitchsDialog.DoSelectionChange;
@@ -227,16 +228,16 @@ begin
   LPreviewRect.Left := LStaticRect.Left + (LStaticRect.Right - LStaticRect.Left);
   Inc(LPreviewRect.Top, 4);
 
-  FGridPanel.BoundsRect := LPreviewRect;
-  FGridPanel.Anchors    := [akLeft, akTop, akRight, akBottom];
+  //FGridPanel.BoundsRect := LPreviewRect;
+  //FGridPanel.Anchors    := [akLeft, akTop, akRight, akBottom];
 
   if not Self.IsSaveDialog then
   begin
-    FStitchsList.Clear;
+    //FStitchsList.Clear;
   end;
 
   FSavedFilename          := '';
-  FGridPanel.ParentWindow := Handle;
+  //FGridPanel.ParentWindow := Handle;
 
   inherited DoShow;
 end;
@@ -296,6 +297,13 @@ end;}
 function TSaveStitchsDialog.IsSaveDialog: boolean;
 begin
   Result := True;
+end;
+
+destructor TOpenStitchsDialog.Destroy;
+begin
+  //FGridPanel.Free;
+  FStitchsList.Destroy;
+  inherited;
 end;
 
 end.

@@ -90,7 +90,7 @@ var
   c16 : T16Colors;
   LColors : TArrayOfTColor;
   buf : array[0..17] of Char;
-  Bytes : T16Byte;
+  LBytes : T16Byte;
   zum0 : TPoint;
   zRct : TRect; 
 
@@ -267,7 +267,8 @@ begin
   Stream.Read(Lstchs[0], sthed.stchs * SizeOf(TSHRTPNT));
   for i := 0 to sthed.stchs do
   begin
-    Lstchs[i].y := hedx.yhup - Lstchs[i].y;
+    //Hey, Thred is updwon side. that is the first Y is in bottom, so we convert to delphi style
+    Lstchs[i].y := {hedx.yhup -}(hedx.yhup - Lstchs[i].y);
   end;
 
   LDesign.Stitchs := Lstchs;
@@ -344,17 +345,15 @@ begin
 //#5807                            prtred();
 //#5808                            return;
 //#5809                        }
-  red := Stream.Read(Bytes[0],16);
+  red := Stream.Read(LBytes[0],16);
   //LCollection.BName := Bytes;
   if red <> 16 then
     Exit;
-
-
   for i := 0 to 15 do
   begin
-     Bytes[i] := Bytes[i] * 10;
+     LBytes[i] := LBytes[i] * 10;
   end;
-  LDesign.ThreadSize := Bytes;
+  LDesign.ThreadSize := LBytes;
 //#5810                        for(ind=0;ind<16;ind++)
 //#5811                            thrdSiz[ind][0]=msgbuf[ind];
 
@@ -507,24 +506,173 @@ var d : integer;
   b : TSHRTPNT;
   i : TStitchItem;
 begin
-  Stream.Read(b,SizeOf(TSHRTPNT));
+  {Stream.Read(b,SizeOf(TSHRTPNT));
   with TStitchItem(AItem) do
   begin
     x := b.x;
     y := b.y;
     //at := b.at;
     ColorIndex := b.at and COLMSK;
-    LayerStackIndex := (b.at and LAYMSK) shr LAYSHFT; 
-  end;
+    LayerStackIndex := (b.at and LAYMSK) shr LAYSHFT;
+  end;}
 
 end;
 
 procedure TStitchTHRConverter.SaveToStream(Stream: TStream;
   ACollection: TCollection);
+var
+	led : Cardinal;
+	len : Cardinal;	//length of strhed + length of stitch data
+  formpnt,
+  vervar,i,red : Integer;
+  sthed : TSTRHED;
+  item  : TSHRTPNT;
+  hedx : TSTREX;
+  LDesign : TStitchCollection;
+  c : TColor;
+  c16 : T16Colors;
+  LColors : TArrayOfTColor;
+  buf : array[0..15] of Char;
+  LBytes : T16Byte;
+  zum0 : TPoint;
+  zRct : TRect; 
+
+  LTempstchs, Lstchs : TArrayOfTSHRTPNT;
+  Lflts,
+  Lclps : TArrayOfFloatPoint;//array of TFLPNT;
+  Lsatks :TArrayOfTSATCON;
+  Ltxpnts : array of TTXPNT;
+  Lfrmlstx : array of TFRMHEDO;
+  Lformlst : TArrayOfTFRMHED;
+  clpad,satkad,fltad : Integer;
+
 begin
-  inherited;
+  
+  LDesign := TStitchCollection(ACollection);
+  //header 0
+  FillChar(sthed, SizeOf(TSTRHED),0);
+  with sthed do
+  begin
+    led := $02746872; //ver 2
+    hup := LDesign.Header.hup;
+    stchs := Length(LDesign.Stitchs);
+  end;
+  Stream.Write(sthed, SizeOf(sthed));
+
+  FillChar(hedx, SizeOf(TSTREX),0);
+  with hedx do
+  begin
+    xhup := LDesign.HeaderEx.xhup;
+    yhup := LDesign.HeaderEx.yhup;
+  end;
+  Stream.Write(hedx, SizeOf(TSTREX));
+
+  
+  //LDesign.Stitchs := Lstchs;
+  SetLength(Lstchs, sthed.stchs);
+  Lstchs := LDesign.Stitchs;
+  for i := 0 to sthed.stchs do
+  begin
+    //Hey, Thred is updwon side. that is the first Y is in bottom, so we convert to delphi style
+
+    Lstchs[i].y := hedx.yhup - Lstchs[i].y;
+  end;
+  Stream.Write(Lstchs[0], sthed.stchs * SizeOf(TSHRTPNT));
+  SetLength(Lstchs, 0);
+  lstchs := nil;
+
+
+
+  //Stitch Sizes
+  //pchar(buf[0])^ := pchar(LDesign.BName);
+  fillchar(buf[0],16,0);
+  Stream.Write(buf, 16);
+
+
+  //BG COLOR
+  Stream.Write(LDesign.BgColor,4);
+
+  //Colors
+  for i := 0 to 15 do
+  begin
+    c16[i] := LDesign.Colors[i];
+  end;
+  Stream.Write(c16[0], 64);
+
+  //custom color
+  Stream.Write(c16[0], 64);
+
+
+  //THREAD SIZE (ON SCREEN)
+  for i := 0 to 15 do
+  begin
+     LBytes[i] := LDesign.ThreadSize[i] div 10;
+  end;
+  Stream.Write(LBytes[0], 16);
+
+//#9816    void thrsav(){
+//#9817                                                                           
+//#9818        unsigned            ind,len;
+//#9819        int                    tind;                                               
+//#9820        unsigned long        wrot;                                                           
+//#9821        unsigned            flind=0;                                                       
+//#9822        unsigned            slind=0;                                                       
+//#9823        unsigned            elind=0;                                                       
+//#9824        WIN32_FIND_DATA        fdat;                                                            
+//#9825        HANDLE                hndl;                                                   
+//#9826        TCHAR                nunam[MAX_PATH];                                                   
+//#9827                                                                           
+//#9828        if(chkattr(filnam))                                                                   
+//#9829            return;                                                               
+//#9830        if(!rstMap(IGNAM)){                                                                   
+//#9831                                                                           
+//#9832            hndl=FindFirstFile(genam,&fdat);                                                               
+//#9833            ind=0;                                                               
+//#9834            if(hndl!=INVALID_HANDLE_VALUE){                                                               
+//#9835                                                                           
+//#9836                rstMap(CMPDO);                                                           
+//#9837                for(ind=0;ind<OLDVER;ind++)                                                           
+//#9838                    vernams[ind][0]=0;                                                       
+//#9839                duver(fdat.cFileName);                                                           
+//#9840                while(FindNextFile(hndl,&fdat))
+//#9841                    duver(fdat.cFileName);                                                       
+//#9842                FindClose(hndl);                                                           
+//#9843                DeleteFile(vernams[OLDVER-1]);                                                           
+//#9844                for(tind=OLDVER-2;tind>=0;tind--){                                                           
+//#9845                                                                           
+//#9846                    if(vernams[tind][0]){                                                       
+//#9847                                                                           
+//#9848                        vernams[tind][MAX_PATH-1]=0;                                                   
+//#9849                        strcpy(nunam,vernams[tind]);                                                   
+//#9850                        len=duth(nunam);                                                   
+//#9851                        nunam[len]=tind+'s';                                                   
+//#9852                        MoveFile(vernams[tind],nunam);                                                   
+//#9853                    }                                                       
+//#9854                }                                                           
+//#9855            }                                                               
+//#9856        }                                                                   
+//#9857        hFil=CreateFile(thrnam,(GENERIC_WRITE),0,NULL,                                                                   
+//#9858            CREATE_ALWAYS,0,NULL);                                                               
+//#9859        if(hFil==INVALID_HANDLE_VALUE){                                                                   
+//#9860                                                                           
+//#9861            crmsg(thrnam);                                                               
+//#9862            hFil=0;                                                               
+//#9863        }                                                                   
+//#9864        else{                                                                   
+//#9865                                                                           
+//#9866            dubuf();                                                               
+//#9867            WriteFile(hFil,bseq,bufref(),&wrot,0);                                                               
+//#9868            if(wrot!=(unsigned long)bufref()){                                                               
+//#9869                                                                           
+//#9870                sprintf(msgbuf,"File Write Error: %s\n",thrnam);                                                           
+//#9871                shoMsg(msgbuf);                                                           
+//#9872            }                                                               
+//#9873            CloseHandle(hFil);                                                               
+//#9874        }                                                                   
+//#9875    }
 
 end;
+
 
 class function TStitchTHRConverter.WantThis(AStream: TStream): Boolean;
 var
@@ -551,4 +699,5 @@ end;
 
 initialization
   TStitchCollection.RegisterConverterReader('THR','Thredwork',0, TStitchTHRConverter);
+  TStitchCollection.RegisterConverterWriter('THR','Thredwork',0, TStitchTHRConverter);
 end.

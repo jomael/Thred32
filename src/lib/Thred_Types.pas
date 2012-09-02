@@ -39,6 +39,7 @@ type
     lin : SmallInt;
   end; //TXPNT;
 
+  PSTRHED = ^TSTRHED; 
   TSTRHED = packed record 		//structure thred file header
     led : Cardinal;
     len : Cardinal;	//length of strhed + length of stitch data
@@ -83,7 +84,9 @@ type
 
   //pes ver 1
   TPESHED = packed record
-    led : array[0..7] of Char;  //#PES0001
+    //led : array[0..7] of Char;  //#PES0001, #PES0001
+    led : array[0..5] of Char;
+    ledVer : array[0..1] of Char;
     off : array[0..2] of Byte;  //PEC offset [3byte]
     m1 : array[0..12] of Byte;
     ce : array[0..5] of Byte;

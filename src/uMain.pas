@@ -9,7 +9,8 @@ uses
   StdCtrls, gmGridBased_List, gmSwatch_List,
   GR32_Image, GR32,
   gmGridBased_ListView, gmSwatch_ListView, gmGridBased_FileDlg,
-  gmSwatch_FileDlgs, ComCtrls, JvExComCtrls, JvPageScroller, ExtCtrls;
+  gmSwatch_FileDlgs, ComCtrls, JvExComCtrls, JvPageScroller, ExtCtrls,
+  gmGradient_List;
 
 type
   TfrmMain = class(TForm)
@@ -259,6 +260,7 @@ type
     spl1: TSplitter;
     pgscrlr1: TPageScroller;
     pb: TPaintBox32;
+    grdlst1: TgmGradientList;
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
@@ -286,6 +288,7 @@ type
     procedure mnu_HLPClick(Sender: TObject);
     procedure pbPaintBuffer(Sender: TObject);
     procedure mnu_FILE_SAVE2Click(Sender: TObject);
+    procedure mnu_FILE_SAVE3Click(Sender: TObject);
   private
     filnam : TFileName;
     FIni: TThredIniFile;
@@ -313,7 +316,8 @@ implementation
 
 uses Thred_Constants, Thred_Defaults,
   gmSwatch_rwTHR, gmSwatch_rwACO, gmSwatch_rwSWA, 
-  Stitch_FileDlg, Stitch_rwTHR, Stitch_rwPCS, Stitch_rwPES;
+  Stitch_FileDlg, Stitch_rwTHR, Stitch_rwPCS, Stitch_rwPES,
+  Stitch_Lines32;
 
 {$R *.dfm}
 
@@ -7138,8 +7142,19 @@ begin
 //#6790        }
 //#6791    }
 end;
-//#6792                                                                           
-//#6793    void savAs(){                                                                       
+
+
+procedure TfrmMain.mnu_FILE_SAVE3Click(Sender: TObject); //SaveAs
+begin
+  with TSaveStitchsDialog.Create(Self) do
+  begin
+    if Execute then
+      FStitchs.SaveToFile(FileName);
+
+
+    Free;
+  end;                                                                           
+//#6793    void savAs(){
 //#6794                                                                           
 //#6795        TCHAR*    pchr;                                                               
 //#6796                                                                           
@@ -7183,51 +7198,46 @@ end;
 //#6834                SetWindowText(hWnd,thrnam);                                                           
 //#6835            }                                                               
 //#6836        }                                                                   
-//#6837    }                                                                       
-//#6838
+//#6837    }
+end;
 
-procedure TfrmMain.mnu_FILE_SAVE2Click(Sender: TObject);
+procedure TfrmMain.mnu_FILE_SAVE2Click(Sender: TObject); //Save
 begin
-  with TSaveStitchsDialog.Create(Self) do
-  begin
-    if Execute then
-    FStitchs.SaveToFile(FileName);
-    
-
-    Free;
-  end;
-
-
-
 //#6839    void save(){
-//#6840                                                                           
-//#6841        TCHAR*    pchr;                                                               
-//#6842        TCHAR    tchr;                                                               
-//#6843                                                                           
-//#6844        if(filnam[0]){                                                                   
-//#6845                                                                           
-//#6846            pchr=strrchr(filnam,'.');                                                               
-//#6847            if(pchr)                                                               
-//#6848                pchr++;                                                           
-//#6849            else{                                                               
-//#6850                                                                           
-//#6851                strcat(filnam,".thr");                                                           
-//#6852                pchr=strrchr(filnam,'.')+1;                                                           
-//#6853            }                                                               
-//#6854            tchr=pchr[0]|0x20;                                                               
-//#6855            thrsav();                                                               
-//#6856            if(hed.stchs)                                                               
-//#6857                sav();                                                           
-//#6858        }                                                                   
-//#6859        else                                                                   
-//#6860            savAs();                                                               
+//#6840
+//#6841        TCHAR*    pchr;
+//#6842        TCHAR    tchr;
+//#6843
+//#6844        if(filnam[0]){
+  if self.FStitchs.FileName <> '' then
+  begin
+//#6845
+//#6846            pchr=strrchr(filnam,'.');
+//#6847            if(pchr)
+//#6848                pchr++;
+//#6849            else{
+//#6850
+//#6851                strcat(filnam,".thr");
+//#6852                pchr=strrchr(filnam,'.')+1;
+//#6853            }
+//#6854            tchr=pchr[0]|0x20;
+//#6855            thrsav();
+//#6856            if(hed.stchs)
+//#6857                sav();
+    FStitchs.SaveToFile(FStitchs.FileName);
+//#6858        }
+  end
+  else
+    mnu_FILE_SAVE3Click(Sender); //SaveAs 
+//#6859        else
+//#6860            savAs();
 //#6861    }
 end;
-                                                                      
-//#6862                                                                           
-//#6863    COLORREF nuCol(COLORREF init){                                                                       
-//#6864                                                                           
-//#6865        gCol.Flags=CC_ANYCOLOR|CC_RGBINIT;                                                                   
+
+//#6862
+//#6863    COLORREF nuCol(COLORREF init){
+//#6864
+//#6865        gCol.Flags=CC_ANYCOLOR|CC_RGBINIT;
 //#6866        gCol.hwndOwner=hWnd;                                                                   
 //#6867        gCol.lCustData=0;                                                                   
 //#6868        gCol.lpCustColors=custCol;                                                                   
@@ -13023,7 +13033,7 @@ begin
   begin
     if Execute then
     FStitchs.LoadFromFile(FileName);
-    Caption := IntToStr(FStitchs.Count);
+    //Caption := IntToStr(FStitchs.Count);
 //    FStitchs.Header.
   //  Caption := Caption +
     //    self.Color := FStitchs.BgColor;
@@ -21626,10 +21636,10 @@ end;
 //#21187                }                                                           
 //#21188                break;                                                           
 //#21189                                                                           
-//#21190            case ID_FILE_SAVE3:                                                               
-//#21191                                                                           
-//#21192                colchk();                                                           
-//#21193                savAs();                                                           
+//#21190            case ID_FILE_SAVE3:
+//#21191
+//#21192                colchk();
+//#21193                savAs();
 //#21194                break;                                                           
 //#21195                                                                           
 //#21196            case ID_EDIT_RESET_COL:                                                               
@@ -24266,16 +24276,23 @@ begin
 //  with TgmColorDialog.create(self) do
 end;
 
+
 procedure TfrmMain.pbPaintBuffer(Sender: TObject);
 var i : Integer;
   zRat : TFloatPoint;
-  C :Cardinal;
+  ColorAt :Cardinal;
+  LastColor,CurrentColor : TColor32;
+  R : TFloatRect;
+  DrawLine : TStitch_LineProc;
 begin
+  DrawLine := Draw3DLine;//DrawLineStippled;//DrawLineFS;
 
   if Length(FStitchs.Stitchs) > 0 then
   begin
     zRat.X := (pb.Width / FStitchs.HeaderEx.xhup );
     zRat.Y := (pb.Height / FStitchs.HeaderEx.yhup );
+
+    //zRat.x := 0.6; //debug
     if zRat.X < zRat.Y then
       zRat.Y := zRat.X
     else
@@ -24288,14 +24305,32 @@ begin
       pb.Buffer.PenColor:= clBlack32;
       with FStitchs.stitchs[i] do
       begin
-        c := at and $FF;
-        if c > High(FStitchs.colors) then
-          c := at and $0F;
-        pb.Buffer.PenColor := Color32( FStitchs.Colors[ c ] );
+        ColorAt := at and $FF;
+        if ColorAt > High(FStitchs.colors) then
+          ColorAt := at and $0F;
+        //pb.Buffer.PenColor := Color32( FStitchs.Colors[ ColorAt ] );
+        CurrentColor := Color32( FStitchs.Colors[ ColorAt ] );
+
         if i = 0 then
+        begin
+          R.TopLeft := floatPoint(x * zRat.X, y * zRat.Y);
+        end
+        else
+        begin
+          R.BottomRight := floatPoint(x * zRat.X, y * zRat.Y);
+
+          //JUMP STITCH + COLOR CHANGED.
+          if CurrentColor = LastColor then
+          DrawLine(pb.Buffer, R, CurrentColor);
+
+          R.TopLeft := R.BottomRight;
+
+        end;
+        LastColor := CurrentColor;
+        {if i = 0 then
           pb.Buffer.MoveToF(x * zRat.X, y * zRat.Y)
         else
-          pb.Buffer.LineToFS(x * zRat.X, y * zRat.Y);
+          pb.Buffer.LineToFS(x * zRat.X, y * zRat.Y);}
       end;
     end;
 
@@ -24303,7 +24338,6 @@ begin
 
   end;  
 end;
-
 
 
 end.
