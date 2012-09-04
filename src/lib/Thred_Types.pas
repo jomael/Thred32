@@ -218,9 +218,10 @@ TTXHED = packed record
 	hi : Single;
 end; //TXHED;
 
-TTFHED = packed record
-	fth : TFTHED;
-	txt : TTXHED;
+TTFHED = packed record   //union
+  case integer of
+    0 :(	fth : TFTHED);
+	  1 :(txt : TTXHED);
 end;//TFHED;
 
 TSATCON = record
@@ -232,18 +233,20 @@ PArrayOfTSATCON = ^TArrayOfTSATCON;
 TArrayOfTSATCON = array of TSATCON;
 
 
+PFANGCLP = ^TFANGCLP;
 TFANGCLP = packed record
 	fang : Single;
 	clp : TArrayOfFloatPoint;
 	sat : TSATCON;
 end; //FANGCLP;
 
-
+PFLENCNT = ^TFLENCNT;
 TFLENCNT = packed record
 	flen : Single;
 	nclp : Cardinal;
 end; //FLENCNT;
 
+PSACANG = ^TSACANG;
 TSACANG = packed record
 	sac : TArrayOfTSATCON;
 	ang : Single; //anle
@@ -272,7 +275,7 @@ TArrayOfTSACANG = array of TSACANG;
     bcol : Byte;	//border color
     nclp : Word;	//number of border clipboard entries
     flt : TArrayOfFloatPoint ;	//points*
-    sacang : TSACANG;	//satin guidlines or angle clipboard fill angle
+    sacang : PSACANG;//TSACANG;	//satin guidlines or angle clipboard fill angle
     clp : TArrayOfFloatPoint;	//border clipboard data*
     stpt : Word;	//number of satin guidlines
     wpar : Word;	//word parameter
@@ -280,8 +283,8 @@ TArrayOfTSACANG = array of TSACANG;
     ftyp : Byte;	//fill type
     etyp : Byte;	//edge type
     fspac : Single;	//fill spacing
-    flencnt : TFLENCNT ;//fill stitch length or clpboard count
-    angclp : TFANGCLP;	//fill angle or clpboard data pointer
+    flencnt : PFLENCNT;// TFLENCNT ;//fill stitch length or clpboard count
+    angclp : PFANGCLP;// TFANGCLP;	//fill angle or clpboard data pointer
     esiz,	//border size
     espac,	//edge spacing
     elen : TFloat;	//edge stitch length

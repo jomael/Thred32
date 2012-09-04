@@ -15,15 +15,11 @@ unit Stitch_rwTHR;
  *
  * The Initial Developer of the Original Code are
  *
+ * Marion McCoskey  <>
  * x2nie - Fathony Luthfillah  <x2nie@yahoo.com>
  * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  *
  * Contributor(s):
- *
- * Lab to RGB color conversion is using RGBCIEUtils.pas under mbColorLib library
- * developed by Marko Binic' marko_binic [at] yahoo [dot] com
- * or mbinic [at] gmail [dot] com.
- * forums : http://mxs.bergsoft.net/forums
  *
  *
  * Alternatively, the contents of this file may be used under the terms of
@@ -100,7 +96,11 @@ var
   Lsatks :TArrayOfTSATCON;
   Ltxpnts : array of TTXPNT;
   Lfrmlstx : array of TFRMHEDO;
+  Lfrmx : TFRMHEDO;
+
+  LTempFormlst: Array[0..255] Of TFRMHED; 
   Lformlst : TArrayOfTFRMHED;
+  Lform : TFRMHED;
   clpad,satkad,fltad : Integer;
 
   procedure xofrm();
@@ -115,13 +115,108 @@ var
   end;
 
   function adflt(cnt: Cardinal): TArrayOfFloatPoint;
+//#2381    FLPNT* adflt(unsigned cnt){
+//#2382
+//#2383        unsigned ind=fltad;
+//#2384
+//#2385        if(fltad+cnt>MAXFLT)
+//#2386            tabmsg(IDS_FRMOVR);
+//#2387        fltad+=cnt;
+//#2388        return &flts[ind];                                                                   
+//#2389    }
+
+  //P :PFloatPoint;
+
+  var i,ind : Cardinal;
+  begin
+	  ind := fltad;
+    if(fltad+cnt>MAXFLT) then
+      raise Exception.Create(IDS_FRMOVR);
+    Inc(fltad,cnt);
+    Setlength(result, cnt);
+
+    //TArrayOfFloatPoint((Result) := TArrayOfFloatPoint(pointer(Lflts[ind]));
+    //move(Lflts[ind], result[0], sizeof(TFloatPoint) * cnt);
+    //P := @LFLTS[0];
+    //inc(p,ind);
+    //move(p^, result[0], sizeof(TFloatPoint) * cnt);
+    for i := 0 to cnt-2 do
+    begin
+      result [i] := Lflts[i + ind];
+    end;
+  end;
+
+  procedure CopyHed(var Des: TFRMHED; src: TFRMHED);
+  begin
+    with des do
+    begin
+      at  :=  src.at;
+      sids  :=  src.sids;
+      typ  :=  src.typ;
+      fcol  :=  src.fcol;
+      bcol  :=  src.bcol;
+      nclp  :=  src.nclp;
+      flt  :=  nil;//src.flt;
+      //sacang  := nil;// src.sacang;
+      clp  :=  nil;//src.clp;
+      stpt  :=  src.stpt;
+      wpar  :=  src.wpar;
+      rct  :=  src.rct;
+      ftyp  :=  src.ftyp;
+      etyp  :=  src.etyp;
+      fspac  :=  src.fspac;
+      flencnt  := nil;//  src.flencnt;
+      angclp  := nil;// src.angclp;
+      esiz :=  src.esiz;
+      espac :=  src.espac;
+      elen  :=  src.elen;
+      res  :=  src.res;
+      xat :=  src.xat;
+      fmax :=  src.fmax;
+      fmin :=  src.fmin;
+      emax :=  src.emax;
+      emin :=  src.emin;
+      dhx  :=  src.dhx;
+      strt :=  src.strt;
+      endp  :=  src.endp;
+      uspac :=  src.uspac;
+      ulen :=  src.ulen;
+      uang :=  src.uang;
+      wind :=  src.wind;
+      txof  :=  src.txof;
+      ucol :=  src.ucol;
+      cres  :=  src.cres;
+
+    end;
+  end;
+
+  procedure j_adflt(var result : TArrayOfFloatPoint;cnt: Cardinal);
+//#2381    FLPNT* adflt(unsigned cnt){
+//#2382
+//#2383        unsigned ind=fltad;                                                                   
+//#2384                                                                           
+//#2385        if(fltad+cnt>MAXFLT)                                                                   
+//#2386            tabmsg(IDS_FRMOVR);                                                               
+//#2387        fltad+=cnt;                                                                   
+//#2388        return &flts[ind];                                                                   
+//#2389    }
+  var
+  P :PFloatPoint;
   var ind : Cardinal;
   begin
 	  ind := fltad;
     if(fltad+cnt>MAXFLT) then
       raise Exception.Create(IDS_FRMOVR);
     Inc(fltad,cnt);
-    Result := TArrayOfFloatPoint(@Lflts[ind]);
+    Setlength(result, cnt);
+
+    //TArrayOfFloatPoint((Result) := TArrayOfFloatPoint(pointer(Lflts[ind]));
+    //move(Lflts[ind], result[0], sizeof(TFloatPoint) * cnt);
+    P := @LFLTS[0];
+    inc(p,ind);
+    move(p^, result[0], sizeof(TFloatPoint) * cnt);
+
+
   end;
 
   function adsatk(cnt: Cardinal) : TArrayOfTSATCON;
@@ -373,22 +468,27 @@ begin
     fltad := 0;
     satkad := 0;
     clpad := 0;
-//#5819                            msgbuf[0]=0;                                               
+//#5819                            msgbuf[0]=0;
 //#5820                            if(vervar<2){
 
     //OLD FORM HEADER
     if vervar < 2 then
     begin
-//#5821                                                                           
+//#5821
 //#5822                                frmlstx=(FRMHEDO*)&bseq;
       SetLength(Lfrmlstx, formpnt);
-      Stream.Read(Lfrmlstx[0], SizeOf(TFRMHEDO) * formpnt);
+      //Stream.Read(Lfrmlstx[0], SizeOf(TFRMHEDO) * formpnt);
+      for i := 0 to formpnt-1 do
+      begin
+        Stream.Read(Lfrmlstx[i], SizeOf(TFRMHEDO) );
+      end;
+
 //#5823                                ReadFile(hFil,(FRMHEDO*)frmlstx,formpnt*sizeof(FRMHEDO),&red,0);
-//#5824                                if(red!=formpnt*sizeof(FRMHEDO)){                                           
-//#5825                                                                           
-//#5826                                    formpnt=red/sizeof(FRMHEDO);                                       
+//#5824                                if(red!=formpnt*sizeof(FRMHEDO)){
+//#5825
+//#5826                                    formpnt=red/sizeof(FRMHEDO);
 //#5827                                    setMap(BADFIL);
-//#5828                                }                                           
+//#5828                                }
 //#5829                                xofrm();
       xofrm();                                      
 //#5830                            }
@@ -398,24 +498,43 @@ begin
 //#5831                            else{                                               
 //#5832
       SetLength(Lformlst, formpnt);
+      //SetLength(LTempFormlst, formpnt);
+      //fillchar(lformlst[0], sizeof(tfrmhed) * formpnt, 0);
       Stream.Read(Lformlst[0], SizeOf(TFRMHED)* formpnt);
+      SetLength(Lformlst, formpnt);
+      for i := 0 to formpnt-1 do
+      begin
+
+        //Stream.Read(Lformlst[i], SizeOf(TFRMHED) );
+        //lformlst[i].flt := nil;
+        //Stream.Read(LTempFormlst[i], SizeOf(TFRMHED));
+        //CopyHed(Lformlst[i],LTempFormlst[i]);
+//        Lformlst[i] := LTempFormlst[i];
+      end;
+
 //#5833                                ReadFile(hFil,(FRMHED*)formlst,formpnt*sizeof(FRMHED),&red,0);
-//#5834                                rstMap(BADFIL);                                           
-//#5835                                if(red!=formpnt*sizeof(FRMHED)){                                           
-//#5836                                                                           
-//#5837                                    formpnt=red/sizeof(FRMHED);                                       
-//#5838                                    setMap(BADFIL);                                       
-//#5839                                }                                           
+//#5834                                rstMap(BADFIL);
+//#5835                                if(red!=formpnt*sizeof(FRMHED)){
+//#5836
+//#5837                                    formpnt=red/sizeof(FRMHED);
+//#5838                                    setMap(BADFIL);
+//#5839                                }
 //#5840                            }
     end;
 
 
   //form points
     SetLength(Lflts, sthed.fcnt);
-    red := Stream.Read(Lflts[0], SizeOf(TFLPNT) * sthed.fcnt);
+    //red := Stream.Read(Lflts[0], SizeOf(TFLPNT) * sthed.fcnt);
+    for i := 0 to sthed.fcnt -1 do
+    begin
+      Stream.Read(Lflts[i], SizeOf(TFLPNT));
+
+    end;
+
 //#5842                            ReadFile(hFil,(FLPNT*)flts,sthed.fcnt*sizeof(FLPNT),&red,0);
-//#5843                            if(red!=sizeof(FLPNT)*sthed.fcnt){                                               
-//#5844                                                                           
+//#5843                            if(red!=sizeof(FLPNT)*sthed.fcnt){
+//#5844
 //#5845                                fltad=red/sizeof(FLPNT);
 //#5846                                for(ind=fltad;ind<sthed.fcnt;ind++)                                           
 //#5847                                    flts[ind].x=flts[ind].y=0;
@@ -430,25 +549,25 @@ begin
 //#5850                            ReadFile(hFil,(SATCON*)satks,sthed.scnt*sizeof(SATCON),&red,0);                                               
 //#5851                            if(red!=sthed.scnt*sizeof(SATCON)){
 //#5852                                                                           
-//#5853                                satkad=red/sizeof(SATCON);                                           
-//#5854                                setMap(BADFIL);                                           
+//#5853                                satkad=red/sizeof(SATCON);
+//#5854                                setMap(BADFIL);
 //#5855                            }
 
-  //points to clipboard data                                               
+  //points to clipboard data
     SetLength(Lclps, sthed.fcnt);
-    Stream.Read(Lclps[0], SizeOf(TFLPNT) * sthed.scnt);
+    Stream.Read(Lclps[0], SizeOf(TFLPNT) * sthed.ecnt);
 //#5856                            ReadFile(hFil,(FLPNT*)clps,sthed.ecnt*sizeof(FLPNT),&red,0);
-//#5857                            if(red!=sthed.ecnt*sizeof(FLPNT)){                                               
-//#5858                                                                           
-//#5859                                clpad=red/sizeof(FLPNT);                                           
-//#5860                                setMap(BADFIL);                                           
+//#5857                            if(red!=sthed.ecnt*sizeof(FLPNT)){
+//#5858
+//#5859                                clpad=red/sizeof(FLPNT);
+//#5860                                setMap(BADFIL);
 //#5861                            }
 
   //textured fill point count
     SetLength(Ltxpnts, sthed.fcnt);
-    Stream.Read(Ltxpnts[0], SizeOf(TTXPNT) * sthed.scnt);
-//#5862                            ReadFile(hFil,(TXPNT*)txpnts,hedx.txcnt*sizeof(TXPNT),&red,0);                                               
-//#5863                            txad=red/sizeof(TXPNT);                                               
+    Stream.Read(Ltxpnts[0], SizeOf(TTXPNT) * hedx.txcnt);
+//#5862                            ReadFile(hFil,(TXPNT*)txpnts,hedx.txcnt*sizeof(TXPNT),&red,0);
+//#5863                            txad=red/sizeof(TXPNT);
 //#5864                            if(rstMap(BADFIL))
 //#5865                                bfilmsg();
 
@@ -458,6 +577,8 @@ begin
     for i := 0 to formpnt -1 do
     begin
       Lformlst[i].flt := adflt(Lformlst[i].sids);
+      //adflt(Lformlst[i].flt, Lformlst[i].sids);
+      //continue;
       if Lformlst[i].typ = SAT then
       begin
 //#5868                                formlst[ind].flt=adflt(formlst[ind].sids);
