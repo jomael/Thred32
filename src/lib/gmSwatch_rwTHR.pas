@@ -1,4 +1,5 @@
 unit gmSwatch_rwTHR;
+
 (* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/LGPL 2.1/GPL 2.0
  *
@@ -15,7 +16,6 @@ unit gmSwatch_rwTHR;
  * The Initial Developer of the Original Code are
  *
  * x2nie - Fathony Luthfillah  <x2nie@yahoo.com>
- * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  *
  * Contributor(s):
  *
@@ -34,8 +34,10 @@ unit gmSwatch_rwTHR;
  * ***** END LICENSE BLOCK ***** *)
 
 interface
-uses Classes,SysUtils, Graphics,
-  gmFileFormatList, gmSwatch ;
+
+uses
+  Classes, SysUtils, Graphics,
+  gmFileFormatList, gmSwatch;
 
 type
 
@@ -52,7 +54,8 @@ implementation
 uses
   Thred_Types, Thred_Constants;
 //  GR32, GR32_LowLevel;
-{ TgmConverter }
+
+{ TStitchTHRConverter }
 
 constructor TStitchTHRConverter.Create;
 begin

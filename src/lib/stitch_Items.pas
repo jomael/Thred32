@@ -17,7 +17,6 @@ unit Stitch_items;
  * The Initial Developer of this unit are
  *
  * x2nie - Fathony Luthfillah  <x2nie@yahoo.com>
- * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  *
  * Contributor(s):
  *
@@ -45,8 +44,6 @@ uses
   Thred_Constants, Thred_Types;
 
 type
-  
-
   TStitchItem = class(TCollectionItem)
   private
     //Fat: Cardinal;
@@ -54,8 +51,6 @@ type
     Fx: Single;
     FColorIndex: Byte;
     FLayerStackIndex: Byte;
-
-
   protected
     FDisplayName     : string;
     //FCachedBitmap: TBitmap32;
@@ -137,8 +132,6 @@ type
     property Forms : TArrayOfTFRMHED read FForms write FForms;
     property Stitchs : TArrayOfTSHRTPNT read FStitchs write Fstitchs;
     property FileName : TFilename read FFileName write FFileName;
-
-
   end;
   TStitchCollectionClass = class of TStitchCollection;
 
@@ -148,7 +141,8 @@ implementation
 uses
   gmMiscFuncs;
 
-var UStitchsReaders,UStitchsWriters : TgmFileFormatsList;  
+var
+  UStitchsReaders, UStitchsWriters : TgmFileFormatsList;  
 
 { TStitchsItem }
 

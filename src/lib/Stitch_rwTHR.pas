@@ -17,7 +17,6 @@ unit Stitch_rwTHR;
  *
  * Marion McCoskey  <>
  * x2nie - Fathony Luthfillah  <x2nie@yahoo.com>
- * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  *
  * Contributor(s):
  *
@@ -36,11 +35,12 @@ unit Stitch_rwTHR;
  * ***** END LICENSE BLOCK ***** *)
 
 interface
-uses Classes,SysUtils, Graphics,
+
+uses
+  Classes, SysUtils, Graphics,
   gmFileFormatList, Stitch_items ;
 
 type
-
   TStitchTHRConverter = class(TgmConverter)
   private
   public
@@ -62,7 +62,8 @@ uses
   GR32, GR32_Polygons
   //, GR32_LowLevel
   ;
-{ TgmConverter }
+
+{ TStitchTHRConverter }
 
 constructor TStitchTHRConverter.Create;
 begin

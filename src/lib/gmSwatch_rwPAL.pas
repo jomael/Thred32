@@ -1,4 +1,5 @@
 unit gmSwatch_rwPAL;
+
 (* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/LGPL 2.1/GPL 2.0
  *
@@ -14,7 +15,6 @@ unit gmSwatch_rwPAL;
  *
  * The Initial Developer of the Original Code are
  *
- * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  * x2nie - Fathony Luthfillah  <x2nie@yahoo.com>
  *
  * Contributor(s):
@@ -31,9 +31,12 @@ unit gmSwatch_rwPAL;
  * the provisions above, a recipient may use your version of this file under
  * the terms of any one of the MPL, the GPL or the LGPL.
  * ***** END LICENSE BLOCK ***** *)
+
 interface
-uses Classes,SysUtils,
-  gmFileFormatList,gmSwatch ;
+
+uses
+  Classes, SysUtils,
+  gmFileFormatList, gmSwatch;
 
 type
   TgmPALConverter = class(TgmConverter)
@@ -51,7 +54,8 @@ implementation
 
 uses
   Graphics,GR32;
-{ TgmConverter }
+  
+{ TgmPALConverter }
 
 procedure TgmPALConverter.LoadFromStream(Stream: TStream;
   ACollection: TCollection);

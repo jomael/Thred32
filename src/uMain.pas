@@ -9,7 +9,7 @@ uses
   StdCtrls, gmGridBased_List, gmSwatch_List,
   GR32_Image, GR32,
   gmGridBased_ListView, gmSwatch_ListView, gmGridBased_FileDlg,
-  gmSwatch_FileDlgs, ComCtrls, JvExComCtrls, JvPageScroller, ExtCtrls,
+  gmSwatch_FileDlgs, ComCtrls, {JvExComCtrls, JvPageScroller,} ExtCtrls,
   gmGradient_List;
 
 type

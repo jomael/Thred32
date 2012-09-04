@@ -1,6 +1,5 @@
 unit Stitch_rwPCS;
 
-//unit gmSwatch_rwACO;
 (* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/LGPL 2.1/GPL 2.0
  *
@@ -17,7 +16,6 @@ unit Stitch_rwPCS;
  * The Initial Developer of the Original Code are
  *
  * x2nie - Fathony Luthfillah  <x2nie@yahoo.com>
- * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  *
  * Contributor(s):
  *
@@ -41,11 +39,12 @@ unit Stitch_rwPCS;
  * ***** END LICENSE BLOCK ***** *)
 
 interface
-uses Classes,SysUtils, Graphics,
-  gmFileFormatList, Stitch_items ;
+
+uses
+  Classes, SysUtils, Graphics,
+  gmFileFormatList, Stitch_items;
 
 type
-
   TStitchPCSConverter = class(TgmConverter)
   private
   public
@@ -64,7 +63,8 @@ implementation
 uses
   Thred_h, Thred_rc, Thred_Types;
 //  GR32, GR32_LowLevel;
-{ TgmConverter }
+
+{ TStitchPCSConverter }
 
 constructor TStitchPCSConverter.Create;
 begin

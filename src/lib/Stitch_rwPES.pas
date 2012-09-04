@@ -16,7 +16,6 @@ unit Stitch_rwPES;
  * The Initial Developer of the Original Code are
  *
  * x2nie - Fathony Luthfillah  <x2nie@yahoo.com>
- * Ma Xiaoguang and Ma Xiaoming < gmbros@hotmail.com >
  *
  * Contributor(s):
  *
@@ -41,14 +40,14 @@ unit Stitch_rwPES;
 
 {$DEFINE COLORREMAP}
 interface
-uses Classes,SysUtils, Graphics,
+
+uses
+  Classes, SysUtils, Graphics,
   GR32,
   gmFileFormatList,
   Stitch_items, Thred_Constants, Thred_Types ;
 
 type
-
-  
   TStitchPESConverter = class(TgmConverter)
   private
     FStream: TStream;
@@ -74,7 +73,8 @@ implementation
 uses
   Windows, math;
 //  GR32, GR32_LowLevel;
-{ TgmConverter }
+
+{ TStitchPESConverter }
 
 constructor TStitchPESConverter.Create;
 begin

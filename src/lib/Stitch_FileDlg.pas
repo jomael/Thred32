@@ -1,5 +1,4 @@
 unit Stitch_FileDlg;
-//unit gmGridBased_FileDlg;
 
 (* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/LGPL 2.1/GPL 2.0

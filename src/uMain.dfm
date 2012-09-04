@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 87
   Top = 44
   Width = 721
-  Height = 681
+  Height = 588
   Caption = 'frmMain'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -19,24 +19,24 @@ object frmMain: TfrmMain
   OnMouseMove = FormMouseMove
   OnMouseUp = FormMouseUp
   PixelsPerInch = 96
-  TextHeight = 13
+  TextHeight = 16
   object spl1: TSplitter
     Left = 0
-    Top = 579
-    Width = 709
+    Top = 475
+    Width = 713
     Height = 3
     Cursor = crVSplit
     Align = alBottom
   end
   object lstCustomColor: TListBox
-    Left = 208
-    Top = 24
-    Width = 105
-    Height = 409
+    Left = 256
+    Top = 30
+    Width = 129
+    Height = 503
     Style = lbOwnerDrawFixed
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindow
-    Font.Height = -11
+    Font.Height = -13
     Font.Name = 'MS Sans Serif'
     Font.Style = []
     ItemHeight = 24
@@ -63,14 +63,14 @@ object frmMain: TfrmMain
     OnDrawItem = lstCustomColorDrawItem
   end
   object lst2: TListBox
-    Left = 320
-    Top = 24
-    Width = 105
-    Height = 409
+    Left = 394
+    Top = 30
+    Width = 129
+    Height = 503
     Style = lbOwnerDrawFixed
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindow
-    Font.Height = -11
+    Font.Height = -13
     Font.Name = 'MS Sans Serif'
     Font.Style = []
     ItemHeight = 24
@@ -97,14 +97,14 @@ object frmMain: TfrmMain
     OnDrawItem = lst2DrawItem
   end
   object lst3: TListBox
-    Left = 432
-    Top = 24
-    Width = 105
-    Height = 409
+    Left = 532
+    Top = 30
+    Width = 129
+    Height = 503
     Style = lbOwnerDrawFixed
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindow
-    Font.Height = -11
+    Font.Height = -13
     Font.Name = 'MS Sans Serif'
     Font.Style = []
     ItemHeight = 24
@@ -131,14 +131,14 @@ object frmMain: TfrmMain
     OnDrawItem = lst3DrawItem
   end
   object lst4: TListBox
-    Left = 544
-    Top = 24
-    Width = 105
-    Height = 409
+    Left = 670
+    Top = 30
+    Width = 129
+    Height = 503
     Style = lbOwnerDrawFixed
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindow
-    Font.Height = -11
+    Font.Height = -13
     Font.Name = 'MS Sans Serif'
     Font.Style = []
     ItemHeight = 24
@@ -165,14 +165,14 @@ object frmMain: TfrmMain
     OnDrawItem = lst4DrawItem
   end
   object lst5: TListBox
-    Left = 96
-    Top = 24
-    Width = 105
-    Height = 409
+    Left = 118
+    Top = 30
+    Width = 129
+    Height = 503
     Style = lbOwnerDrawFixed
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindow
-    Font.Height = -11
+    Font.Height = -13
     Font.Name = 'MS Sans Serif'
     Font.Style = []
     ItemHeight = 24
@@ -201,8 +201,8 @@ object frmMain: TfrmMain
   object swaDefault: TgmSwatchListView
     Left = 0
     Top = 0
-    Width = 30
-    Height = 579
+    Width = 37
+    Height = 475
     Align = alLeft
     SwatchList = swlDefault
     ThumbWidth = 30
@@ -216,10 +216,10 @@ object frmMain: TfrmMain
     FrameColor = clSilver
   end
   object swa2: TgmSwatchListView
-    Left = 30
+    Left = 37
     Top = 0
-    Width = 33
-    Height = 579
+    Width = 41
+    Height = 475
     Align = alLeft
     SwatchList = swlCustom
     ThumbWidth = 30
@@ -235,9 +235,9 @@ object frmMain: TfrmMain
   end
   object pgscrlr1: TPageScroller
     Left = 0
-    Top = 582
-    Width = 709
-    Height = 45
+    Top = 478
+    Width = 713
+    Height = 56
     Align = alBottom
     Control = swa1
     TabOrder = 7
@@ -245,7 +245,7 @@ object frmMain: TfrmMain
       Left = 0
       Top = 0
       Width = 950
-      Height = 45
+      Height = 56
       Align = alLeft
       AutoSize = True
       GrowFlow = NHeight2Right
@@ -263,10 +263,10 @@ object frmMain: TfrmMain
     end
   end
   object pb: TPaintBox32
-    Left = 63
+    Left = 78
     Top = 0
-    Width = 646
-    Height = 579
+    Width = 635
+    Height = 475
     Align = alClient
     TabOrder = 8
     OnPaintBuffer = pbPaintBuffer
