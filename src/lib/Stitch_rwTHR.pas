@@ -590,14 +590,13 @@ begin
   //STPT = number of satin guidlines
 //#5871                                    if(formlst[ind].stpt)
 //#5872                                        formlst[ind].sacang.sac=adsatk(formlst[ind].stpt);
-        if LFormlst[i].stpt > 0 then
-          lformlst[i].sacang.sac := adsatk(Lformlst[i].stpt);
+///        if LFormlst[i].stpt > 0 then          lformlst[i].sacang.sac := adsatk(Lformlst[i].stpt);
 //#5873                                }
       end;
 
   //HAS CLIPBOARD?
       if isclp(i) then
-        Lformlst[i].angclp.clp := adclp(lformlst[i].flencnt.nclp);
+//        Lformlst[i].angclp.clp := adclp(lformlst[i].flencnt.nclp);
 //#5874                                if(isclp(ind))
 //#5875                                    formlst[ind].angclp.clp=adclp(formlst[ind].flencnt.nclp);
 
@@ -695,7 +694,7 @@ begin
   Lstchs := LDesign.Stitchs;
   for i := 0 to sthed.stchs do
   begin
-    //Hey, Thred is updwon side. that is the first Y is in bottom, so we convert to delphi style
+    //Hey, Thred is updwon side. that is the first Y is in bottom, so we convert to it back from delphi style
 
     Lstchs[i].y := hedx.yhup - Lstchs[i].y;
   end;
