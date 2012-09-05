@@ -321,9 +321,9 @@ TArrayOfTSACANG = array of TSACANG;
     fcol : byte;	//fill color
     bcol : Byte;	//border color
     nclp : Word;	//number of border clipboard entries
-    flt : PArrayOfFloatPoint ;	//points*
+    flt : TArrayOfFloatPoint ;	//points*
     sacang : TSACANG;	//satin guidlines or angle clipboard fill angle
-    clp : PArrayOfFloatPoint;	//border clipboard data*
+    clp : TArrayOfFloatPoint;	//border clipboard data*
     stpt : Word;	//number of satin guidlines
     wpar : Word;	//word parameter
     rct : TFloatRect;	//rectangle
@@ -337,6 +337,31 @@ TArrayOfTSACANG = array of TSACANG;
     elen : TFloat;	//edge stitch length
     res : word;	//pico length
   end;//FRMHEDO;
+
+  PFRMHEDX = ^TFRMHEDX;
+  TFRMHEDX = packed record
+    at : Byte;		//attribute
+    sids : Word;	//number of sides
+    typ : Byte;	//type
+    fcol : byte;	//fill color
+    bcol : Byte;	//border color
+    nclp : Word;	//number of border clipboard entries
+    flt : CARDINAL ;	//points*
+    sacang : TSACANG;	//satin guidlines or angle clipboard fill angle
+    clp : CARDINAL;	//border clipboard data*
+    stpt : Word;	//number of satin guidlines
+    wpar : Word;	//word parameter
+    rct : TFloatRect;	//rectangle
+    ftyp : Byte;	//fill type
+    etyp : Byte;	//edge type
+    fspac : Single;	//fill spacing
+    flencnt : TFLENCNT ;//fill stitch length or clpboard count
+    angclp : TFANGCLP;	//fill angle or clpboard data pointer
+    esiz,	//border size
+    espac,	//edge spacing
+    elen : TFloat;	//edge stitch length
+    res : word;	//pico length
+  end;
 
 implementation
 

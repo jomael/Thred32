@@ -502,9 +502,15 @@ begin
       //SetLength(LTempFormlst, formpnt);
       //fillchar(lformlst[0], sizeof(tfrmhed) * formpnt, 0);
       Stream.Read(Lformlst[0], SizeOf(TFRMHED)* formpnt);
-      SetLength(Lformlst, formpnt);
+      //SetLength(Lformlst, formpnt);
+
+      //clean the memory address valued by stream to zero. it is avoid a "access violation".
       for i := 0 to formpnt-1 do
       begin
+        PFRMHEDX(pointer(@Lformlst[I])).flt := 0;
+        PFRMHEDX(@Lformlst[I]).sacang.ang := 0.0;
+        PFRMHEDX(@Lformlst[I]).angclp.fang := 0.0;
+        PFRMHEDX(@Lformlst[I]).clp:= 0;
 
         //Stream.Read(Lformlst[i], SizeOf(TFRMHED) );
         //lformlst[i].flt := nil;
@@ -590,13 +596,16 @@ begin
   //STPT = number of satin guidlines
 //#5871                                    if(formlst[ind].stpt)
 //#5872                                        formlst[ind].sacang.sac=adsatk(formlst[ind].stpt);
-///        if LFormlst[i].stpt > 0 then          lformlst[i].sacang.sac := adsatk(Lformlst[i].stpt);
+        if LFormlst[i].stpt > 0 then
+          //lformlst[i].sacang.sac := adsatk(Lformlst[i].stpt)
+          ;
 //#5873                                }
       end;
 
   //HAS CLIPBOARD?
       if isclp(i) then
-//        Lformlst[i].angclp.clp := adclp(lformlst[i].flencnt.nclp);
+        //Lformlst[i].angclp.clp := adclp(lformlst[i].flencnt.nclp)
+        ;
 //#5874                                if(isclp(ind))
 //#5875                                    formlst[ind].angclp.clp=adclp(formlst[ind].flencnt.nclp);
 
