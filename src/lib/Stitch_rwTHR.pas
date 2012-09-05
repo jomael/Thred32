@@ -166,8 +166,8 @@ var
       ftyp  :=  src.ftyp;
       etyp  :=  src.etyp;
       fspac  :=  src.fspac;
-      flencnt  := nil;//  src.flencnt;
-      angclp  := nil;// src.angclp;
+      flencnt  :=   src.flencnt;
+      angclp  := src.angclp;
       esiz :=  src.esiz;
       espac :=  src.espac;
       elen  :=  src.elen;

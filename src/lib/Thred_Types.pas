@@ -224,32 +224,37 @@ TTFHED = packed record   //union
 	  1 :(txt : TTXHED);
 end;//TFHED;
 
+PSATCON = ^TSATCON;
 TSATCON = record
 	strt,
 	fin : Word; //finish
 end; //SATCON;
 
-PArrayOfTSATCON = ^TArrayOfTSATCON;
+//PArrayOfTSATCON = ^TArrayOfTSATCON;
 TArrayOfTSATCON = array of TSATCON;
 
 
-PFANGCLP = ^TFANGCLP;
+//PFANGCLP = ^TFANGCLP;
 TFANGCLP = packed record
-	fang : Single;
-	clp : TArrayOfFloatPoint;
-	sat : TSATCON;
+  case integer of
+    0 :	(fang : Single);
+	  //1 : (clp : TArrayOfFloatPoint);
+    1 : (clp : PFloatPoint;);
+	  2 : (sat : TSATCON);
 end; //FANGCLP;
 
-PFLENCNT = ^TFLENCNT;
+//PFLENCNT = ^TFLENCNT;
 TFLENCNT = packed record
-	flen : Single;
-	nclp : Cardinal;
+  case boolean of
+    true : (flen : Single);
+	  false : (nclp : Cardinal);
 end; //FLENCNT;
 
-PSACANG = ^TSACANG;
+//PSACANG = ^TSACANG;
 TSACANG = packed record
-	sac : TArrayOfTSATCON;
-	ang : Single; //anle
+  case boolean of
+	  false : (sac : PSATCON);
+	  true  : (ang : Single); //anle
 end; //SACANG;
 
 TArrayOfTSACANG = array of TSACANG;
@@ -275,7 +280,7 @@ TArrayOfTSACANG = array of TSACANG;
     bcol : Byte;	//border color
     nclp : Word;	//number of border clipboard entries
     flt : TArrayOfFloatPoint ;	//points*
-    sacang : PSACANG;//TSACANG;	//satin guidlines or angle clipboard fill angle
+    sacang : TSACANG;	//satin guidlines or angle clipboard fill angle
     clp : TArrayOfFloatPoint;	//border clipboard data*
     stpt : Word;	//number of satin guidlines
     wpar : Word;	//word parameter
@@ -283,8 +288,8 @@ TArrayOfTSACANG = array of TSACANG;
     ftyp : Byte;	//fill type
     etyp : Byte;	//edge type
     fspac : Single;	//fill spacing
-    flencnt : PFLENCNT;// TFLENCNT ;//fill stitch length or clpboard count
-    angclp : PFANGCLP;// TFANGCLP;	//fill angle or clpboard data pointer
+    flencnt : TFLENCNT ;//fill stitch length or clpboard count
+    angclp : TFANGCLP;	//fill angle or clpboard data pointer
     esiz,	//border size
     espac,	//edge spacing
     elen : TFloat;	//edge stitch length

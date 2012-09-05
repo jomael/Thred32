@@ -261,6 +261,11 @@ type
     pgscrlr1: TPageScroller;
     pb: TPaintBox32;
     grdlst1: TgmGradientList;
+    pmForm: TPopupMenu;
+    Line1: TMenuItem;
+    Freehand1: TMenuItem;
+    RegularPolygon1: TMenuItem;
+    Line2: TMenuItem;
     procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
     procedure FormMouseUp(Sender: TObject; Button: TMouseButton;
@@ -289,6 +294,8 @@ type
     procedure pbPaintBuffer(Sender: TObject);
     procedure mnu_FILE_SAVE2Click(Sender: TObject);
     procedure mnu_FILE_SAVE3Click(Sender: TObject);
+    procedure mnu_FORMClick(Sender: TObject);
+    procedure Line1Click(Sender: TObject);
   private
     filnam : TFileName;
     FIni: TThredIniFile;
@@ -315,7 +322,7 @@ var
 implementation
 
 uses Thred_Constants, Thred_Defaults,
-  gmSwatch_rwTHR, gmSwatch_rwACO, gmSwatch_rwSWA, 
+  gmSwatch_rwTHR, gmSwatch_rwACO, gmSwatch_rwSWA,
   Stitch_FileDlg, Stitch_rwTHR, Stitch_rwPCS, Stitch_rwPES,
   Stitch_Lines32;
 
@@ -15641,7 +15648,7 @@ end;
 //#15223                            if(!key&&col==wcol){                                               
 //#15224                                                                           
 //#15225                                stchs[ind].at&=NCOLMSK;                                           
-//#15226                                stchs[ind].at|=vind;                                           
+//#15226                                stchs[ind].at|=vind;
 //#15227                            }                                               
 //#15228                        }                                                   
 //#15229                    }                                                       
@@ -15670,7 +15677,7 @@ end;
 //#15252                            if(pfrm->bcol==vind)                                               
 //#15253                                pfrm->bcol=wcol;                                           
 //#15254                            else{                                               
-//#15255                                                                           
+//#15255
 //#15256                                if(!key&&pfrm->bcol==wcol)                                           
 //#15257                                    pfrm->bcol=vind;                                       
 //#15258                            }                                               
@@ -15728,7 +15735,7 @@ end;
 //#15310                                                                           
 //#15311                        if(tfrm->fcol>=vind&&tfrm->fcol<dcol)                                                   
 //#15312                            tfrm->fcol++;                                               
-//#15313                        if(tfrm->dhx.fth.fthcol>=vind&&tfrm->dhx.fth.fthcol<dcol)                                                   
+//#15313                        if(tfrm->dhx.fth.fthcol>=vind&&tfrm->dhx.fth.fthcol<dcol)
 //#15314                            tfrm->dhx.fth.fthcol++;                                               
 //#15315                    }                                                       
 //#15316                    if(tfrm->etyp){                                                       
@@ -15757,7 +15764,7 @@ end;
 //#15339            if((stchs[ind].at&COLMSK)==vind)                                                               
 //#15340                return 1;                                                           
 //#15341        }                                                                   
-//#15342        return 0;                                                                   
+//#15342        return 0;
 //#15343    }                                                                       
 //#15344                                                                           
 //#15345    void delcol(){                                                                       
@@ -15786,7 +15793,7 @@ end;
 //#15368                    tfrm=&formlst[ind];                                                       
 //#15369                    if(tfrm->ftyp){                                                       
 //#15370                                                                           
-//#15371                        if(tfrm->fcol>vind)                                                   
+//#15371                        if(tfrm->fcol>vind)
 //#15372                            tfrm->fcol--;                                               
 //#15373                        if(tfrm->dhx.fth.fthcol>vind)                                                   
 //#15374                            tfrm->dhx.fth.fthcol--;                                               
@@ -15815,7 +15822,7 @@ end;
 //#15397        if(hed.stchs&&chkMap(SELBOX)){                                                                   
 //#15398                                                                           
 //#15399            savdo();                                                               
-//#15400            if(cloInd==(unsigned)hed.stchs-1){                                                               
+//#15400            if(cloInd==(unsigned)hed.stchs-1){
 //#15401                                                                           
 //#15402                setMap(FILDIR);                                                           
 //#15403                opnt=cloInd+1;                                                           
@@ -15844,7 +15851,7 @@ end;
 //#15426    void selfrm0(){                                                                       
 //#15427                                                                           
 //#15428        rstMap(GRPSEL);                                                                   
-//#15429        if(rstMap(FORMSEL)){                                                                   
+//#15429        if(rstMap(FORMSEL)){
 //#15430                                                                           
 //#15431            setMap(FRMPSEL);                                                               
 //#15432            clofine=0;                                                               
@@ -15873,7 +15880,7 @@ end;
 //#15455        fplin[0].x=tpnt.x;                                                                   
 //#15456        fplin[0].y=tpnt.y;                                                                   
 //#15457        sfCor2px(iseq[1],&tpnt);                                                                   
-//#15458        tof.x=msg.pt.x-stOrg.x-tpnt.x;                                                                   
+//#15458        tof.x=msg.pt.x-stOrg.x-tpnt.x;
 //#15459        tof.y=msg.pt.y-stOrg.y-tpnt.y;                                                                   
 //#15460        for(ind=0;ind<opnt-2;ind++){                                                                   
 //#15461                                                                           
@@ -15902,7 +15909,7 @@ end;
 //#15484            dupclp();                                                               
 //#15485    }                                                                       
 //#15486                                                                           
-//#15487    void fixpclp(){                                                                       
+//#15487    void fixpclp(){
 //#15488
 //#15489        POINT        tpnt;                                                           
 //#15490        FLPNT        pof;                                                           
@@ -15931,7 +15938,7 @@ end;
 //#15513    BOOL sidclp(){                                                                       
 //#15514                                                                           
 //#15515        fvars(clofind);                                                                   
-//#15516        if(OpenClipboard(hWnd)){                                                                   
+//#15516        if(OpenClipboard(hWnd)){
 //#15517                                                                           
 //#15518            hClip=RegisterClipboardFormat(pcdClip);                                                               
 //#15519            hClpMem=GetClipboardData(hClip);                                                               
@@ -15960,7 +15967,7 @@ end;
 //#15542                                                                           
 //#15543    unsigned chkMsg(){                                                                       
 //#15544                                                                           
-//#15545        unsigned        cod,dst;                                                           
+//#15545        unsigned        cod,dst;
 //#15546        unsigned        ine,inf;                                                           
 //#15547        long            ind;                                                       
 //#15548        long            tlng;                                                       
@@ -16018,7 +16025,7 @@ begin
 //#15595                if(chkMap(INSRT)){                                                           
 //#15596                                                                           
 //#15597                    if(chku(NEDOF))
-//#15598                        SetCursor(hCros);                                                   
+//#15598                        SetCursor(hCros);
 //#15599                    else{                                                       
 //#15600                                                                           
 //#15601                        if(chkMap(LIN1))                                                   
@@ -16041,13 +16048,13 @@ begin
 //#15618                            }                                               
 //#15619                        }
 //#15620                    }                                                       
-//#15621                    goto gotcur;                                                       
+//#15621                    goto gotcur;
 //#15622                }                                                           
 //#15623                if(*map&(BZUMINB|BOXZUMB|SELPNTB)){                                                           
 //#15624                                                                           
 //#15625                    SetCursor(hCros);                                                       
 //#15626                    goto gotcur;                                                       
-//#15627                }                                                           
+//#15627                }
 //#15628                if(*map&(SATINB|SATPNTB|INSFRMB)){                                                           
 //#15629                                                                           
 //#15630                    if(chku(FRMX))                                                       
@@ -16070,13 +16077,13 @@ begin
 //#15647                }                                                           
 //#15648                if(chkMap(INSFIL)){                                                           
 //#15649                                                                           
-//#15650                    unfrm();                                                       
+//#15650                    unfrm();
 //#15651                    tpnt.x=msg.pt.x-stOrg.x;                                                       
 //#15652                    tpnt.y=msg.pt.y-stOrg.y;                                                       
 //#15653                    insflin(tpnt);
 //#15654                    setMap(SHOFRM);                                                       
 //#15655                    dufrm();                                                       
-//#15656                    return 1;                                                       
+//#15656                    return 1;
 //#15657                }                                                           
 //#15658                if(chkMap(MOVFRMS)){                                                           
 //#15659                                                                           
@@ -16105,7 +16112,7 @@ begin
 //#15682                    ind=(cntrl+2)%4;                                                       
 //#15683                    tdub=fabs((double)(nusiz.x-sizlin[ind].x)/(nusiz.y-sizlin[ind].y));                                                       
 //#15684                    if(ind&1){                                                       
-//#15685                                                                           
+//#15685
 //#15686                        if(tdub<xpct)                                                   
 //#15687                            nusiz.x=(sizlin[ind].y-nusiz.y)*xpct+sizlin[ind].x;
 //#15688                        else                                                   
@@ -16128,13 +16135,13 @@ begin
 //#15705                        sizlin[ind].x=nusiz.x;                                                   
 //#15706                        ind=nxtcrnr(ind);                                                   
 //#15707                        sizlin[ind].x=nusiz.x;                                                   
-//#15708                        sizlin[ind].y=nusiz.y;                                                   
+//#15708                        sizlin[ind].y=nusiz.y;
 //#15709                        ind=nxtcrnr(ind);                                                   
 //#15710                        sizlin[ind].y=nusiz.y;                                                   
 //#15711                    }                                                       
 //#15712                    sizlin[4].x=sizlin[0].x;                                                       
 //#15713                    sizlin[4].y=sizlin[0].y;
-//#15714                    setMap(SHOSTRTCH);                                                       
+//#15714                    setMap(SHOSTRTCH);
 //#15715                    strtchbox();                                                       
 //#15716                    return 1;                                                       
 //#15717                }                                                           
@@ -16157,13 +16164,13 @@ begin
 //#15734                                sizlin[ind].y=tlng;                                           
 //#15735                        }                                                   
 //#15736                    }                                                       
-//#15737                    sizlin[4].x=sizlin[0].x;                                                       
+//#15737                    sizlin[4].x=sizlin[0].x;
 //#15738                    sizlin[4].y=sizlin[0].y;                                                       
 //#15739                    setMap(SHOSTRTCH);                                                       
 //#15740                    strtchbox();                                                       
 //#15741                    return 1;                                                       
 //#15742                }                                                           
-//#15743                if(chkMap(INSFRM)){                                                           
+//#15743                if(chkMap(INSFRM)){
 //#15744                                                                           
 //#15745                    uninsf();                                                       
 //#15746                    inlin[1].x=msg.pt.x-stOrg.x;                                                       
@@ -16186,13 +16193,13 @@ begin
 //#15763                    return 1;                                                       
 //#15764                }                                                           
 //#15765                if(chkMap(SATPNT)){                                                           
-//#15766                                                                           
+//#15766
 //#15767                    drwsat();
 //#15768                    return 1;                                                       
 //#15769                }                                                           
 //#15770                if(chkMap(FRMOV)){                                                           
 //#15771                                                                           
-//#15772                    munfrm();                                                       
+//#15772                    munfrm();
 //#15773                    setmfrm();                                                       
 //#15774                    setMap(SHOFRM);                                                       
 //#15775                    mdufrm();                                                       
@@ -16215,7 +16222,7 @@ begin
 //#15792                    px2stch();                                                       
 //#15793                    rotcntr.x=sPnt.x;                                                       
 //#15794                    rotcntr.y=sPnt.y;                                                       
-//#15795                    ritrot();                                                       
+//#15795                    ritrot();
 //#15796                    return 1;                                                       
 //#15797                }                                                           
 //#15798                if(chkMap(ROTCAPT)){                                                           
@@ -16337,15 +16344,15 @@ begin
 //#15907                savdo();
 //#15908                tpnt.x=(msg.pt.x-fmovdif.x-stOrg.x)-bigrct.left;
 //#15909                tpnt.y=(msg.pt.y-fmovdif.y-stOrg.y)-bigrct.top;
-//#15910                ratsr();                                                           
-//#15911                fmovdif.x=tpnt.x/hfrat;                                                           
-//#15912                fmovdif.y=tpnt.y/vfrat;                                                           
-//#15913                if(chkMap(FPSEL)){                                                           
-//#15914                                                                           
-//#15915                    fvars(clofind);                                                       
-//#15916                    ine=pselrng.strt;                                                       
+//#15910                ratsr();
+//#15911                fmovdif.x=tpnt.x/hfrat;
+//#15912                fmovdif.y=tpnt.y/vfrat;
+//#15913                if(chkMap(FPSEL)){
+//#15914
+//#15915                    fvars(clofind);
+//#15916                    ine=pselrng.strt;
 //#15917                    for(ind=0;(unsigned)ind<=pselrng.cnt;ind++){
-//#15918                                                                           
+//#15918
 //#15919                        flt[ine].x+=fmovdif.x;                                                   
 //#15920                        flt[ine].y-=fmovdif.y;                                                   
 //#15921                        ine=pdir(ine);                                                   
@@ -16360,13 +16367,13 @@ begin
 //#15930                    if(chkMap(BIGBOX)){                                                       
 //#15931                                                                           
 //#15932                        savdo();                                                   
-//#15933                        for(ind=0;ind<(long)formpnt;ind++)                                                   
+//#15933                        for(ind=0;ind<(long)formpnt;ind++)
 //#15934                            frmadj(ind);                                               
 //#15935                        for(ind=0;ind<hed.stchs;ind++){                                                   
 //#15936                                                                           
 //#15937                            stchs[ind].x+=fmovdif.x;
 //#15938                            stchs[ind].y-=fmovdif.y;                                               
-//#15939                        }                                                   
+//#15939                        }
 //#15940                        selal();                                                   
 //#15941                    }                                                       
 //#15942                    else{                                                       
@@ -16389,13 +16396,13 @@ begin
 //#15959                                                                           
 //#15960                setstrtch();                                                           
 //#15961                return 1;                                                           
-//#15962            }                                                               
+//#15962            }
 //#15963            if(rstMap(FRMOV)){                                                               
 //#15964                                                                           
 //#15965                savdo();                                                           
 //#15966                rstfrm();                                                           
 //#15967                setMap(RESTCH);                                                           
-//#15968                return 1;                                                           
+//#15968                return 1;
 //#15969            }                                                               
 //#15970            if(rstMap(FRMPMOV)){                                                               
 //#15971
@@ -16418,13 +16425,13 @@ begin
 //#15988                savdo();                                                           
 //#15989                ReleaseCapture();                                                           
 //#15990                unsel();                                                           
-//#15991                padj.x=(rngrct.left+selof.x)-sPnt.x;                                                           
+//#15991                padj.x=(rngrct.left+selof.x)-sPnt.x;
 //#15992                padj.y=(rngrct.bottom+selof.y)-sPnt.y;
 //#15993                for(ind=gpnt0;ind<=(long)gpnt1;ind++){                                                           
 //#15994                                                                           
 //#15995                    stchs[ind].x-=padj.x;                                                       
 //#15996                    stchs[ind].y-=padj.y;                                                       
-//#15997                }                                                           
+//#15997                }
 //#15998                setMap(RESTCH);                                                           
 //#15999                return 1;                                                           
 //#16000            }                                                               
@@ -16447,7 +16454,7 @@ begin
 //#16017                    SetROP2(sdc,R2_COPYPEN);                                                       
 //#16018                }                                                           
 //#16019                setMap(SELBOX);
-//#16020                rstMap(FRMPSEL);                                                           
+//#16020                rstMap(FRMPSEL);
 //#16021                setMap(RESTCH);                                                           
 //#16022                return 1;                                                           
 //#16023            }                                                               
@@ -16476,13 +16483,13 @@ begin
 //#16046                        rngrct.top=sPnt.y;                                                   
 //#16047                        rngrct.bottom=zBoxo.y;                                                   
 //#16048                    }                                                       
-//#16049                    if(rstMap(GRPSEL)){                                                       
+//#16049                    if(rstMap(GRPSEL)){
 //#16050                                                                           
 //#16051                        rngadj();                                                   
 //#16052                        for(ine=gpnt0;ine<gpnt1;ine++){                                                   
 //#16053
 //#16054                            if(inrng(ine)){                                               
-//#16055                                                                           
+//#16055
 //#16056                                cloInd=ine;                                           
 //#16057                                setMap(SELBOX);                                           
 //#16058                                break;                                           
@@ -16505,13 +16512,13 @@ begin
 //#16075                                ReleaseCapture();                                           
 //#16076                                gotbox();                                           
 //#16077                                clofind=selist[0];                                           
-//#16078                                clofine=0;                                           
+//#16078                                clofine=0;
 //#16079                                fselpnt=0;                                           
 //#16080                                ritnum(STR_NUMFORM,clofind);                                           
 //#16081                                setMap(RESTCH);                                           
 //#16082                                setMap(FORMSEL);                                           
 //#16083                                return 1;                                           
-//#16084                            }                                               
+//#16084                            }
 //#16085                        }                                                   
 //#16086                        if(fselpnt){                                                   
 //#16087
@@ -16540,7 +16547,7 @@ begin
 //#16110                            return 1;                                               
 //#16111                        }                                                   
 //#16112                    }                                                       
-//#16113                    if(!chkMap(INSRT))                                                       
+//#16113                    if(!chkMap(INSRT))
 //#16114                        rngal();                                                   
 //#16115    //                gotbox();                                                       
 //#16116                    return 1;                                                       
@@ -16563,13 +16570,13 @@ begin
 //#16133                    nusiz.y=sPnt.y-zBoxo.y;                                                       
 //#16134                    sPnt.x=zBoxo.x+nusiz.x/2;                                                       
 //#16135                    sPnt.y=zBoxo.y+nusiz.y/2;                                                       
-//#16136                    tdub=zumFct;                                                       
+//#16136                    tdub=zumFct;
 //#16137                    if(nusiz.x>nusiz.y){                                                       
 //#16138                                                                           
 //#16139                        nusiz.y=nusiz.x/stchAspct;                                                   
 //#16140                        zumFct=nusiz.x/zum0.x;                                                   
 //#16141                    }
-//#16142                    else{                                                       
+//#16142                    else{
 //#16143                                                                           
 //#16144                        nusiz.x=nusiz.y*stchAspct;                                                   
 //#16145                        zumFct=nusiz.y/zum0.x;                                                   
@@ -16621,13 +16628,13 @@ begin
 //#16184                unbsho();
 //#16185                rstMap(THUMSHO);
 //#16186                unmsg();                                                           
-//#16187                return 1;                                                           
+//#16187                return 1;
 //#16188            }                                                               
 //#16189            if(rstMap(BAKSHO)){                                                               
 //#16190                                                                           
 //#16191                if(msg.message==WM_RBUTTONDOWN)                                                           
 //#16192                    setMap(RBUT);                                                       
-//#16193                else                                                           
+//#16193                else
 //#16194                    rstMap(RBUT);                                                       
 //#16195                for(ind=0;ind<OLDVER;ind++){                                                           
 //#16196
@@ -16650,13 +16657,13 @@ begin
 //#16213                                return 1;                                           
 //#16214                            }                                               
 //#16215                        }                                                   
-//#16216                        else                                                   
+//#16216                        else
 //#16217                            rebak();                                               
 //#16218                        rstAll();                                                   
 //#16219                        setMap(RESTCH);
 //#16220                        return 1;                                                   
 //#16221                    }                                                       
-//#16222                }                                                           
+//#16222                }
 //#16223            }                                                               
 //#16224            if(msg.pt.x>=bRct.left&&msg.pt.x<=bRct.right                                                               
 //#16225                &&msg.pt.y>=bRct.top&&msg.pt.y<=bRct.bottom){                                                           
@@ -16679,13 +16686,13 @@ begin
 //#16242                                                                           
 //#16243                        cloInd=tdub*hed.stchs;
 //#16244                        nuAct(cloInd);                                                   
-//#16245                        movbox();                                                   
+//#16245                        movbox();
 //#16246                        if(rstMap(GRPSEL)){                                                   
 //#16247                                                                           
 //#16248                            rstMap(SCROS);                                               
 //#16249                            rstMap(ECROS);                                               
 //#16250                            setMap(RESTCH);                                               
-//#16251                        }                                                   
+//#16251                        }
 //#16252                    }                                                       
 //#16253                }
 //#16254                else{                                                           
@@ -16708,13 +16715,13 @@ begin
 //#16271                return 1;                                                           
 //#16272            }                                                               
 //#16273            if(GetKeyState(VK_SHIFT)&0X8000){                                                               
-//#16274                                                                           
+//#16274
 //#16275                if(closfrm()){                                                           
 //#16276                                                                           
 //#16277                    if((chkMap(FRMPSEL)||chkMap(FPSEL))&&pselrng.frm==clofind){
 //#16278                                                                           
 //#16279                        rstMap(FRMPSEL);                                                   
-//#16280                        setMap(FPSEL);                                                   
+//#16280                        setMap(FPSEL);
 //#16281                        pselrng.fin=clofine;                                                   
 //#16282                        ine=(pselrng.fin-pselrng.strt+sids)%sids;                                                   
 //#16283                        if(ine<(unsigned)sids>>1){                                                   
@@ -16737,13 +16744,13 @@ begin
 //#16300                    selfpnt();                                                       
 //#16301                    return 1;
 //#16302                }                                                           
-//#16303            }                                                               
+//#16303            }
 //#16304            if(chkMap(WASTRAC)){                                                               
 //#16305                                                                           
 //#16306                if(chkMap(TRNIN0))                                                           
 //#16307                    dutrnum0(atoi(trinbuf));                                                       
 //#16308                if(chkMap(TRNIN1))                                                           
-//#16309                    dutrnum1();                                                       
+//#16309                    dutrnum1();
 //#16310                if(!chkMap(WASEDG))                                                           
 //#16311                    tracpar();
 //#16312                return 1;                                                           
@@ -16795,13 +16802,13 @@ begin
 //#16358                    return 1;                                                       
 //#16359                }                                                           
 //#16360            }                                                               
-//#16361            if(rstMap(INSFRM)){                                                               
+//#16361            if(rstMap(INSFRM)){
 //#16362                                                                           
 //#16363                insadj();                                                           
 //#16364                rstMap(SHOINSF);                                                           
 //#16365                setMap(RESTCH);                                                           
 //#16366                return 1;
-//#16367            }                                                               
+//#16367            }
 //#16368            if(px2stch()&&!(chkMap(SIZSEL)&&chkMsgs(msg.pt,hSizChng[0],hSizChng[2]))){                                                               
 //#16369
 //#16370                if(formpnt&&!chkMap(FRMOF)){                                                           
@@ -16824,13 +16831,13 @@ begin
 //#16387                                                                           
 //#16388                                    if(bakfrm>clofind){                                       
 //#16389                                                                           
-//#16390                                        ine=clofind;                                   
+//#16390                                        ine=clofind;
 //#16391                                        clofind=bakfrm;                                   
 //#16392                                        bakfrm=ine;                                   
 //#16393                                    }                                       
 //#16394                                    for(ind=bakfrm;ind<=(long)clofind;ind++)                                       
 //#16395                                        selist[ine++]=ind;                                   
-//#16396                                    fselpnt=ine;                                       
+//#16396                                    fselpnt=ine;
 //#16397                                    setMap(RESTCH);                                       
 //#16398                                    return 1;                                       
 //#16399                                }                                           
@@ -16853,13 +16860,13 @@ begin
 //#16416                        else                                                   
 //#16417                            ritnum(STR_NUMFORM,selist[0]+1);                                               
 //#16418                        return 1;                                                   
-//#16419                    }                                                       
+//#16419                    }
 //#16420                    if(chkMap(FORMSEL)){                                                       
 //#16421                                                                           
 //#16422                        if(sidtyp){                                                   
 //#16423                                                                           
 //#16424                            chknum();                                               
-//#16425                            sidtyp=0;                                               
+//#16425                            sidtyp=0;
 //#16426                            goto frmskip;                                               
 //#16427                        }                                                   
 //#16428                        if(hfdat){                                                   
@@ -16882,13 +16889,13 @@ begin
 //#16445                    if(closfrm()){
 //#16446                                                                           
 //#16447                        setMap(FORMSEL);
-//#16448                        rstMap(FPSEL);                                                   
+//#16448                        rstMap(FPSEL);
 //#16449                        unpsel();                                                   
 //#16450                        fvars(clofind);                                                   
 //#16451                        ritfrct(clofind,rsdc);                                                   
 //#16452                        if(rstMap(FRMPSEL)||fselpnt){                                                   
 //#16453                                                                           
-//#16454                            setMap(RESTCH);                                               
+//#16454                            setMap(RESTCH);
 //#16455                            fselpnt=0;                                               
 //#16456                        }                                                   
 //#16457                        ritnum(STR_NUMFORM,clofind);                                                   
@@ -16911,13 +16918,13 @@ begin
 //#16474                                                                           
 //#16475                        if(chkMap(SELBOX)){                                                   
 //#16476                                                                           
-//#16477                            cod=cloInd;                                               
+//#16477                            cod=cloInd;
 //#16478                            closPnt1(&cloInd);                                               
 //#16479                            if(cloInd!=cod){
 //#16480                                                                           
 //#16481                                unbox();
 //#16482                                grpInd=cloInd;                                           
-//#16483                                cloInd=cod;                                           
+//#16483                                cloInd=cod;
 //#16484                                setMap(GRPSEL);                                           
 //#16485                                grpAdj();                                           
 //#16486                            }                                               
@@ -16940,13 +16947,13 @@ begin
 //#16503                    }                                                       
 //#16504                    else{                                                       
 //#16505
-//#16506                        rstMap(LENSRCH);                                                   
+//#16506                        rstMap(LENSRCH);
 //#16507                        rstMap(WASGRP);                                                   
 //#16508                        rstMap(FPSEL);                                                   
 //#16509                        rstMap(WASFRMFRM);                                                   
 //#16510                        rstMap(SIDACT);                                                   
 //#16511                        if(rstMap(INSRT)){                                                   
-//#16512                                                                           
+//#16512
 //#16513                            ReleaseCapture();
 //#16514                            rstAll();                                               
 //#16515                            setMap(RESTCH);
@@ -16969,13 +16976,13 @@ begin
 //#16532                                                                           
 //#16533                srchk();                                                           
 //#16534                setsrch(minpnt);                                                           
-//#16535                lensadj();                                                           
+//#16535                lensadj();
 //#16536                setMap(GRPSEL);
 //#16537                setMap(RESTCH);                                                           
 //#16538                return 1;                                                           
 //#16539            }
 //#16540            if(msg.pt.x>=maxLenRct.left&&msg.pt.x<=maxLenRct.right                                                               
-//#16541                &&msg.pt.y>maxLenRct.top&&msg.pt.y<=maxLenRct.bottom){                                                           
+//#16541                &&msg.pt.y>maxLenRct.top&&msg.pt.y<=maxLenRct.bottom){
 //#16542                                                                           
 //#16543                srchk();                                                           
 //#16544                setsrch(maxpnt);                                                           
@@ -16998,7 +17005,7 @@ begin
 //#16561                return 1;                                                           
 //#16562            }                                                               
 //#16563            if(rstMap(FSETFCOL))                                                               
-//#16564            {                                                               
+//#16564            {
 //#16565                unsid();                                                           
 //#16566                unmsg();                                                           
 //#16567                if(chkMsgs(msg.pt,hDef[0],hDef[15]))                                                           
@@ -17027,13 +17034,13 @@ begin
 //#16590            if(chkMap(FPSEL)&&!chkMap(FUNCLP)&&!chkMap(ROTAT)){                                                               
 //#16591                                                                           
 //#16592                MoveMemory(&biglin,&pselin,sizeof(POINT)*9);                                                           
-//#16593                MoveMemory(&bigrct,&pxselrct,sizeof(RECT));                                                           
+//#16593                MoveMemory(&bigrct,&pxselrct,sizeof(RECT));
 //#16594                if(chkbig())                                                           
 //#16595                    return 1;                                                       
 //#16596            }                                                               
 //#16597            if(chkMap(WASTRAC)){                                                               
 //#16598                                                                           
-//#16599                tracpar();                                                           
+//#16599                tracpar();
 //#16600                return 1;                                                           
 //#16601            }                                                               
 //#16602            if(rstMap(HUPMSG)){                                                               
@@ -17056,13 +17063,13 @@ begin
 //#16619                        case SMALHUP:                                                   
 //#16620                                                                           
 //#16621                            ini.hupx=SHUPX;                                               
-//#16622                            ini.hupy=SHUPY;                                               
+//#16622                            ini.hupy=SHUPY;
 //#16623                            ini.hup=SMALHUP;                                               
 //#16624                            break;                                               
 //#16625                                                                           
 //#16626                        case LARGHUP:                                                   
 //#16627                                                                           
-//#16628                            ini.hupx=LHUPX;                                               
+//#16628                            ini.hupx=LHUPX;
 //#16629                            ini.hupy=LHUPY;                                               
 //#16630                            ini.hup=LARGHUP;                                               
 //#16631                            break;                                               
@@ -17091,7 +17098,7 @@ begin
 //#16654                unsid();                                                           
 //#16655                prfmsg();                                                           
 //#16656                return 1;                                                           
-//#16657            }                                                               
+//#16657            }
 //#16658            if(rstMap(INSFIL)){                                                               
 //#16659                                                                           
 //#16660                duinsfil();                                                           
@@ -17114,13 +17121,13 @@ begin
 //#16677                    if(msg.pt.x>=trct.left&&msg.pt.x<=trct.right                                                       
 //#16678                        &&msg.pt.y>=trct.top&&msg.pt.y<=trct.bottom){                                                   
 //#16679                                                                           
-//#16680                        savdo();                                                   
+//#16680                        savdo();
 //#16681                        setMap(DELTO);                                                   
 //#16682                        cod=1;                                                   
 //#16683                    }
 //#16684                }                                                           
 //#16685                delsfrms(cod);
-//#16686                unmsg();                                                           
+//#16686                unmsg();
 //#16687                return 1;                                                           
 //#16688            }                                                               
 //#16689            if(rstMap(MOVMSG)){                                                               
@@ -17149,7 +17156,7 @@ begin
 //#16712                    fvars(clofind);                                                       
 //#16713                    for(ine=0;ine<frmpnt->sids;ine++){                                                       
 //#16714                                                                           
-//#16715                        frmpnt->flt[ine].x+=fmovdif.x;                                                   
+//#16715                        frmpnt->flt[ine].x+=fmovdif.x;
 //#16716                        frmpnt->flt[ine].y+=fmovdif.y;                                                   
 //#16717                    }
 //#16718                    frmout(clofind);                                                       
@@ -17172,13 +17179,13 @@ begin
 //#16735                if(rstMap(BRDSID))                                                           
 //#16736                {                                                           
 //#16737                    nubrdcol(vind);                                                       
-//#16738                    goto chkcolx;                                                       
+//#16738                    goto chkcolx;
 //#16739                }                                                           
 //#16740                if(rstMap(APSID))                                                           
 //#16741                {                                                           
 //#16742                    nulapcol(vind);                                                       
 //#16743                    goto chkcolx;
-//#16744                }                                                           
+//#16744                }
 //#16745                if(rstMap(FTHSID))                                                           
 //#16746                {                                                           
 //#16747                    nufthcol(vind);                                                       
@@ -17201,13 +17208,13 @@ begin
 //#16764                msgbuf[0]=(TCHAR)vind+0x30;                                                           
 //#16765                msgbuf[1]=0;                                                           
 //#16766                SetWindowText(thDat[LBRDCOL],msgbuf);                                                           
-//#16767                unsid();                                                           
+//#16767                unsid();
 //#16768                coltab();                                                           
 //#16769                setMap(RESTCH);                                                           
 //#16770                rstMap(SIDCOL);                                                           
 //#16771                sidtyp=0;                                                           
 //#16772                return 1;                                                           
-//#16773            }                                                               
+//#16773            }
 //#16774            if(rstMap(OSAV)){                                                               
 //#16775                                                                           
 //#16776                if(chkok()){                                                           
@@ -17230,13 +17237,13 @@ begin
 //#16793                                                                           
 //#16794                if(chkok())                                                           
 //#16795                    save();                                                       
-//#16796                else{                                                           
+//#16796                else{
 //#16797                                                                           
 //#16798                    if(!chkwnd(hcan))                                                       
 //#16799                        closfn();                                                   
 //#16800                }                                                           
 //#16801                unmsg();                                                           
-//#16802                return 1;                                                           
+//#16802                return 1;
 //#16803            }                                                               
 //#16804            if(rstMap(SAVEX)){                                                               
 //#16805                                                                           
@@ -17259,13 +17266,13 @@ begin
 //#16822                        SetWindowText(thDat[PSQR],stab[STR_PNTD]);                                                   
 //#16823                    else                                                       
 //#16824                        SetWindowText(thDat[PSQR],stab[STR_SQR]);                                                   
-//#16825                    return 1;                                                       
+//#16825                    return 1;
 //#16826                }                                                           
 //#16827                if(msg.hwnd==thDat[PBLNT]){                                                           
 //#16828                                                                           
 //#16829                    if(toglu(BLUNT))                                                       
 //#16830                        SetWindowText(thDat[PBLNT],stab[STR_TAPR]);                                                   
-//#16831                    else                                                       
+//#16831                    else
 //#16832                        SetWindowText(thDat[PBLNT],stab[STR_BLUNT]);                                                   
 //#16833                    return 1;                                                       
 //#16834                }                                                           
@@ -17288,13 +17295,13 @@ begin
 //#16851                                                                           
 //#16852                        prfind=ind+1;                                                   
 //#16853                        prfsid(thDat[ind]);
-//#16854                        break;                                                   
+//#16854                        break;
 //#16855                    }
 //#16856                }                                                           
 //#16857                return 1;                                                           
 //#16858            }                                                               
 //#16859            if(!chkMap(ROTAT)&&chkMap(GRPSEL)){                                                               
-//#16860                                                                           
+//#16860
 //#16861                if(iselpnt()){                                                           
 //#16862                                                                           
 //#16863                    for(ind=0;ind<4;ind++){                                                       
@@ -17317,7 +17324,7 @@ begin
 //#16880                    return 1;                                                       
 //#16881                }                                                           
 //#16882                else{                                                           
-//#16883                                                                           
+//#16883
 //#16884                    pPnt.x=msg.pt.x-stOrg.x;                                                       
 //#16885                    pPnt.y=msg.pt.y-stOrg.y;                                                       
 //#16886                    if(pPnt.x>=rctlin[0].x&&pPnt.x<=rctlin[2].x&&                                                       
@@ -17346,13 +17353,13 @@ begin
 //#16909                    unmsg();                                                       
 //#16910                    newFil();                                                       
 //#16911                    return 1;                                                       
-//#16912                }                                                           
+//#16912                }
 //#16913                unmsg();
 //#16914                return 1;                                                           
 //#16915            }                                                               
 //#16916            if(rstMap(PRGMSG)){                                                               
 //#16917                                                                           
-//#16918                if(chkok()){                                                           
+//#16918                if(chkok()){
 //#16919                                                                           
 //#16920                    deldir();                                                       
 //#16921                    return 1;
@@ -17375,7 +17382,7 @@ begin
 //#16938                        ind=duth(thrnam);                                                   
 //#16939                        thrnam[ind]='t';                                                   
 //#16940                        setMap(IGNAM);                                                   
-//#16941                        thrsav();                                                   
+//#16941                        thrsav();
 //#16942                        thrnam[ind]='r';                                                   
 //#16943                        if(baknum)                                                   
 //#16944                            filnam[ind]=baknum+0x2f;                                               
@@ -17404,13 +17411,13 @@ begin
 //#16967                            OPEN_EXISTING,0,NULL);                                               
 //#16968                        if(hFil==INVALID_HANDLE_VALUE)                                                   
 //#16969                            hFil=0;                                               
-//#16970                        return 1;                                                   
+//#16970                        return 1;
 //#16971                    }                                                       
 //#16972                    GetWindowRect(hcan,&trct);                                                       
 //#16973                    if(msg.pt.x>=trct.left&&msg.pt.x<=trct.right                                                       
 //#16974                        &&msg.pt.y>=trct.top&&msg.pt.y<=trct.bottom){                                                   
 //#16975                                                                           
-//#16976                        getbak();                                                   
+//#16976                        getbak();
 //#16977                        return 1;                                                   
 //#16978                    }                                                       
 //#16979                }                                                           
@@ -17433,13 +17440,13 @@ begin
 //#16996                        savdo();                                                   
 //#16997                        setMap(DELTO);                                                   
 //#16998                        cod=1;                                                   
-//#16999                    }                                                       
+//#16999                    }
 //#17000                }                                                           
 //#17001                if(cod){                                                           
 //#17002                                                                           
 //#17003                    frmdel();                                                       
 //#17004                    coltab();                                                       
-//#17005                    setMap(RESTCH);                                                       
+//#17005                    setMap(RESTCH);
 //#17006                }                                                           
 //#17007                unmsg();                                                           
 //#17008                return 1;                                                           
@@ -17462,13 +17469,13 @@ begin
 //#17025
 //#17026                    vind-=13;                                                       
 //#17027                    thrdSiz[thrdSel][0]=cmap[vind];                                                       
-//#17028                    sizInd[thrdSel]=vind;                                                       
+//#17028                    sizInd[thrdSel]=vind;
 //#17029                    strncpy(buf,thrdSiz[thrdSel],2);                                                       
 //#17030                    buf[2]=0;                                                       
 //#17031                    SetWindowText(hSiz[thrdSel],buf);                                                       
 //#17032                    setMap(RESTCH);                                                       
 //#17033                    for(ind=0;ind<3;ind++)                                                       
-//#17034                        DestroyWindow(hSizChng[ind]);                                                   
+//#17034                        DestroyWindow(hSizChng[ind]);
 //#17035                    return 1;                                                       
 //#17036                }                                                           
 //#17037                else{                                                           
@@ -17497,7 +17504,7 @@ begin
 //#17060                        if(ind==4)                                                   
 //#17061                            setu(SQRFIL);                                               
 //#17062                    }                                                       
-//#17063                    else                                                       
+//#17063                    else
 //#17064                        duform(ind);                                                   
 //#17065                    switch(ind){                                                       
 //#17066                                                                           
@@ -17526,7 +17533,7 @@ begin
 //#17089            if(rstMap(SIDACT)){                                                               
 //#17090                                                                           
 //#17091                savdo();
-//#17092                if(sidtyp==LFTHTYP){                                                           
+//#17092                if(sidtyp==LFTHTYP){
 //#17093
 //#17094                    for(ind=0;ind<6;ind++){                                                       
 //#17095                                                                           
@@ -17555,7 +17562,7 @@ begin
 //#17118                    return 1;                                                       
 //#17119                }                                                           
 //#17120                frmpnt->bcol&=0xf;                                                           
-//#17121                if(rstMap(BRDACT)){                                                           
+//#17121                if(rstMap(BRDACT)){
 //#17122                                                                           
 //#17123                    if(iseclp(clofind))                                                       
 //#17124                        deleclp(clofind);                                                   
@@ -17584,7 +17591,7 @@ begin
 //#17147                            unsid();                                               
 //#17148                            bord();                                               
 //#17149                            return 1;                                               
-//#17150                        }                                                   
+//#17150                        }
 //#17151                    }
 //#17152                    if(msg.hwnd==hsidWnd[2]){                                                       
 //#17153                                                                           
@@ -17613,7 +17620,7 @@ begin
 //#17176                    }                                                       
 //#17177                    if(msg.hwnd==hsidWnd[4]){                                                       
 //#17178                                                                           
-//#17179                        if(frmpnt->etyp){                                                   
+//#17179                        if(frmpnt->etyp){
 //#17180                                                                           
 //#17181                            switch(frmpnt->etyp){                                               
 //#17182                                                                           
@@ -17642,7 +17649,7 @@ begin
 //#17205                                                                           
 //#17206                            unmsg();                                               
 //#17207                            unsid();                                               
-//#17208                            satbrd();                                               
+//#17208                            satbrd();
 //#17209                            return 1;                                               
 //#17210                        }                                                   
 //#17211                    }                                                       
@@ -17671,7 +17678,7 @@ begin
 //#17234                        else{                                                   
 //#17235                                                                           
 //#17236                            unmsg();                                               
-//#17237                            unsid();                                               
+//#17237                            unsid();
 //#17238                            apliq();                                               
 //#17239                            return 1;                                               
 //#17240                        }                                                   
@@ -17700,7 +17707,7 @@ begin
 //#17263                            if(chku(DUND))
 //#17264                                frmpnt->etyp|=EGUND;                                           
 //#17265                            goto didfil;                                               
-//#17266                        }                                                   
+//#17266                        }
 //#17267                        else{                                                   
 //#17268                                                                           
 //#17269                            unmsg();                                               
@@ -17758,7 +17765,7 @@ begin
 //#17321                        if(frmpnt->etyp){
 //#17322                                                                           
 //#17323                            cod=frmpnt->etyp&NEGUND;                                               
-//#17324                            if(cod==EGCLP||cod==EGSAT||cod==EGAP)                                               
+//#17324                            if(cod==EGCLP||cod==EGSAT||cod==EGAP)
 //#17325                                bsizpar();                                           
 //#17326                            frmpnt->etyp=EGDUB;                                               
 //#17327                            goto didfil;                                               
@@ -17787,7 +17794,7 @@ begin
 //#17350                        unmsg();                                                   
 //#17351                        unsid();                                                   
 //#17352                        chan();                                                   
-//#17353                        coltab();                                                   
+//#17353                        coltab();
 //#17354                        setMap(RESTCH);                                                   
 //#17355                        return 1;
 //#17356                    }                                                       
@@ -17816,7 +17823,7 @@ begin
 //#17379                        frmpnt->ftyp=0;                                                   
 //#17380                        coltab();                                                   
 //#17381                        unsid();                                                   
-//#17382                        setMap(RESTCH);                                                   
+//#17382                        setMap(RESTCH);
 //#17383                        return 1;                                                   
 //#17384                    }                                                       
 //#17385                    if(msg.hwnd==hsidWnd[1]){                                                       
@@ -17845,7 +17852,7 @@ begin
 //#17408                                                                           
 //#17409                            respac();                                               
 //#17410                            frmpnt->ftyp=HORF;                                               
-//#17411                            goto didfil;                                               
+//#17411                            goto didfil;
 //#17412                        }                                                   
 //#17413                        else{                                                   
 //#17414                                                                           
@@ -17874,7 +17881,7 @@ begin
 //#17437                        }                                                   
 //#17438                    }                                                       
 //#17439                    if(msg.hwnd==hsidWnd[4]){                                                       
-//#17440                                                                           
+//#17440
 //#17441                        frmpnt->typ=SAT;                                                   
 //#17442                        if(frmpnt->ftyp){                                                   
 //#17443                                                                           
@@ -17903,7 +17910,7 @@ begin
 //#17466                                                                           
 //#17467                        if(frmpnt->ftyp){
 //#17468                                                                           
-//#17469                            if(frmpnt->ftyp==CLPF)                                               
+//#17469                            if(frmpnt->ftyp==CLPF)
 //#17470                                frmpnt->fspac=stspace;                                           
 //#17471                            chkcont();                                               
 //#17472                            goto didfil;                                               
@@ -17932,7 +17939,7 @@ begin
 //#17495                        unmsg();                                                   
 //#17496                        unsid();                                                   
 //#17497                        if(sidclp())                                                   
-//#17498                            horsclp();                                               
+//#17498                            horsclp();
 //#17499                        rstMap(CLPSHO);
 //#17500                        coltab();                                                   
 //#17501                        setMap(RESTCH);
@@ -17961,7 +17968,7 @@ begin
 //#17524                        else                                                   
 //#17525                            fethrf();
 //#17526                        setMap(INIT);                                                   
-//#17527                        coltab();                                                   
+//#17527                        coltab();
 //#17528                        setMap(RESTCH);                                                   
 //#17529                        return 1;                                                   
 //#17530                    }                                                       
@@ -17990,7 +17997,7 @@ begin
 //#17553                            frmpnt->ftyp=TXANGF;                                               
 //#17554                            frmpnt->angclp.fang=ini.angl;                                               
 //#17555                            goto didfil;                                               
-//#17556                        }                                                   
+//#17556                        }
 //#17557                        dutxtfil();                                                   
 //#17558                    }                                                       
 //#17559    didfil:;
@@ -18019,7 +18026,7 @@ begin
 //#17582                }                                                           
 //#17583                if(msg.hwnd==thDat[LUANG])                                                           
 //#17584                {                                                           
-//#17585                    sidtyp=LUANG;                                                       
+//#17585                    sidtyp=LUANG;
 //#17586                    sidwnd(thDat[LUANG]);                                                       
 //#17587                    goto didat;                                                       
 //#17588                }                                                           
@@ -18048,7 +18055,7 @@ begin
 //#17611                    goto didat;                                                       
 //#17612                }                                                           
 //#17613                if(msg.hwnd==thDat[LFTHFLR]){                                                           
-//#17614                                                                           
+//#17614
 //#17615                    sidtyp=LFTHFLR;                                                       
 //#17616                    sidwnd(thDat[LFTHFLR]);                                                       
 //#17617                    goto didat;                                                       
@@ -18077,7 +18084,7 @@ begin
 //#17640                }                                                           
 //#17641                if(msg.hwnd==thDat[LFTHDWN]){                                                           
 //#17642                                                                           
-//#17643                    frmpnt->xat^=AT_FTHDWN;                                                       
+//#17643                    frmpnt->xat^=AT_FTHDWN;
 //#17644                    goto didfil;                                                       
 //#17645                }                                                           
 //#17646                if(msg.hwnd==thDat[LFTHTYP]){                                                           
@@ -18106,7 +18113,7 @@ begin
 //#17669                    sidmsg(thDat[LLAYR],laytxt,5);
 //#17670                    goto didat;                                                       
 //#17671                }
-//#17672                if(msg.hwnd==thDat[LFRMFIL]){                                                           
+//#17672                if(msg.hwnd==thDat[LFRMFIL]){
 //#17673                                                                           
 //#17674                    rstMap(FILTYP);                                                       
 //#17675                    sidtyp=LFRMFIL;                                                       
@@ -18135,7 +18142,7 @@ begin
 //#17698                    setMap(SIDCOL);                                                       
 //#17699                    setMap(FTHSID);                                                       
 //#17700                    goto didat;                                                       
-//#17701                }                                                           
+//#17701                }
 //#17702                if(msg.hwnd==thDat[LFRMSPAC]){                                                           
 //#17703
 //#17704                    sidtyp=LFRMSPAC;                                                       
@@ -18164,7 +18171,7 @@ begin
 //#17727                    goto didat;                                                       
 //#17728                }                                                           
 //#17729                if(msg.hwnd==thDat[LBRDSPAC]){
-//#17730                                                                           
+//#17730
 //#17731                    sidtyp=LBRDSPAC;                                                       
 //#17732                    sidwnd(thDat[LBRDSPAC]);                                                       
 //#17733                    goto didat;                                                       
@@ -18193,7 +18200,7 @@ begin
 //#17756                                                                           
 //#17757                    sidtyp=LBCSIZ;                                                       
 //#17758                    sidwnd(thDat[LBCSIZ]);                                                       
-//#17759                    goto didat;                                                       
+//#17759                    goto didat;
 //#17760                }                                                           
 //#17761                if(msg.hwnd==thDat[LBSTRT]){                                                           
 //#17762                                                                           
@@ -18222,7 +18229,7 @@ begin
 //#17785                if(msg.hwnd==thDat[LFRMANG]){                                                           
 //#17786                                                                           
 //#17787                    sidtyp=LFRMANG;                                                       
-//#17788                    sidwnd(thDat[LFRMANG]);                                                       
+//#17788                    sidwnd(thDat[LFRMANG]);
 //#17789                    goto didat;                                                       
 //#17790                }                                                           
 //#17791                if(msg.hwnd==thDat[LBRDPIC]){                                                           
@@ -18251,7 +18258,7 @@ begin
 //#17814                }                                                           
 //#17815                if(msg.hwnd==thDat[LBRDPOS]){                                                           
 //#17816                                                                           
-//#17817                    sidtyp=LBRDPOS;                                                       
+//#17817                    sidtyp=LBRDPOS;
 //#17818                    sidwnd(thDat[LBRDPOS]);                                                       
 //#17819                    goto didat;                                                       
 //#17820                }                                                           
@@ -18280,7 +18287,7 @@ begin
 //#17843                {                                                           
 //#17844                    sidtyp=LDEND;                                                       
 //#17845                    sidwnd(thDat[LDEND]);                                                       
-//#17846                    goto didat;                                                       
+//#17846                    goto didat;
 //#17847                }                                                           
 //#17848                if(msg.hwnd==thDat[LWALK])                                                           
 //#17849                {                                                           
@@ -18338,7 +18345,7 @@ begin
 //#17901                savdo();                                                           
 //#17902                formpnt++;                                                           
 //#17903                setMap(INIT);                                                           
-//#17904                rstfrm();                                                           
+//#17904                rstfrm();
 //#17905                fvars(clofind);                                                           
 //#17906                refil();                                                           
 //#17907                rstMap(FUNCLP);
@@ -18396,7 +18403,7 @@ begin
 //#17959                    else{                                                       
 //#17960                                                                           
 //#17961                        if(padj.x)                                                   
-//#17962                            hang=-atan2(padj.y,padj.x);                                               
+//#17962                            hang=-atan2(padj.y,padj.x);
 //#17963                        else{                                                   
 //#17964                                                                           
 //#17965                            if(padj.y>0)                                               
@@ -18425,7 +18432,7 @@ begin
 //#17988                    rctlin[3].y=rctlin[7].y=midl(trct.top,trct.bottom);                                                       
 //#17989                    rctlin[4].y=rctlin[5].y=rctlin[6].y=trct.bottom;                                                       
 //#17990                    rctlin[2].x=rctlin[3].x=rctlin[4].x=trct.right;                                                       
-//#17991                    coltab();                                                       
+//#17991                    coltab();
 //#17992                    setMap(RESTCH);                                                       
 //#17993                    return 1;                                                       
 //#17994                }                                                           
@@ -18454,7 +18461,7 @@ begin
 //#18017                            frmovlin();                                               
 //#18018                            return 1;                                               
 //#18019                        }                                                   
-//#18020                    }                                                       
+//#18020                    }
 //#18021                }                                                           
 //#18022                if(chkMap(INIT)){                                                           
 //#18023                                                                           
@@ -18483,7 +18490,7 @@ begin
 //#18046                                coltab();                                           
 //#18047                                setMap(RESTCH);                                           
 //#18048                                return 1;                                           
-//#18049                            }                                               
+//#18049                            }
 //#18050                            else{                                               
 //#18051                                                                           
 //#18052                                xlin1();                                           
@@ -18512,7 +18519,7 @@ begin
 //#18075                                                                           
 //#18076                            xlin();                                               
 //#18077                            if(stchs[cloInd].at&ALTYPMSK&&stchs[cloInd+1].at&ALTYPMSK)
-//#18078                            {                                               
+//#18078                            {
 //#18079                                if((stchs[cloInd].at&FRMSK)==(stchs[cloInd+1].at&FRMSK))
 //#18080                                    cod=stchs[cloInd].at|USMSK;                                       
 //#18081                            }                                               
@@ -18541,7 +18548,7 @@ begin
 //#18104                            coltab();                                               
 //#18105                            setMap(RESTCH);                                               
 //#18106                            ritnum(STR_NUMSEL,cloInd);                                               
-//#18107                            return 1;                                               
+//#18107                            return 1;
 //#18108                        }                                                   
 //#18109                    }                                                       
 //#18110                    if((!chkMap(HIDSTCH))&&closPnt1(&selclo)){                                                       
@@ -18570,7 +18577,7 @@ begin
 //#18133                                                                           
 //#18134                                if(zumFct<STCHBOX){                                           
 //#18135                                                                           
-//#18136                                    SelectObject(rsdc,lPen);                                       
+//#18136                                    SelectObject(rsdc,lPen);
 //#18137                                    stchbox(hed.stchs-1,rsdc);
 //#18138                                    stchbox(hed.stchs-2,rsdc);                                       
 //#18139                                }                                           
@@ -18599,7 +18606,7 @@ begin
 //#18162                                                                           
 //#18163                            setMap(ISDWN);                                               
 //#18164                            stch2px1(cloInd-1);                                               
-//#18165                            mlin0[0].x=pPnt.x;                                               
+//#18165                            mlin0[0].x=pPnt.x;
 //#18166                            mlin0[0].y=pPnt.y;                                               
 //#18167                        }                                                   
 //#18168                        tlng=hed.stchs-1;                                                   
@@ -18628,7 +18635,7 @@ begin
 //#18191                        inlin[0].y=msg.pt.y-stOrg.y;                                                   
 //#18192                        stchs[0].at=USMSK|actcol|laycod|NOTFRM;                                                   
 //#18193                        stchs[0].x=sPnt.x;                                                   
-//#18194                        stchs[0].y=sPnt.y;                                                   
+//#18194                        stchs[0].y=sPnt.y;
 //#18195                        colCnt=1;                                                   
 //#18196                        colch[0].colind=actcol;                                                   
 //#18197                        colch[0].stind=0;                                                   
@@ -18651,20 +18658,20 @@ begin
 //#18214                px2stch();                                                           
 //#18215                zBoxo.x=sPnt.x;
 //#18216                zBoxo.y=sPnt.y;                                                           
-//#18217                setMap(VCAPT);                                                           
+//#18217                setMap(VCAPT);
 //#18218                return 1;                                                           
 //#18219            }                                                               
 //#18220            if(msg.hwnd==hbuts[HBOXSEL]){                                                               
 //#18221                                                                           
 //#18222                boxsel();                                                           
-//#18223                return 1;                                                           
+//#18223                return 1;
 //#18224            }                                                               
 //#18225            if(msg.hwnd==hbuts[HUPTO]){                                                               
 //#18226                                                                           
 //#18227                toglup();                                                           
 //#18228                return 1;                                                           
 //#18229            }                                                               
-//#18230            if(msg.hwnd==hbuts[HHID]){                                                               
+//#18230            if(msg.hwnd==hbuts[HHID]){
 //#18231                                                                           
 //#18232                toglHid();                                                           
 //#18233                return 1;                                                           
@@ -18677,7 +18684,7 @@ begin
 //#18240                    cod=actcol;                                                       
 //#18241                    actcol=vind&0xf;                                                       
 //#18242                    redraw(hCol[cod]);                                                       
-//#18243                    redraw(hCol[actcol]);                                                       
+//#18243                    redraw(hCol[actcol]);
 //#18244                    if(chkMap(HID)){                                                       
 //#18245                                                                           
 //#18246                        rstMap(SELBOX);                                                   
@@ -18686,11 +18693,11 @@ begin
 //#18249                        rstMap(ECROS);
 //#18250                        setMap(RESTCH);                                                   
 //#18251                        redraw(hbuts[HHID]);                                                   
-//#18252                    }                                                       
+//#18252                    }
 //#18253                    else{                                                       
 //#18254                                                                           
 //#18255                        if(fselpnt){                                                   
-//#18256                                                                           
+//#18256
 //#18257                            nucols();                                               
 //#18258                            coltab();                                               
 //#18259                            setMap(RESTCH);                                               
@@ -18703,7 +18710,7 @@ begin
 //#18266                                frmpnt=&formlst[clofind];                                           
 //#18267                                if(frmpnt->ftyp||frmpnt->etyp||frmpnt->xat&(AT_UND|AT_WALK|AT_CWLK)){                                           
 //#18268                                                                           
-//#18269                                    if(formlst[clofind].ftyp){                                       
+//#18269                                    if(formlst[clofind].ftyp){
 //#18270                                                                           
 //#18271                                        formlst[clofind].fcol=actcol;                                   
 //#18272                                        if(formlst[clofind].ftyp==FTHF)                                   
@@ -18716,7 +18723,7 @@ begin
 //#18279                                            formlst[clofind].bcol&=0xf0;                               
 //#18280                                            formlst[clofind].bcol|=actcol;                               
 //#18281                                        }
-//#18282                                        else                                   
+//#18282                                        else
 //#18283                                            formlst[clofind].bcol=actcol;
 //#18284                                    }                                       
 //#18285                                    if(frmpnt->xat&(AT_UND|AT_WALK|AT_CWLK))                                       
@@ -18729,7 +18736,7 @@ begin
 //#18292                                        {                                   
 //#18293                                            ine&=NCOLMSK;                               
 //#18294                                            ine|=actcol;                               
-//#18295                                            stchs[ind].at=ine;                               
+//#18295                                            stchs[ind].at=ine;
 //#18296                                        }                                   
 //#18297                                    }                                       
 //#18298                                    coltab();                                       
@@ -18742,9 +18749,9 @@ begin
 //#18305                                                                           
 //#18306                                    for(ind=gpnt0+1;ind<=(long)gpnt1;ind++){                                       
 //#18307
-//#18308                                        stchs[ind].at&=0xfffffff0;                                   
+//#18308                                        stchs[ind].at&=0xfffffff0;
 //#18309                                        stchs[ind].at|=actcol;                                   
-//#18310                                    }                                       
+//#18310                                    }
 //#18311                                    coltab();                                       
 //#18312                                    setMap(RESTCH);                                       
 //#18313                                }                                           
@@ -18755,7 +18762,7 @@ begin
 //#18318                                }                                           
 //#18319                            }                                               
 //#18320                        }                                                   
-//#18321                    }                                                       
+//#18321                    }
 //#18322                }                                                           
 //#18323                return 1;                                                           
 //#18324            }                                                               
@@ -18841,41 +18848,81 @@ begin
 //#18392                }
 //#18393            }
 //#18394    #endif
+
+
+
 //#18395            if(chkMap(FORMIN)){
 //#18396
-//#18397                if(GetKeyState(VK_CONTROL)&0X8000)                                                           
-//#18398                    return 1;                                                       
-//#18399                                                                           
-//#18400                switch(cod){                                                           
-//#18401                                                                           
-//#18402                case 'E':                                                           
-//#18403                                                                           
-//#18404                    rstMap(FORMIN);                                                       
-//#18405                    unmsg();                                                       
-//#18406                    duform(LIN-1);                                                       
-//#18407                    return 1;                                                       
-//#18408                                                                           
+//#18397                if(GetKeyState(VK_CONTROL)&0X8000)
+//#18398                    return 1;
+//#18399
+//#18400                switch(cod){
+//#18401
+
+  case chr(Key) of
+
+    'F' : begin
+            key := 0;
+            //with ClientToScreen(point(10,10)) do               pmForm.Popup(x,y);
+            mnu_form.Click;
+          end;
+  end;
+  key := 0;
+
+//#19309            case 'F':
+//#19310
+//#19311                if(fselpnt)
+//#19312                {
+//#19313                    PostMessage(hWnd,WM_SYSCOMMAND,SC_KEYMENU,'E');
+//#19314                    keybd_event('F',0,0,0);
+//#19315                }
+//#19316                else{
+//#19317
+//#19318                    if(GetKeyState(VK_SHIFT)&0X8000){
+//#19319
+//#19320                        setMap(CNV2FTH);
+//#19321                        ribon();
+//#19322                    }
+//#19323                    else{
+//#19324
+//#19325                        frmon();
+//#19326                        if(chkMap(FORMSEL))
+//#19327                            refrm();
+//#19328                        else
+//#19329                            form();
+//#19330                    }
+//#19331                }
+//#19332                break;
+
+
+//#18402                case 'E':
+//#18403
+//#18404                    rstMap(FORMIN);
+//#18405                    unmsg();
+//#18406                    duform(LIN-1);
+//#18407                    return 1;
+//#18408
 //#18409                case 'F':
-//#18410                                                                           
-//#18411                    rstMap(FORMIN);                                                       
-//#18412                    unmsg();                                                       
-//#18413                    duform(POLI-1);                                                       
-//#18414                    return 1;                                                       
-//#18415                                                                           
-//#18416                case 'R':                                                           
-//#18417                                                                           
-//#18418                    duform(RPOLI-1);                                                       
+//#18410
+//#18411                    rstMap(FORMIN);
+//#18412                    unmsg();
+//#18413                    duform(POLI-1);
+//#18414                    return 1;
+//#18415
+//#18416                case 'R':
+//#18417
+//#18418                    duform(RPOLI-1);
 //#18419                    return 1;
-//#18420                                                                           
-//#18421                case 'S':                                                           
-//#18422                                                                           
-//#18423                    duform(STAR-1);                                                       
-//#18424                    return 1;                                                       
-//#18425                                                                           
-//#18426                case 'A':                                                           
-//#18427                                                                           
-//#18428                    duform(SPIR-1);                                                       
-//#18429                    return 1;                                                       
+//#18420
+//#18421                case 'S':
+//#18422
+//#18423                    duform(STAR-1);
+//#18424                    return 1;
+//#18425
+//#18426                case 'A':
+//#18427
+//#18428                    duform(SPIR-1);
+//#18429                    return 1;
 //#18430
 //#18431                case 'H':                                                           
 //#18432                                                                           
@@ -18885,193 +18932,193 @@ begin
 //#18436                case 'L':                                                           
 //#18437                                                                           
 //#18438                    duform(LENS-2);                                                       
-//#18439                    return 1;                                                       
+//#18439                    return 1;
 //#18440                                                                           
 //#18441                case 'G':                                                           
 //#18442                                                                           
 //#18443                    duform(EGG-2);
 //#18444                    return 1;                                                       
 //#18445                                                                           
-//#18446                case 'T':                                                           
-//#18447                                                                           
-//#18448                    duform(TEAR-2);                                                       
-//#18449                    return 1;                                                       
-//#18450                                                                           
-//#18451                case 'Z':                                                           
-//#18452                                                                           
+//#18446                case 'T':
+//#18447
+//#18448                    duform(TEAR-2);
+//#18449                    return 1;
+//#18450
+//#18451                case 'Z':
+//#18452
 //#18453                    duform(ZIG-2);
-//#18454                    return 1;                                                       
-//#18455                                                                           
-//#18456                case 'W':                                                           
-//#18457                                                                           
-//#18458                    duform(WAV-2);                                                       
-//#18459                    return 1;                                                       
-//#18460                                                                           
-//#18461                case 'D':                                                           
-//#18462                                                                           
-//#18463                    duform(DASY-2);                                                       
+//#18454                    return 1;
+//#18455
+//#18456                case 'W':
+//#18457
+//#18458                    duform(WAV-2);
+//#18459                    return 1;
+//#18460
+//#18461                case 'D':
+//#18462
+//#18463                    duform(DASY-2);
 //#18464                    return 1;
-//#18465                }                                                           
-//#18466            }                                                               
-//#18467            if(chkMap(FILMSG)){                                                               
-//#18468                                                                           
-//#18469                if(cod=VK_RETURN||cod==0xc0){                                                           
-//#18470                                                                           
-//#18471                    savdo();                                                       
-//#18472                    unfil();                                                       
-//#18473                    coltab();                                                       
-//#18474                    setMap(RESTCH);                                                       
-//#18475                    unmsg();                                                       
-//#18476                    return 1;                                                       
+//#18465                }
+//#18466            }
+//#18467            if(chkMap(FILMSG)){
+//#18468
+//#18469                if(cod=VK_RETURN||cod==0xc0){
+//#18470
+//#18471                    savdo();
+//#18472                    unfil();
+//#18473                    coltab();
+//#18474                    setMap(RESTCH);
+//#18475                    unmsg();
+//#18476                    return 1;
 //#18477                }
-//#18478            }                                                               
-//#18479            if(rstMap(MOVMSG)){                                                               
-//#18480                                                                           
-//#18481                if(cod==VK_RETURN||cod==0xc0){                                                           
-//#18482                                                                           
-//#18483                    savdo();                                                       
-//#18484                    refilfn();                                                       
-//#18485                    unmsg();                                                       
-//#18486                }                                                           
+//#18478            }
+//#18479            if(rstMap(MOVMSG)){
+//#18480
+//#18481                if(cod==VK_RETURN||cod==0xc0){
+//#18482
+//#18483                    savdo();
+//#18484                    refilfn();
+//#18485                    unmsg();
+//#18486                }
 //#18487                else
-//#18488                    unmsg();                                                       
-//#18489                if(rstMap(WASFRMFRM))                                                           
-//#18490                    refrm();                                                       
-//#18491                return 1;                                                           
-//#18492            }                                                               
-//#18493            if(rstMap(PRGMSG)){                                                               
-//#18494                                                                           
-//#18495                if(cod==VK_RETURN||cod==0xc0){                                                           
-//#18496                                                                           
-//#18497                    deldir();                                                       
+//#18488                    unmsg();
+//#18489                if(rstMap(WASFRMFRM))
+//#18490                    refrm();
+//#18491                return 1;
+//#18492            }
+//#18493            if(rstMap(PRGMSG)){
+//#18494
+//#18495                if(cod==VK_RETURN||cod==0xc0){
+//#18496
+//#18497                    deldir();
 //#18498                    return 1;
-//#18499                }                                                           
-//#18500            }                                                               
-//#18501            if(rstMap(DELSFRMS)){                                                               
-//#18502                                                                           
-//#18503                if(cod=='S'||cod==VK_RETURN||cod==0xc0){                                                           
-//#18504                                                                           
-//#18505                    savdo();                                                       
-//#18506                    if(cod=='S')                                                       
-//#18507                        setMap(DELTO);                                                   
-//#18508                    else                                                       
-//#18509                        rstMap(DELTO);                                                   
-//#18510                    delsfrms(cod);                                                       
+//#18499                }
+//#18500            }
+//#18501            if(rstMap(DELSFRMS)){
+//#18502
+//#18503                if(cod=='S'||cod==VK_RETURN||cod==0xc0){
+//#18504
+//#18505                    savdo();
+//#18506                    if(cod=='S')
+//#18507                        setMap(DELTO);
+//#18508                    else
+//#18509                        rstMap(DELTO);
+//#18510                    delsfrms(cod);
 //#18511                    coltab();
-//#18512                    setMap(RESTCH);                                                       
-//#18513                    unmsg();                                                       
-//#18514                    return 1;                                                       
-//#18515                }                                                           
-//#18516            }                                                               
-//#18517            if(rstMap(DELFRM)){                                                               
-//#18518                                                                           
-//#18519                if(cod=='S'||cod==VK_RETURN||cod==0xc0){                                                           
-//#18520                                                                           
+//#18512                    setMap(RESTCH);
+//#18513                    unmsg();
+//#18514                    return 1;
+//#18515                }
+//#18516            }
+//#18517            if(rstMap(DELFRM)){
+//#18518
+//#18519                if(cod=='S'||cod==VK_RETURN||cod==0xc0){
+//#18520
 //#18521                    savdo();
-//#18522                    if(cod=='S')                                                       
-//#18523                        setMap(DELTO);                                                   
-//#18524                    else                                                       
-//#18525                        rstMap(DELTO);                                                   
-//#18526                    frmdel();                                                       
-//#18527                    fndknt();                                                       
-//#18528                    coltab();                                                       
-//#18529                    setMap(RESTCH);                                                       
-//#18530                    unmsg();                                                       
-//#18531                    return 1;                                                       
+//#18522                    if(cod=='S')
+//#18523                        setMap(DELTO);
+//#18524                    else
+//#18525                        rstMap(DELTO);
+//#18526                    frmdel();
+//#18527                    fndknt();
+//#18528                    coltab();
+//#18529                    setMap(RESTCH);
+//#18530                    unmsg();
+//#18531                    return 1;
 //#18532                }
-//#18533            }                                                               
-//#18534            if(chkMap(THUMSHO)){                                                               
-//#18535                                                                           
-//#18536                switch(cod){                                                           
-//#18537                                                                           
-//#18538                case VK_ESCAPE:                                                           
-//#18539                                                                           
-//#18540                    unthum();                                                       
-//#18541                    rstMap(BAKSHO);                                                       
-//#18542                    goto thumout;                                                       
-//#18543                                                                           
-//#18544                case VK_DOWN:                                                           
+//#18533            }
+//#18534            if(chkMap(THUMSHO)){
+//#18535
+//#18536                switch(cod){
+//#18537
+//#18538                case VK_ESCAPE:
+//#18539
+//#18540                    unthum();
+//#18541                    rstMap(BAKSHO);
+//#18542                    goto thumout;
+//#18543
+//#18544                case VK_DOWN:
 //#18545                case 0x22:        //page down
-//#18546                                                                           
-//#18547                    nuthsel();                                                       
-//#18548                    break;                                                       
-//#18549                                                                           
-//#18550                case VK_UP:                                                           
-//#18551                case 0x21:        //page up                                                   
-//#18552                                                                           
-//#18553                    nuthbak(8);                                                       
-//#18554                    break;                                                       
+//#18546
+//#18547                    nuthsel();
+//#18548                    break;
+//#18549
+//#18550                case VK_UP:
+//#18551                case 0x21:        //page up
+//#18552
+//#18553                    nuthbak(8);
+//#18554                    break;
 //#18555
-//#18556                case VK_HOME:                                                           
-//#18557                                                                           
-//#18558                    thumind=0;                                                       
-//#18559                    nuthsel();                                                       
-//#18560                    break;                                                       
-//#18561                                                                           
-//#18562                case VK_END:                                                           
-//#18563                                                                           
-//#18564                    thumind=thumcnt;                                                       
-//#18565                    nuthbak(4);                                                       
+//#18556                case VK_HOME:
+//#18557
+//#18558                    thumind=0;
+//#18559                    nuthsel();
+//#18560                    break;
+//#18561
+//#18562                case VK_END:
+//#18563
+//#18564                    thumind=thumcnt;
+//#18565                    nuthbak(4);
 //#18566                    break;
-//#18567                                                                           
-//#18568                case 8:            //backspace                                               
-//#18569                case VK_LEFT:                                                           
-//#18570                                                                           
-//#18571                    bakthum();                                                       
-//#18572                    break;                                                       
-//#18573                                                                           
-//#18574                default:                                                           
-//#18575                                                                           
-//#18576                    TranslateMessage(&msg);                                                       
-//#18577                }                                                           
-//#18578                return 1;                                                           
-//#18579            }                                                               
-//#18580            if(chkMap(FSETFSPAC)||chkMap(GTWLKIND))                                                               
-//#18581            {                                                               
-//#18582                if(cod==189||cod==109)                                                           
-//#18583                {                                                           
-//#18584                    *msgbuf='-';                                                       
-//#18585                    msgpnt=1;                                                       
-//#18586                    msgbuf[1]=0;                                                       
-//#18587                    SetWindowText(hgNum,msgbuf);                                                       
-//#18588                    return 1;                                                       
+//#18567
+//#18568                case 8:            //backspace
+//#18569                case VK_LEFT:
+//#18570
+//#18571                    bakthum();
+//#18572                    break;
+//#18573
+//#18574                default:
+//#18575
+//#18576                    TranslateMessage(&msg);
+//#18577                }
+//#18578                return 1;
+//#18579            }
+//#18580            if(chkMap(FSETFSPAC)||chkMap(GTWLKIND))
+//#18581            {
+//#18582                if(cod==189||cod==109)
+//#18583                {
+//#18584                    *msgbuf='-';
+//#18585                    msgpnt=1;
+//#18586                    msgbuf[1]=0;
+//#18587                    SetWindowText(hgNum,msgbuf);
+//#18588                    return 1;
 //#18589                }
-//#18590            }                                                               
-//#18591            if(sidtyp||prfind){                                                               
-//#18592                                                                           
-//#18593                if(chkminus(cod)){                                                           
-//#18594                                                                           
-//#18595                    msgpnt=1;                                                       
-//#18596                    sidbuf[0]='-';                                                       
-//#18597                    SetWindowText(hSid,sidbuf);                                                       
-//#18598                    return 1;                                                       
-//#18599                }                                                           
+//#18590            }
+//#18591            if(sidtyp||prfind){
+//#18592
+//#18593                if(chkminus(cod)){
+//#18594
+//#18595                    msgpnt=1;
+//#18596                    sidbuf[0]='-';
+//#18597                    SetWindowText(hSid,sidbuf);
+//#18598                    return 1;
+//#18599                }
 //#18600                if(dunum(cod)){
-//#18601                                                                           
-//#18602                    if(prfind==PSHO+1||prfind==PBOX+1){                                                       
-//#18603                                                                           
-//#18604                        msgbuf[0]=(TCHAR)numcod;                                                   
-//#18605                        msgbuf[1]=0;                                                   
-//#18606                        if(prfind==PSHO+1){                                                   
-//#18607                                                                           
-//#18608                            shopnts=unthrsh(numcod-0x30);                                               
-//#18609                            SetWindowText(thDat[PSHO],msgbuf);                                               
-//#18610                        }                                                   
-//#18611                        else{                                                   
-//#18612                                                                           
-//#18613                            stchboxs=unthrsh(numcod-0x30);                                               
-//#18614                            SetWindowText(thDat[PBOX],msgbuf);                                               
-//#18615                        }                                                   
-//#18616                        unsid();                                                   
-//#18617                    }                                                       
-//#18618                    else{                                                       
-//#18619                                                                           
-//#18620                        sidbuf[msgpnt++]=numcod;                                                   
-//#18621                        sidbuf[msgpnt]=0;                                                   
-//#18622                        SetWindowText(hSid,sidbuf);                                                   
+//#18601
+//#18602                    if(prfind==PSHO+1||prfind==PBOX+1){
+//#18603
+//#18604                        msgbuf[0]=(TCHAR)numcod;
+//#18605                        msgbuf[1]=0;
+//#18606                        if(prfind==PSHO+1){
+//#18607
+//#18608                            shopnts=unthrsh(numcod-0x30);
+//#18609                            SetWindowText(thDat[PSHO],msgbuf);
+//#18610                        }
+//#18611                        else{
+//#18612
+//#18613                            stchboxs=unthrsh(numcod-0x30);
+//#18614                            SetWindowText(thDat[PBOX],msgbuf);
+//#18615                        }
+//#18616                        unsid();
+//#18617                    }
+//#18618                    else{
+//#18619
+//#18620                        sidbuf[msgpnt++]=numcod;
+//#18621                        sidbuf[msgpnt]=0;
+//#18622                        SetWindowText(hSid,sidbuf);
 //#18623                    }
-//#18624                    return 1;                                                       
-//#18625                }                                                           
+//#18624                    return 1;
+//#18625                }
 //#18626                switch(cod){                                                           
 //#18627                                                                           
 //#18628                case 0x6e://numpat period                                                           
@@ -19093,189 +19140,191 @@ begin
 //#18644                                                                           
 //#18645                case VK_RETURN:                                                           
 //#18646                                                                           
-//#18647                    chknum();                                                       
+//#18647                    chknum();
 //#18648                    sidtyp=0;                                                       
 //#18649                    prfind=0;                                                       
 //#18650                    return 1;                                                       
 //#18651                }                                                           
 //#18652            }                                                               
 //#18653            if(cod=='I'){                                                               
-//#18654                                                                           
-//#18655                movi();                                                           
-//#18656                lastcod='I';                                                           
-//#18657                return 1;                                                           
-//#18658            }                                                               
-//#18659            if(cod=='Q'&&lastcod=='Q')                                                               
-//#18660                unpat();                                                           
-//#18661            lastcod=cod;                                                               
-//#18662            if(chkMap(NUMIN)){                                                               
-//#18663                                                                           
-//#18664                if(chkMap(SCLPSPAC)&&cod==0xbd&&!msgpnt)                                                           
-//#18665                {                                                           
-//#18666                    msgbuf[0]='-';                                                       
-//#18667                    msgbuf[1]=0;                                                       
+//#18654
+//#18655                movi();
+//#18656                lastcod='I';
+//#18657                return 1;
+//#18658            }
+//#18659            if(cod=='Q'&&lastcod=='Q')
+//#18660                unpat();
+//#18661            lastcod=cod;
+//#18662            if(chkMap(NUMIN)){
+//#18663
+//#18664                if(chkMap(SCLPSPAC)&&cod==0xbd&&!msgpnt)
+//#18665                {
+//#18666                    msgbuf[0]='-';
+//#18667                    msgbuf[1]=0;
 //#18668                    msgpnt=1;
-//#18669                    SetWindowText(hgNum,msgbuf);                                                       
-//#18670                    return 1;                                                       
-//#18671                }                                                           
-//#18672                if(dunum(cod)){                                                           
-//#18673                                                                           
-//#18674                    if(chkMap(TRNIN0)){                                                       
-//#18675                                                                           
-//#18676                        trinbuf[msgpnt++]=numcod;                                                   
-//#18677                        trinbuf[msgpnt]=0;                                                   
-//#18678                        ind=atoi(trinbuf);                                                   
-//#18679                        switch(msgpnt){                                                   
-//#18680                                                                           
-//#18681                        case 2:                                                   
-//#18682                                                                           
-//#18683                            if(ind>25)                                               
-//#18684                                dutrnum0(ind);                                           
-//#18685                            break;                                               
-//#18686                                                                           
-//#18687                        case 3:                                                   
-//#18688                                                                           
-//#18689                            if(ind>255)                                               
-//#18690                                ind=255;                                           
-//#18691                            dutrnum0(ind);                                               
-//#18692                            break;                                               
-//#18693                        }                                                   
-//#18694                        redraw(htrnum);                                                   
-//#18695                    }                                                       
-//#18696                    else{                                                       
-//#18697                                                                           
-//#18698                        msgbuf[msgpnt++]=numcod;                                                   
-//#18699                        msgbuf[msgpnt]=0;                                                   
-//#18700                        SetWindowText(hgNum,msgbuf);                                                   
-//#18701                    }                                                       
+//#18669                    SetWindowText(hgNum,msgbuf);
+//#18670                    return 1;
+//#18671                }
+//#18672                if(dunum(cod)){
+//#18673
+//#18674                    if(chkMap(TRNIN0)){
+//#18675
+//#18676                        trinbuf[msgpnt++]=numcod;
+//#18677                        trinbuf[msgpnt]=0;
+//#18678                        ind=atoi(trinbuf);
+//#18679                        switch(msgpnt){
+//#18680
+//#18681                        case 2:
+//#18682
+//#18683                            if(ind>25)
+//#18684                                dutrnum0(ind);
+//#18685                            break;
+//#18686
+//#18687                        case 3:
+//#18688
+//#18689                            if(ind>255)
+//#18690                                ind=255;
+//#18691                            dutrnum0(ind);
+//#18692                            break;
+//#18693                        }
+//#18694                        redraw(htrnum);
+//#18695                    }
+//#18696                    else{
+//#18697
+//#18698                        msgbuf[msgpnt++]=numcod;
+//#18699                        msgbuf[msgpnt]=0;
+//#18700                        SetWindowText(hgNum,msgbuf);
+//#18701                    }
 //#18702                    return 1;
-//#18703                }                                                           
-//#18704                switch(cod){                                                           
-//#18705                                                                           
-//#18706                case 0x6e://numpad period                                                           
-//#18707                case 0xbe://period                                                           
-//#18708                                                                           
-//#18709                    msgbuf[msgpnt++]='.';                                                       
-//#18710                    msgbuf[msgpnt]=0;                                                       
-//#18711                    SetWindowText(hgNum,msgbuf);                                                       
-//#18712                    return 1;                                                       
-//#18713                                                                           
-//#18714                case 8:    //backspace                                                       
-//#18715                                                                           
-//#18716                    if(msgpnt){                                                       
-//#18717                                                                           
-//#18718                        msgpnt--;                                                   
-//#18719                        if(chkMap(TRNIN0)){                                                   
-//#18720                                                                           
-//#18721                            trinbuf[msgpnt]=0;                                               
-//#18722                            redraw(htrnum);                                               
-//#18723                        }                                                   
-//#18724                        else{                                                   
-//#18725                                                                           
-//#18726                            msgbuf[msgpnt]=0;                                               
-//#18727                            SetWindowText(hgNum,msgbuf);                                               
-//#18728                        }                                                   
-//#18729                    }                                                       
-//#18730                    return 1;                                                       
-//#18731                                                                           
-//#18732                case VK_RETURN:                                                           
-//#18733                                                                           
-//#18734                    if(chkMap(TRNIN0))                                                       
-//#18735                        dutrnum0(atoi(trinbuf));                                                   
+//#18703                }
+//#18704                switch(cod){
+//#18705
+//#18706                case 0x6e://numpad period
+//#18707                case 0xbe://period
+//#18708
+//#18709                    msgbuf[msgpnt++]='.';
+//#18710                    msgbuf[msgpnt]=0;
+//#18711                    SetWindowText(hgNum,msgbuf);
+//#18712                    return 1;
+//#18713
+//#18714                case 8:    //backspace
+//#18715
+//#18716                    if(msgpnt){
+//#18717
+//#18718                        msgpnt--;
+//#18719                        if(chkMap(TRNIN0)){
+//#18720
+//#18721                            trinbuf[msgpnt]=0;
+//#18722                            redraw(htrnum);
+//#18723                        }
+//#18724                        else{
+//#18725
+//#18726                            msgbuf[msgpnt]=0;
+//#18727                            SetWindowText(hgNum,msgbuf);
+//#18728                        }
+//#18729                    }
+//#18730                    return 1;
+//#18731
+//#18732                case VK_RETURN:
+//#18733
+//#18734                    if(chkMap(TRNIN0))
+//#18735                        dutrnum0(atoi(trinbuf));
 //#18736                    else{
-//#18737                                                                           
-//#18738                        if(chkMap(TRNIN1))                                                   
-//#18739                            dutrnum1();                                               
-//#18740                    }                                                       
-//#18741                    break;                                                       
-//#18742                }                                                           
-//#18743            }                                                               
-//#18744            if(cod==8&&numpnt){                                                               
-//#18745                                                                           
-//#18746                numbuf[--numpnt]=0;                                                           
-//#18747                butxt(HNUM,numbuf);                                                           
-//#18748                cloInd=atoi(numbuf);                                                           
-//#18749                movbox();                                                           
-//#18750                return 1;                                                           
-//#18751            }                                                               
-//#18752            if(!chkMap(WASTRAC)&&dunum(cod)){                                                               
-//#18753                                                                           
-//#18754                if(numpnt>stchdigs-1)                                                           
-//#18755                    numpnt=0;                                                       
-//#18756                if(numbuf[0]=='0'&&numpnt)                                                           
-//#18757                    numpnt--;                                                       
-//#18758                numbuf[numpnt++]=numcod;                                                           
-//#18759                numbuf[numpnt]=0;                                                           
-//#18760                cloInd=atoi(numbuf);                                                           
-//#18761                if(cloInd>(unsigned)hed.stchs-1){                                                           
-//#18762                                                                           
-//#18763                    sprintf(numbuf,"%d",hed.stchs-1);                                                       
-//#18764                    cloInd=hed.stchs-1;                                                       
-//#18765                }                                                           
-//#18766                butxt(HNUM,numbuf);                                                           
-//#18767                movbox();                                                           
-//#18768                rstMap(NUMIN);                                                           
-//#18769                return 1;                                                           
+//#18737
+//#18738                        if(chkMap(TRNIN1))
+//#18739                            dutrnum1();
+//#18740                    }
+//#18741                    break;
+//#18742                }
+//#18743            }
+//#18744            if(cod==8&&numpnt){
+//#18745
+//#18746                numbuf[--numpnt]=0;
+//#18747                butxt(HNUM,numbuf);
+//#18748                cloInd=atoi(numbuf);
+//#18749                movbox();
+//#18750                return 1;
+//#18751            }
+//#18752            if(!chkMap(WASTRAC)&&dunum(cod)){
+//#18753
+//#18754                if(numpnt>stchdigs-1)
+//#18755                    numpnt=0;
+//#18756                if(numbuf[0]=='0'&&numpnt)
+//#18757                    numpnt--;
+//#18758                numbuf[numpnt++]=numcod;
+//#18759                numbuf[numpnt]=0;
+//#18760                cloInd=atoi(numbuf);
+//#18761                if(cloInd>(unsigned)hed.stchs-1){
+//#18762
+//#18763                    sprintf(numbuf,"%d",hed.stchs-1);
+//#18764                    cloInd=hed.stchs-1;
+//#18765                }
+//#18766                butxt(HNUM,numbuf);
+//#18767                movbox();
+//#18768                rstMap(NUMIN);
+//#18769                return 1;
 //#18770            }
-//#18771            numpnt=0;                                                               
-//#18772            unmsg();                                                               
-//#18773            switch(cod){                                                               
-//#18774                                                                           
-//#18775            case VK_ESCAPE:                                                               
-//#18776                                                                           
-//#18777    thumout:;                                                                       
-//#18778                chkbit();                                                           
-//#18779                duhbit(MF_UNCHECKED);                                                           
-//#18780                unthum();                                                           
-//#18781                rstMap(MOVSET);                                                           
-//#18782                rstMap(HID);                                                           
-//#18783                rstMap(FRMOF);                                                           
-//#18784                rstMap(THRDS);                                                           
-//#18785                redraw(hbuts[HHID]);                                                           
-//#18786                CheckMenuItem(hMen,ID_VUTHRDS,MF_BYCOMMAND|MF_UNCHECKED);                                                           
-//#18787                rstMap(COL);                                                           
-//#18788                CheckMenuItem(hMen,ID_VUSELTHRDS,MF_BYCOMMAND|MF_UNCHECKED);                                                           
-//#18789                setMap(DUMEN);                                                           
-//#18790                rstMap(RUNPAT);                                                           
-//#18791                rstMap(WASPAT);                                                           
-//#18792                rstMap(WASBLAK);                                                           
-//#18793                rstMap(GTUANG);                                                           
-//#18794                rstMap(GTUSPAC);                                                           
-//#18795                rstMap(GTWLKIND);                                                           
-//#18796                rstMap(GTWLKLEN);                                                           
-//#18797                DestroyWindow(hSped);                                                           
-//#18798                rstMap(GMRK);                                                           
-//#18799                                                                           
-//#18800            case 'Q':                                                               
-//#18801                                                                           
-//#18802                if(GetKeyState(VK_SHIFT)&0x8000){                                                           
-//#18803                                                                           
+//#18771            numpnt=0;
+//#18772            unmsg();
+//#18773            switch(cod){
+
+
+//#18774
+//#18775            case VK_ESCAPE:
+//#18776
+//#18777    thumout:;
+//#18778                chkbit();
+//#18779                duhbit(MF_UNCHECKED);
+//#18780                unthum();
+//#18781                rstMap(MOVSET);
+//#18782                rstMap(HID);
+//#18783                rstMap(FRMOF);
+//#18784                rstMap(THRDS);
+//#18785                redraw(hbuts[HHID]);
+//#18786                CheckMenuItem(hMen,ID_VUTHRDS,MF_BYCOMMAND|MF_UNCHECKED);
+//#18787                rstMap(COL);
+//#18788                CheckMenuItem(hMen,ID_VUSELTHRDS,MF_BYCOMMAND|MF_UNCHECKED);
+//#18789                setMap(DUMEN);
+//#18790                rstMap(RUNPAT);
+//#18791                rstMap(WASPAT);
+//#18792                rstMap(WASBLAK);
+//#18793                rstMap(GTUANG);
+//#18794                rstMap(GTUSPAC);
+//#18795                rstMap(GTWLKIND);
+//#18796                rstMap(GTWLKLEN);
+//#18797                DestroyWindow(hSped);
+//#18798                rstMap(GMRK);
+//#18799
+//#18800            case 'Q':
+//#18801
+//#18802                if(GetKeyState(VK_SHIFT)&0x8000){
+//#18803
 //#18804                    ritcur();
-//#18805                    return 1;                                                       
-//#18806                }                                                           
-//#18807                untrace();                                                           
-//#18808                rstMap(HIDMAP);                                                           
-//#18809                rstMap(FILDIR);                                                           
-//#18810                ReleaseCapture();                                                           
-//#18811                if(hed.stchs==1)                                                           
-//#18812                    hed.stchs=0;                                                       
-//#18813                if(!chku(MARQ))                                                           
-//#18814                    rstMap(GMRK);                                                       
-//#18815                if(rstMap(PRFACT)){                                                           
-//#18816                                                                           
-//#18817                    if(rstMap(WASRT)){                                                       
-//#18818                                                                           
-//#18819                        setMap(INSRT);                                                   
-//#18820                        setMap(RESTCH);                                                   
-//#18821                        return 1;                                                   
-//#18822                    }                                                       
-//#18823                    else                                                       
-//#18824                        rstAll();                                                   
-//#18825                }                                                           
-//#18826                else                                                           
-//#18827                    rstAll();                                                       
-//#18828                setMap(RESTCH);                                                           
-//#18829                if(numpnt){                                                           
+//#18805                    return 1;
+//#18806                }
+//#18807                untrace();
+//#18808                rstMap(HIDMAP);
+//#18809                rstMap(FILDIR);
+//#18810                ReleaseCapture();
+//#18811                if(hed.stchs==1)
+//#18812                    hed.stchs=0;
+//#18813                if(!chku(MARQ))
+//#18814                    rstMap(GMRK);
+//#18815                if(rstMap(PRFACT)){
+//#18816
+//#18817                    if(rstMap(WASRT)){
+//#18818
+//#18819                        setMap(INSRT);
+//#18820                        setMap(RESTCH);
+//#18821                        return 1;
+//#18822                    }
+//#18823                    else
+//#18824                        rstAll();
+//#18825                }
+//#18826                else
+//#18827                    rstAll();
+//#18828                setMap(RESTCH);
+//#18829                if(numpnt){
 //#18830                                                                           
 //#18831                    numpnt=0;                                                       
 //#18832                    numbuf[0]=0;                                                       
@@ -19288,7 +19337,7 @@ begin
 //#18839            case 0xc0:        //`                                                       
 //#18840                                                                           
 //#18841                if(GetKeyState(VK_CONTROL)&0x8000&&GetKeyState(VK_MENU)&0x8000){                                                           
-//#18842                                                                           
+//#18842
 //#18843                    stchBak=0x505050;                                                       
 //#18844                    bakPen=nuPen(bakPen,1,stchBak);                                                       
 //#18845                    bakwid=1;                                                       
@@ -19301,397 +19350,397 @@ begin
 //#18852                else{                                                           
 //#18853    #if PESACT                                                                       
 //#18854    //                ini.auxfil=AUXPES;                                                       
-//#18855    //                strcpy(filnam,"u:\\mrd\\t.thr");                                                       
+//#18855    //                strcpy(filnam,"u:\\mrd\\t.thr");
 //#18856    //                setMap(REDOLD);                                                       
 //#18857    //                nuFil();                                                       
-//#18858    //                lodpes();                                                       
-//#18859    //                savpes();                                                       
-//#18860    #endif                                                                       
-//#18861                                                                           
-//#18862                    tst();                                                       
-//#18863                }                                                           
-//#18864                break;                                                           
-//#18865                                                                           
-//#18866            case VK_INSERT:                                                               
-//#18867                                                                           
-//#18868                inscol();                                                           
-//#18869                break;                                                           
-//#18870                                                                           
-//#18871            case 0x6d:        //keypad -                                                       
+//#18858    //                lodpes();
+//#18859    //                savpes();
+//#18860    #endif
+//#18861
+//#18862                    tst();
+//#18863                }
+//#18864                break;
+//#18865
+//#18866            case VK_INSERT:
+//#18867
+//#18868                inscol();
+//#18869                break;
+//#18870
+//#18871            case 0x6d:        //keypad -
 //#18872
-//#18873                toglup();                                                           
-//#18874                break;                                                           
-//#18875                                                                           
-//#18876            case 0xbd:        //-                                                       
-//#18877                                                                           
-//#18878                rstMap(CNTRH);                                                           
-//#18879                rstMap(CNTRV);                                                           
-//#18880                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#18881                    setMap(CNTRV);                                                       
-//#18882                else{                                                           
-//#18883                                                                           
-//#18884                    if(GetKeyState(VK_CONTROL)&0X8000)                                                       
-//#18885                        setMap(CNTRH);                                                   
-//#18886                }                                                           
-//#18887                cntrx();                                                           
-//#18888                break;                                                           
-//#18889                                                                           
-//#18890            case 0xbf:        ///forward slash /                                                       
-//#18891                                                                           
-//#18892                frmnum();                                                           
-//#18893                break;                                                           
-//#18894                                                                           
-//#18895            case 0xbb:        //=                                                       
-//#18896                                                                           
-//#18897                shrnk();                                                           
-//#18898                break;                                                           
-//#18899                                                                           
-//#18900            case 0x21:        //page up                                                       
-//#18901                                                                           
-//#18902                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#18903                    redup();                                                       
-//#18904                else                                                           
-//#18905                    rotagain();                                                       
+//#18873                toglup();
+//#18874                break;
+//#18875
+//#18876            case 0xbd:        //-
+//#18877
+//#18878                rstMap(CNTRH);
+//#18879                rstMap(CNTRV);
+//#18880                if(GetKeyState(VK_SHIFT)&0X8000)
+//#18881                    setMap(CNTRV);
+//#18882                else{
+//#18883
+//#18884                    if(GetKeyState(VK_CONTROL)&0X8000)
+//#18885                        setMap(CNTRH);
+//#18886                }
+//#18887                cntrx();
+//#18888                break;
+//#18889
+//#18890            case 0xbf:        ///forward slash /
+//#18891
+//#18892                frmnum();
+//#18893                break;
+//#18894
+//#18895            case 0xbb:        //=
+//#18896
+//#18897                shrnk();
+//#18898                break;
+//#18899
+//#18900            case 0x21:        //page up
+//#18901
+//#18902                if(GetKeyState(VK_SHIFT)&0X8000)
+//#18903                    redup();
+//#18904                else
+//#18905                    rotagain();
 //#18906                break;
-//#18907                                                                           
-//#18908            case 0x22:        //page down                                                       
-//#18909                                                                           
-//#18910                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#18911                    bakdup();                                                       
-//#18912                else                                                           
-//#18913                    bakagain();                                                       
-//#18914                break;                                                           
-//#18915                                                                           
-//#18916            case 0xde:    //'                                                           
-//#18917                                                                           
-//#18918                desiz();                                                           
-//#18919                break;                                                           
-//#18920                                                                           
-//#18921            case 0xdb:        //[                                                       
-//#18922                                                                           
-//#18923    #if LANG==ENG||LANG==HNG                                                                       
-//#18924                                                                           
-//#18925                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#18926                    selfrm0();                                                       
-//#18927                else                                                           
-//#18928    #endif                                                                       
-//#18929                    ungrplo();                                                       
-//#18930                break;                                                           
-//#18931                                                                           
-//#18932            case 0xdd:        //]                                                       
-//#18933                                                                           
-//#18934    #if LANG==ENG||LANG==HNG                                                                       
-//#18935                                                                           
-//#18936                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#18937                    selfrmx();                                                       
-//#18938                else                                                           
-//#18939    #endif                                                                       
+//#18907
+//#18908            case 0x22:        //page down
+//#18909
+//#18910                if(GetKeyState(VK_SHIFT)&0X8000)
+//#18911                    bakdup();
+//#18912                else
+//#18913                    bakagain();
+//#18914                break;
+//#18915
+//#18916            case 0xde:    //'
+//#18917
+//#18918                desiz();
+//#18919                break;
+//#18920
+//#18921            case 0xdb:        //[
+//#18922
+//#18923    #if LANG==ENG||LANG==HNG
+//#18924
+//#18925                if(GetKeyState(VK_SHIFT)&0X8000)
+//#18926                    selfrm0();
+//#18927                else
+//#18928    #endif
+//#18929                    ungrplo();
+//#18930                break;
+//#18931
+//#18932            case 0xdd:        //]
+//#18933
+//#18934    #if LANG==ENG||LANG==HNG
+//#18935
+//#18936                if(GetKeyState(VK_SHIFT)&0X8000)
+//#18937                    selfrmx();
+//#18938                else
+//#18939    #endif
 //#18940                    ungrphi();
-//#18941                break;                                                           
-//#18942                                                                           
-//#18943            case 0xba:        //semicolon                                                       
-//#18944                                                                           
-//#18945                movmrk();                                                           
-//#18946                break;                                                           
-//#18947                                                                           
-//#18948            case VK_DOWN:                                                               
-//#18949                                                                           
-//#18950                if(GetKeyState(VK_CONTROL)&0X8000)                                                           
-//#18951                    nudgfn(0,-ini.nudg);                                                       
-//#18952                else                                                           
-//#18953                    seldwn();                                                       
-//#18954                break;                                                           
-//#18955                                                                           
-//#18956            case VK_UP:                                                               
-//#18957                                                                           
-//#18958                if(GetKeyState(VK_CONTROL)&0X8000)                                                           
-//#18959                    nudgfn(0,ini.nudg);                                                       
-//#18960                else                                                           
-//#18961                    selup();                                                       
-//#18962                break;                                                           
-//#18963                                                                           
-//#18964            case 0xbe:        //period                                                       
-//#18965                                                                           
-//#18966                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#18967                    setfilend();                                                       
-//#18968                else                                                           
-//#18969                    setmov();                                                       
-//#18970                break;                                                           
-//#18971                                                                           
-//#18972            case 'W':                                                               
-//#18973                                                                           
+//#18941                break;
+//#18942
+//#18943            case 0xba:        //semicolon
+//#18944
+//#18945                movmrk();
+//#18946                break;
+//#18947
+//#18948            case VK_DOWN:
+//#18949
+//#18950                if(GetKeyState(VK_CONTROL)&0X8000)
+//#18951                    nudgfn(0,-ini.nudg);
+//#18952                else
+//#18953                    seldwn();
+//#18954                break;
+//#18955
+//#18956            case VK_UP:
+//#18957
+//#18958                if(GetKeyState(VK_CONTROL)&0X8000)
+//#18959                    nudgfn(0,ini.nudg);
+//#18960                else
+//#18961                    selup();
+//#18962                break;
+//#18963
+//#18964            case 0xbe:        //period
+//#18965
+//#18966                if(GetKeyState(VK_SHIFT)&0X8000)
+//#18967                    setfilend();
+//#18968                else
+//#18969                    setmov();
+//#18970                break;
+//#18971
+//#18972            case 'W':
+//#18973
 //#18974                if(GetKeyState(VK_SHIFT)&0X8000)
-//#18975                    crop();                                                       
-//#18976                else{                                                           
-//#18977                                                                           
-//#18978                    if(GetKeyState(VK_CONTROL)&0X8000)                                                       
-//#18979                        pes2crd();                                                   
-//#18980                    else                                                       
-//#18981                        insat();                                                   
-//#18982                }                                                           
-//#18983                break;                                                           
-//#18984                                                                           
-//#18985            case 'E':                                                               
-//#18986                                                                           
-//#18987                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#18988                    dutxtfil();                                                       
-//#18989                else                                                           
-//#18990                    infrm();                                                       
-//#18991                break;                                                           
-//#18992                                                                           
-//#18993            case VK_F2:                                                               
-//#18994                                                                           
-//#18995                snap();                                                           
-//#18996                break;                                                           
-//#18997                                                                           
-//#18998            case VK_F1:                                                               
-//#18999                                                                           
-//#19000                help();                                                           
-//#19001                break;                                                           
-//#19002                                                                           
-//#19003            case VK_F3:                                                               
-//#19004                                                                           
-//#19005                if(GetKeyState(VK_CONTROL)&0X8000)                                                           
-//#19006                    srtfrm();                                                       
-//#19007                else{                                                           
+//#18975                    crop();
+//#18976                else{
+//#18977
+//#18978                    if(GetKeyState(VK_CONTROL)&0X8000)
+//#18979                        pes2crd();
+//#18980                    else
+//#18981                        insat();
+//#18982                }
+//#18983                break;
+//#18984
+//#18985            case 'E':
+//#18986
+//#18987                if(GetKeyState(VK_SHIFT)&0X8000)
+//#18988                    dutxtfil();
+//#18989                else
+//#18990                    infrm();
+//#18991                break;
+//#18992
+//#18993            case VK_F2:
+//#18994
+//#18995                snap();
+//#18996                break;
+//#18997
+//#18998            case VK_F1:
+//#18999
+//#19000                help();
+//#19001                break;
+//#19002
+//#19003            case VK_F3:
+//#19004
+//#19005                if(GetKeyState(VK_CONTROL)&0X8000)
+//#19006                    srtfrm();
+//#19007                else{
 //#19008
-//#19009                    if(GetKeyState(VK_SHIFT)&0X8000)                                                       
-//#19010                        srtbyfrm();                                                   
-//#19011                    else                                                       
-//#19012                        fsort();                                                   
-//#19013                }                                                           
-//#19014                break;                                                           
-//#19015                                                                           
-//#19016            case VK_F4:                                                               
-//#19017                                                                           
-//#19018                rtrclp();                                                           
-//#19019                break;                                                           
-//#19020                                                                           
-//#19021            case VK_F5:                                                               
-//#19022                                                                           
-//#19023                filfrms();                                                           
-//#19024                break;                                                           
-//#19025                                                                           
-//#19026            case VK_F6:                                                               
-//#19027                                                                           
-//#19028                vuthrds();                                                           
-//#19029                break;                                                           
-//#19030                                                                           
-//#19031            case VK_F7:                                                               
-//#19032                                                                           
-//#19033                save();                                                           
-//#19034                break;                                                           
-//#19035                                                                           
-//#19036            case VK_F8:                                                               
-//#19037                                                                           
-//#19038                savAs();                                                           
-//#19039                break;                                                           
-//#19040                                                                           
-//#19041            case VK_F9:                                                               
+//#19009                    if(GetKeyState(VK_SHIFT)&0X8000)
+//#19010                        srtbyfrm();
+//#19011                    else
+//#19012                        fsort();
+//#19013                }
+//#19014                break;
+//#19015
+//#19016            case VK_F4:
+//#19017
+//#19018                rtrclp();
+//#19019                break;
+//#19020
+//#19021            case VK_F5:
+//#19022
+//#19023                filfrms();
+//#19024                break;
+//#19025
+//#19026            case VK_F6:
+//#19027
+//#19028                vuthrds();
+//#19029                break;
+//#19030
+//#19031            case VK_F7:
+//#19032
+//#19033                save();
+//#19034                break;
+//#19035
+//#19036            case VK_F8:
+//#19037
+//#19038                savAs();
+//#19039                break;
+//#19040
+//#19041            case VK_F9:
 //#19042
-//#19043                selCol();                                                           
-//#19044                break;                                                           
-//#19045                                                                           
-//#19046            case VK_F11:                                                               
-//#19047                                                                           
-//#19048                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#19049                    rembig();                                                       
-//#19050                else                                                           
-//#19051                    duzero();                                                       
-//#19052                break;                                                           
-//#19053                                                                           
-//#19054            case VK_F12:                                                               
-//#19055                                                                           
-//#19056                if(GetKeyState(VK_CONTROL)&GetKeyState(VK_MENU)&0X8000)                                                           
-//#19057                    reldun();                                                       
-//#19058                else                                                           
-//#19059                {                                                           
-//#19060    #ifdef _DEBUG                                                                       
-//#19061                    if(GetKeyState(VK_SHIFT)&0X8000)                                                       
-//#19062                        dmpat();                                                   
-//#19063                    else                                                       
-//#19064    #endif                                                                       
-//#19065                        dun();                                                   
-//#19066                }                                                           
-//#19067                break;                                                           
-//#19068                                                                           
-//#19069            case 'Y':                                                               
-//#19070                                                                           
-//#19071                if(closfrm())                                                           
-//#19072                    selfpnt();                                                       
-//#19073                break;                                                           
-//#19074                                                                           
-//#19075            case 'O':                                                               
+//#19043                selCol();
+//#19044                break;
+//#19045
+//#19046            case VK_F11:
+//#19047
+//#19048                if(GetKeyState(VK_SHIFT)&0X8000)
+//#19049                    rembig();
+//#19050                else
+//#19051                    duzero();
+//#19052                break;
+//#19053
+//#19054            case VK_F12:
+//#19055
+//#19056                if(GetKeyState(VK_CONTROL)&GetKeyState(VK_MENU)&0X8000)
+//#19057                    reldun();
+//#19058                else
+//#19059                {
+//#19060    #ifdef _DEBUG
+//#19061                    if(GetKeyState(VK_SHIFT)&0X8000)
+//#19062                        dmpat();
+//#19063                    else
+//#19064    #endif
+//#19065                        dun();
+//#19066                }
+//#19067                break;
+//#19068
+//#19069            case 'Y':
+//#19070
+//#19071                if(closfrm())
+//#19072                    selfpnt();
+//#19073                break;
+//#19074
+//#19075            case 'O':
 //#19076
-//#19077                fop();                                                           
-//#19078                break;                                                           
-//#19079                                                                           
-//#19080            case 'Z':                                                               
-//#19081                                                                           
-//#19082                if(GetKeyState(VK_SHIFT)&0X8000){                                                           
-//#19083                                                                           
-//#19084                    zumFct=zumflor;                                                       
-//#19085                    zumin();                                                       
-//#19086                }                                                           
-//#19087                else{                                                           
-//#19088                                                                           
-//#19089                    if(GetKeyState(VK_CONTROL)&0X8000)                                                       
-//#19090                        bak();                                                   
-//#19091                    else                                                       
-//#19092                        zumin();                                                   
-//#19093                }                                                           
-//#19094                break;                                                           
-//#19095                                                                           
-//#19096            case 'X':                                                               
-//#19097                                                                           
-//#19098                if(GetKeyState(VK_CONTROL)&0X8000)                                                           
-//#19099                    cut();                                                       
-//#19100                else{                                                           
-//#19101                                                                           
-//#19102                    if(GetKeyState(VK_SHIFT)&0X8000)                                                       
-//#19103                        hidbit();                                                   
-//#19104                    else                                                       
-//#19105                        zumhom();                                                   
-//#19106                }                                                           
-//#19107                break;                                                           
-//#19108                                                                           
-//#19109            case 'P':                                                               
+//#19077                fop();
+//#19078                break;
+//#19079
+//#19080            case 'Z':
+//#19081
+//#19082                if(GetKeyState(VK_SHIFT)&0X8000){
+//#19083
+//#19084                    zumFct=zumflor;
+//#19085                    zumin();
+//#19086                }
+//#19087                else{
+//#19088
+//#19089                    if(GetKeyState(VK_CONTROL)&0X8000)
+//#19090                        bak();
+//#19091                    else
+//#19092                        zumin();
+//#19093                }
+//#19094                break;
+//#19095
+//#19096            case 'X':
+//#19097
+//#19098                if(GetKeyState(VK_CONTROL)&0X8000)
+//#19099                    cut();
+//#19100                else{
+//#19101
+//#19102                    if(GetKeyState(VK_SHIFT)&0X8000)
+//#19103                        hidbit();
+//#19104                    else
+//#19105                        zumhom();
+//#19106                }
+//#19107                break;
+//#19108
+//#19109            case 'P':
 //#19110
-//#19111                prfmsg();                                                           
-//#19112                break;                                                           
-//#19113                                                                           
-//#19114            case 'N':                                                               
-//#19115                                                                           
-//#19116            if(GetKeyState(VK_CONTROL)&0X8000)                                                               
-//#19117                nudsiz();                                                           
-//#19118            else                                                               
-//#19119            {                                                               
-//#19120                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#19121                    pgdwn();                                                       
-//#19122                else                                                           
-//#19123                {                                                           
-//#19124                    setMap(TRCUP);                                                       
-//#19125                    trace();                                                       
-//#19126                }                                                           
-//#19127            }                                                               
-//#19128            break;                                                               
-//#19129                                                                           
-//#19130            case 'U':                                                               
-//#19131                                                                           
-//#19132                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#19133                    pgup();                                                       
-//#19134                else{                                                           
-//#19135                                                                           
-//#19136                    if(GetKeyState(VK_CONTROL)&0X8000)                                                       
-//#19137                        trdif();                                                   
-//#19138                    else{                                                       
-//#19139                                                                           
-//#19140                        rstMap(TRCUP);                                                   
-//#19141                        trace();                                                   
-//#19142                    }                                                       
-//#19143                }                                                           
+//#19111                prfmsg();
+//#19112                break;
+//#19113
+//#19114            case 'N':
+//#19115
+//#19116            if(GetKeyState(VK_CONTROL)&0X8000)
+//#19117                nudsiz();
+//#19118            else
+//#19119            {
+//#19120                if(GetKeyState(VK_SHIFT)&0X8000)
+//#19121                    pgdwn();
+//#19122                else
+//#19123                {
+//#19124                    setMap(TRCUP);
+//#19125                    trace();
+//#19126                }
+//#19127            }
+//#19128            break;
+//#19129
+//#19130            case 'U':
+//#19131
+//#19132                if(GetKeyState(VK_SHIFT)&0X8000)
+//#19133                    pgup();
+//#19134                else{
+//#19135
+//#19136                    if(GetKeyState(VK_CONTROL)&0X8000)
+//#19137                        trdif();
+//#19138                    else{
+//#19139
+//#19140                        rstMap(TRCUP);
+//#19141                        trace();
+//#19142                    }
+//#19143                }
 //#19144                break;
-//#19145                                                                           
-//#19146            case 'H':                                                               
-//#19147                                                                           
-//#19148                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#19149                    pglft();                                                       
-//#19150                else{                                                           
-//#19151                                                                           
-//#19152                    if(GetKeyState(VK_CONTROL)&0X8000)                                                       
-//#19153                        trcsel();                                                   
-//#19154                    else                                                       
-//#19155                        blak();                                                   
-//#19156                }                                                           
-//#19157                break;                                                           
-//#19158                                                                           
-//#19159            case 'J':                                                               
-//#19160                                                                           
-//#19161                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#19162                    pgrit();                                                       
-//#19163                else                                                           
-//#19164                    refilal();                                                       
-//#19165                break;                                                           
-//#19166                                                                           
-//#19167            case 0xbc:        //comma                                                       
-//#19168                                                                           
-//#19169                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#19170                    setfilstrt();                                                       
-//#19171                else                                                           
-//#19172                {                                                           
-//#19173                    savdo();                                                       
-//#19174                    join();                                                       
-//#19175                }                                                           
-//#19176                break;                                                           
-//#19177                                                                           
+//#19145
+//#19146            case 'H':
+//#19147
+//#19148                if(GetKeyState(VK_SHIFT)&0X8000)
+//#19149                    pglft();
+//#19150                else{
+//#19151
+//#19152                    if(GetKeyState(VK_CONTROL)&0X8000)
+//#19153                        trcsel();
+//#19154                    else
+//#19155                        blak();
+//#19156                }
+//#19157                break;
+//#19158
+//#19159            case 'J':
+//#19160
+//#19161                if(GetKeyState(VK_SHIFT)&0X8000)
+//#19162                    pgrit();
+//#19163                else
+//#19164                    refilal();
+//#19165                break;
+//#19166
+//#19167            case 0xbc:        //comma
+//#19168
+//#19169                if(GetKeyState(VK_SHIFT)&0X8000)
+//#19170                    setfilstrt();
+//#19171                else
+//#19172                {
+//#19173                    savdo();
+//#19174                    join();
+//#19175                }
+//#19176                break;
+//#19177
 //#19178            case 'B':
-//#19179                                                                           
-//#19180                if(GetKeyState(VK_CONTROL)&0X8000)                                                           
-//#19181                    redo();                                                       
-//#19182                else{                                                           
-//#19183                                                                           
-//#19184                    if(GetKeyState(VK_SHIFT)&0X8000)                                                       
-//#19185                        bakmrk();                                                   
-//#19186                    else                                                       
-//#19187                        bak();                                                   
-//#19188                }                                                           
-//#19189                break;                                                           
-//#19190                                                                           
-//#19191            case 'D':                                                               
-//#19192                                                                           
-//#19193                if(GetKeyState(VK_SHIFT)&0X8000)                                                           
-//#19194                {                                                           
-//#19195                    if(chkMap(FORMSEL))                                                       
-//#19196                    {                                                       
-//#19197                        PostMessage(hWnd,WM_SYSCOMMAND,SC_KEYMENU,'E');                                                   
-//#19198                        keybd_event('F',0,0,0);                                                   
-//#19199                    }                                                       
-//#19200                }                                                           
-//#19201                else                                                           
-//#19202                    satsel();                                                       
-//#19203                break;                                                           
-//#19204                                                                           
-//#19205            case 'K':                                                               
-//#19206                                                                           
-//#19207                if(GetKeyState(VK_MENU)&GetKeyState(VK_CONTROL)&0X8000)                                                           
-//#19208                    setknots();                                                       
-//#19209                else                                                           
-//#19210                {                                                           
-//#19211                    if(GetKeyState(VK_SHIFT)&0X8000)                                                       
+//#19179
+//#19180                if(GetKeyState(VK_CONTROL)&0X8000)
+//#19181                    redo();
+//#19182                else{
+//#19183
+//#19184                    if(GetKeyState(VK_SHIFT)&0X8000)
+//#19185                        bakmrk();
+//#19186                    else
+//#19187                        bak();
+//#19188                }
+//#19189                break;
+//#19190
+//#19191            case 'D':
+//#19192
+//#19193                if(GetKeyState(VK_SHIFT)&0X8000)
+//#19194                {
+//#19195                    if(chkMap(FORMSEL))
+//#19196                    {
+//#19197                        PostMessage(hWnd,WM_SYSCOMMAND,SC_KEYMENU,'E');
+//#19198                        keybd_event('F',0,0,0);
+//#19199                    }
+//#19200                }
+//#19201                else
+//#19202                    satsel();
+//#19203                break;
+//#19204
+//#19205            case 'K':
+//#19206
+//#19207                if(GetKeyState(VK_MENU)&GetKeyState(VK_CONTROL)&0X8000)
+//#19208                    setknots();
+//#19209                else
+//#19210                {
+//#19211                    if(GetKeyState(VK_SHIFT)&0X8000)
 //#19212                        tglhid();
-//#19213                    else{                                                       
-//#19214                                                                           
-//#19215                        if(GetKeyState(VK_CONTROL)&0X8000)                                                   
-//#19216                            set1knot();                                               
-//#19217                        else                                                   
-//#19218                            tglfrm();                                               
-//#19219                    }                                                       
-//#19220                }                                                           
-//#19221                break;                                                           
-//#19222                                                                           
-//#19223            case 'A':                                                               
-//#19224                                                                           
-//#19225                if(GetKeyState(VK_CONTROL)&0X8000)                                                           
-//#19226                    selalstch();                                                       
-//#19227                else{                                                           
-//#19228                                                                           
-//#19229                    if(GetKeyState(VK_SHIFT)&0X8000)                                                       
-//#19230                        selal();                                                   
-//#19231                    else                                                       
-//#19232                        zumout();                                                   
-//#19233                }                                                           
-//#19234                break;                                                           
-//#19235                                                                           
-//#19236            case VK_SPACE:                                                               
-//#19237                                                                           
-//#19238                if(toglMap(INSRT)){                                                           
-//#19239                                                                           
+//#19213                    else{
+//#19214
+//#19215                        if(GetKeyState(VK_CONTROL)&0X8000)
+//#19216                            set1knot();
+//#19217                        else
+//#19218                            tglfrm();
+//#19219                    }
+//#19220                }
+//#19221                break;
+//#19222
+//#19223            case 'A':
+//#19224
+//#19225                if(GetKeyState(VK_CONTROL)&0X8000)
+//#19226                    selalstch();
+//#19227                else{
+//#19228
+//#19229                    if(GetKeyState(VK_SHIFT)&0X8000)
+//#19230                        selal();
+//#19231                    else
+//#19232                        zumout();
+//#19233                }
+//#19234                break;
+//#19235
+//#19236            case VK_SPACE:
+//#19237
+//#19238                if(toglMap(INSRT)){
+//#19239
 //#19240                    ReleaseCapture();                                                       
 //#19241                    setMap(RESTCH);                                                       
 //#19242                }                                                           
 //#19243                else                                                           
 //#19244                    istch();                                                       
-//#19245                unbox();                                                           
+//#19245                unbox();
 //#19246                if(rstMap(GRPSEL)||rstMap(FORMSEL))
 //#19247                    setMap(RESTCH);                                                       
 //#19248                break;                                                           
@@ -19704,7 +19753,7 @@ begin
 //#19255                                                                           
 //#19256                    if(GetKeyState(VK_CONTROL)&0x8000)                                                       
 //#19257                        trinit();                                                   
-//#19258                    else                                                       
+//#19258                    else
 //#19259                        thumnail();                                                   
 //#19260                }                                                           
 //#19261                break;                                                           
@@ -19714,10 +19763,10 @@ begin
 //#19265                if(GetKeyState(VK_CONTROL)&GetKeyState(VK_SHIFT)&0x8000){                                                           
 //#19266                                                                           
 //#19267                    movStch();                                                       
-//#19268                    unbox();                                                       
+//#19268                    unbox();
 //#19269                    setMap(RESTCH);                                                       
 //#19270                }                                                           
-//#19271                else{                                                           
+//#19271                else{
 //#19272                                                                           
 //#19273                    if(GetKeyState(VK_CONTROL)&0x8000){                                                       
 //#19274                                                                           
@@ -19730,7 +19779,7 @@ begin
 //#19281                        return 1;                                                   
 //#19282                    }                                                       
 //#19283                    else                                                       
-//#19284                        rotseg();                                                   
+//#19284                        rotseg();
 //#19285                }                                                           
 //#19286                break;                                                           
 //#19287                                                                           
@@ -19743,57 +19792,35 @@ begin
 //#19294                                                                           
 //#19295                if(GetKeyState(VK_CONTROL)&0X8000){                                                           
 //#19296                                                                           
-//#19297                    colchk();                                                       
+//#19297                    colchk();
 //#19298                    save();                                                       
 //#19299                }                                                           
 //#19300                else{                                                           
-//#19301                                                                           
-//#19302                    if(GetKeyState(VK_SHIFT)&0X8000)                                                       
-//#19303                        gsnap();                                                   
-//#19304                    else                                                       
-//#19305                        zumshft();                                                   
-//#19306                }                                                           
-//#19307                break;                                                           
-//#19308                                                                           
-//#19309            case 'F':                                                               
-//#19310                                                                           
-//#19311                if(fselpnt)                                                           
-//#19312                {                                                           
-//#19313                    PostMessage(hWnd,WM_SYSCOMMAND,SC_KEYMENU,'E');                                                       
-//#19314                    keybd_event('F',0,0,0);
-//#19315                }                                                           
-//#19316                else{                                                           
-//#19317                                                                           
-//#19318                    if(GetKeyState(VK_SHIFT)&0X8000){                                                       
-//#19319                                                                           
-//#19320                        setMap(CNV2FTH);                                                   
-//#19321                        ribon();                                                   
-//#19322                    }                                                       
-//#19323                    else{                                                       
-//#19324                                                                           
-//#19325                        frmon();                                                   
-//#19326                        if(chkMap(FORMSEL))                                                   
-//#19327                            refrm();                                               
-//#19328                        else                                                   
-//#19329                            form();                                               
-//#19330                    }                                                       
-//#19331                }                                                           
-//#19332                break;                                                           
-//#19333                                                                           
-//#19334            case 'V':                                                               
-//#19335                                                                           
-//#19336                if(GetKeyState(VK_CONTROL)&0X8000&&OpenClipboard(hWnd)){                                                           
-//#19337                                                                           
-//#19338                    htclp=RegisterClipboardFormat(thredclp);                                                       
-//#19339                    hClpMem=GetClipboardData(htclp);                                                       
-//#19340                    if(hClpMem){                                                       
-//#19341                                                                           
-//#19342                        clpvoid=GlobalLock(hClpMem);                                                   
-//#19343                        fpclpdat=(FPCLP*)clpvoid;                                                   
-//#19344                        if(fpclpdat->led==CLP_FRMPS){                                                   
-//#19345                                                                           
-//#19346                            duzrat();                                               
-//#19347                            ind=sizeof(FPCLP)+(fpclpdat->cnt+1)*sizeof(FLPNT);                                               
+//#19301
+//#19302                    if(GetKeyState(VK_SHIFT)&0X8000)
+//#19303                        gsnap();
+//#19304                    else
+//#19305                        zumshft();
+//#19306                }
+//#19307                break;
+//#19308
+
+
+//#19333
+//#19334            case 'V':
+//#19335
+//#19336                if(GetKeyState(VK_CONTROL)&0X8000&&OpenClipboard(hWnd)){
+//#19337
+//#19338                    htclp=RegisterClipboardFormat(thredclp);
+//#19339                    hClpMem=GetClipboardData(htclp);
+//#19340                    if(hClpMem){
+//#19341
+//#19342                        clpvoid=GlobalLock(hClpMem);
+//#19343                        fpclpdat=(FPCLP*)clpvoid;
+//#19344                        if(fpclpdat->led==CLP_FRMPS){
+//#19345
+//#19346                            duzrat();
+//#19347                            ind=sizeof(FPCLP)+(fpclpdat->cnt+1)*sizeof(FLPNT);
 //#19348                            MoveMemory(&bseq,clpvoid,ind);
 //#19349                            GlobalUnlock(hClpMem);                                               
 //#19350                            fpclpdat=(FPCLP*)&bseq;                                               
@@ -21473,6 +21500,8 @@ end;
 //#21022                setMap(RESTCH);
 //#21023                break;
 //#21024
+procedure TfrmMain.mnu_FORMClick(Sender: TObject);
+begin
 //#21025            case ID_FORM:
 //#21026
 //#21027                frmon();
@@ -21481,6 +21510,8 @@ end;
 //#21030                else
 //#21031                    form();
 //#21032                break;
+end;
+
 //#21033
 //#21034            case ID_FILSAT:
 //#21035
@@ -21764,7 +21795,7 @@ end;
 //#21328            strcpy(locnam,penv);                                                               
 //#21329        else                                                                   
 //#21330            return;                                                               
-//#21331        penv=strrchr(locnam,'\\')+1;                                                                   
+//#21331        penv=strrchr(locnam,'\\')+1;
 //#21332        strcpy(penv,"thredloc.txt");                                                                   
 //#21333        hloc=CreateFile(locnam,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,0,NULL);                                                                   
 //#21334        *phom=0;                                                                   
@@ -21793,151 +21824,151 @@ end;
 //#21357        _asm{                                                                   
 //#21358                                                                           
 //#21359                jmp        short delups                                                   
-//#21360                                                                           
-//#21361                                                                           
-//#21362    delsubl:    bswap    eax                                                               
-//#21363                mov        [edi],eax                                                   
-//#21364                add        edi,4                                                   
-//#21365                bswap    eax                                                       
-//#21366                shl        eax,1                                                   
-//#21367                loop    delsubl                                                       
-//#21368                ret                                                           
-//#21369                                                                           
-//#21370    delsubr:    bswap    eax                                                               
-//#21371                mov        [edi],eax                                                   
-//#21372                add        edi,4                                                   
-//#21373                bswap    eax                                                       
-//#21374                shr        eax,1                                                   
-//#21375                loop    delsubr                                                       
-//#21376                ret                                                           
-//#21377                                                                           
-//#21378    delsubt:    mov        eax,[esi]                                                           
-//#21379                add        esi,4                                                   
-//#21380                bswap    eax                                                       
-//#21381                mov        [edi],eax                                                   
-//#21382                add        edi,4                                                   
-//#21383                loop    delsubt                                                       
-//#21384                ret                                                           
-//#21385                                                                           
-//#21386    //form cursor                                                                       
-//#21387    delups:        mov        ebx,pnt                                                       
-//#21388                mov        edi,ebx                                                   
-//#21389                xor        ecx,ecx                                                   
-//#21390                mov        cl,32                                                   
-//#21391                mov        eax,0x00000100                                                   
-//#21392                rep        stosd                                                   
-//#21393                xor        eax,eax                                                   
-//#21394                dec        eax                                                   
-//#21395                mov        edi,ebx                                                   
-//#21396                add        edi,64                                                   
-//#21397                mov        [edi],eax                                                   
-//#21398                mov        eax,0x00ffff00                                                   
-//#21399                add        edi,32                                                   
-//#21400                mov        [edi],eax                                                   
-//#21401                sub        edi,64                                                   
-//#21402                mov        [edi],eax                                                   
-//#21403                mov        eax,0x00018000                                                   
-//#21404                mov        cl,16                                                   
-//#21405    dulup0:        or        [edi],eax                                                       
-//#21406                add        edi,4                                                   
-//#21407                loop    dulup0                                                       
-//#21408                                                                           
-//#21409    //dlin cursor                                                                       
-//#21410                                                                           
-//#21411                add        ebx,128                                                   
-//#21412                mov        edi,ebx                                                   
-//#21413                mov        ecx,32                                                   
-//#21414                xor        edx,edx                                                   
-//#21415                inc        edx                                                   
-//#21416                mov        esi,edx                                                   
-//#21417                ror        esi,1                                                   
-//#21418    dulup:        mov        eax,edx                                                       
-//#21419                or        eax,esi                                                   
-//#21420                or        eax,0x80000001                                                   
-//#21421                bswap    eax                                                       
-//#21422                mov        [edi],eax                                                   
-//#21423                add        edi,4                                                   
-//#21424                shl        edx,1                                                   
-//#21425                shr        esi,1                                                   
-//#21426                loop    dulup                                                       
-//#21427                xor        eax,eax                                                   
-//#21428                dec        eax                                                   
-//#21429                sub        edi,4                                                   
-//#21430                mov        [edi],eax                                                   
-//#21431                mov        [ebx],eax                                                   
-//#21432                                                                           
-//#21433    //straight up needle cursor                                                                       
-//#21434                add        ebx,128                                                   
-//#21435                mov        edi,ebx                                                   
-//#21436                mov        eax,0x0003c000                                                   
-//#21437                bswap    eax                                                       
-//#21438                mov        cl,24                                                   
-//#21439                rep        stosd                                                   
-//#21440                mov        eax,0x00024000                                                   
-//#21441                bswap    eax                                                       
-//#21442                mov        cl,5                                                   
-//#21443                rep        stosd                                                   
-//#21444                mov        eax,0x00018000                                                   
-//#21445                bswap    eax                                                       
-//#21446                mov        cl,2                                                   
-//#21447                rep        stosd                                                   
-//#21448                                                                           
-//#21449    //left up                                                                       
-//#21450                add        ebx,128                                                   
-//#21451                mov        edi,ebx                                                   
-//#21452                mov        cl,5                                                   
-//#21453                mov        esi,offset lucurstrt                                                   
-//#21454                call    delsubt                                                       
-//#21455                mov        cl,4                                                   
-//#21456                mov        eax,0x88                                                   
-//#21457                call    delsubl                                                       
-//#21458                mov        cl,19                                                   
-//#21459                mov        eax,0x1f00                                                   
-//#21460                call    delsubl                                                       
-//#21461                mov        esi,offset lucurfin                                                   
-//#21462                mov        cl,3                                                   
-//#21463                call    delsubt                                                       
-//#21464                                                                           
-//#21465    //left down                                                                       
-//#21466                                                                           
-//#21467                add        ebx,128                                                   
-//#21468                mov        edi,ebx                                                   
-//#21469                mov        esi,offset ldcurstrt                                                   
-//#21470                mov        cl,4                                                   
-//#21471                call    delsubt                                                       
-//#21472                mov        cl,19                                                   
-//#21473                mov        eax,0x7c000000                                                   
-//#21474                call    delsubr                                                       
-//#21475                mov        cl,4                                                   
-//#21476                mov        eax,0x440                                                   
-//#21477                call    delsubr                                                       
-//#21478                mov        cl,5                                                   
-//#21479                mov        esi,offset ldcurfin                                                   
-//#21480                call    delsubt                                                       
-//#21481                                                                           
-//#21482    //right up                                                                       
-//#21483                                                                           
-//#21484                add        ebx,128                                                   
-//#21485                mov        edi,ebx                                                   
-//#21486                mov        cl,5                                                   
-//#21487                mov        esi,offset rucurstrt                                                   
-//#21488                call    delsubt                                                       
-//#21489                mov        eax,0x9000000                                                   
-//#21490                mov        cl,4                                                   
-//#21491                call    delsubr                                                       
-//#21492                mov        cl,19                                                   
-//#21493                mov        eax,0x1f00000                                                   
-//#21494                call    delsubr                                                       
-//#21495                mov        esi,offset rucurfin                                                   
-//#21496                mov        cl,3                                                   
-//#21497                call    delsubt                                                       
-//#21498                                                                           
-//#21499    //right down                                                                       
-//#21500                add        ebx,128                                                   
-//#21501                mov        edi,ebx                                                   
-//#21502                mov        esi,offset rdcurstrt                                                   
-//#21503                mov        cl,4                                                   
-//#21504                call    delsubt                                                       
+//#21360
+//#21361
+//#21362    delsubl:    bswap    eax
+//#21363                mov        [edi],eax
+//#21364                add        edi,4
+//#21365                bswap    eax
+//#21366                shl        eax,1
+//#21367                loop    delsubl
+//#21368                ret
+//#21369
+//#21370    delsubr:    bswap    eax
+//#21371                mov        [edi],eax
+//#21372                add        edi,4
+//#21373                bswap    eax
+//#21374                shr        eax,1
+//#21375                loop    delsubr
+//#21376                ret
+//#21377
+//#21378    delsubt:    mov        eax,[esi]
+//#21379                add        esi,4
+//#21380                bswap    eax
+//#21381                mov        [edi],eax
+//#21382                add        edi,4
+//#21383                loop    delsubt
+//#21384                ret
+//#21385
+//#21386    //form cursor
+//#21387    delups:        mov        ebx,pnt
+//#21388                mov        edi,ebx
+//#21389                xor        ecx,ecx
+//#21390                mov        cl,32
+//#21391                mov        eax,0x00000100
+//#21392                rep        stosd
+//#21393                xor        eax,eax
+//#21394                dec        eax
+//#21395                mov        edi,ebx
+//#21396                add        edi,64
+//#21397                mov        [edi],eax
+//#21398                mov        eax,0x00ffff00
+//#21399                add        edi,32
+//#21400                mov        [edi],eax
+//#21401                sub        edi,64
+//#21402                mov        [edi],eax
+//#21403                mov        eax,0x00018000
+//#21404                mov        cl,16
+//#21405    dulup0:        or        [edi],eax
+//#21406                add        edi,4
+//#21407                loop    dulup0
+//#21408
+//#21409    //dlin cursor
+//#21410
+//#21411                add        ebx,128
+//#21412                mov        edi,ebx
+//#21413                mov        ecx,32
+//#21414                xor        edx,edx
+//#21415                inc        edx
+//#21416                mov        esi,edx
+//#21417                ror        esi,1
+//#21418    dulup:        mov        eax,edx
+//#21419                or        eax,esi
+//#21420                or        eax,0x80000001
+//#21421                bswap    eax
+//#21422                mov        [edi],eax
+//#21423                add        edi,4
+//#21424                shl        edx,1
+//#21425                shr        esi,1
+//#21426                loop    dulup
+//#21427                xor        eax,eax
+//#21428                dec        eax
+//#21429                sub        edi,4
+//#21430                mov        [edi],eax
+//#21431                mov        [ebx],eax
+//#21432
+//#21433    //straight up needle cursor
+//#21434                add        ebx,128
+//#21435                mov        edi,ebx
+//#21436                mov        eax,0x0003c000
+//#21437                bswap    eax
+//#21438                mov        cl,24
+//#21439                rep        stosd
+//#21440                mov        eax,0x00024000
+//#21441                bswap    eax
+//#21442                mov        cl,5
+//#21443                rep        stosd
+//#21444                mov        eax,0x00018000
+//#21445                bswap    eax
+//#21446                mov        cl,2
+//#21447                rep        stosd
+//#21448
+//#21449    //left up
+//#21450                add        ebx,128
+//#21451                mov        edi,ebx
+//#21452                mov        cl,5
+//#21453                mov        esi,offset lucurstrt
+//#21454                call    delsubt
+//#21455                mov        cl,4
+//#21456                mov        eax,0x88
+//#21457                call    delsubl
+//#21458                mov        cl,19
+//#21459                mov        eax,0x1f00
+//#21460                call    delsubl
+//#21461                mov        esi,offset lucurfin
+//#21462                mov        cl,3
+//#21463                call    delsubt
+//#21464
+//#21465    //left down
+//#21466
+//#21467                add        ebx,128
+//#21468                mov        edi,ebx
+//#21469                mov        esi,offset ldcurstrt
+//#21470                mov        cl,4
+//#21471                call    delsubt
+//#21472                mov        cl,19
+//#21473                mov        eax,0x7c000000
+//#21474                call    delsubr
+//#21475                mov        cl,4
+//#21476                mov        eax,0x440
+//#21477                call    delsubr
+//#21478                mov        cl,5
+//#21479                mov        esi,offset ldcurfin
+//#21480                call    delsubt
+//#21481
+//#21482    //right up
+//#21483
+//#21484                add        ebx,128
+//#21485                mov        edi,ebx
+//#21486                mov        cl,5
+//#21487                mov        esi,offset rucurstrt
+//#21488                call    delsubt
+//#21489                mov        eax,0x9000000
+//#21490                mov        cl,4
+//#21491                call    delsubr
+//#21492                mov        cl,19
+//#21493                mov        eax,0x1f00000
+//#21494                call    delsubr
+//#21495                mov        esi,offset rucurfin
+//#21496                mov        cl,3
+//#21497                call    delsubt
+//#21498
+//#21499    //right down
+//#21500                add        ebx,128
+//#21501                mov        edi,ebx
+//#21502                mov        esi,offset rdcurstrt
+//#21503                mov        cl,4
+//#21504                call    delsubt
 //#21505                mov        eax,0xf8                                                   
 //#21506                mov        cl,19                                                   
 //#21507                call    delsubl                                                       
@@ -24052,6 +24083,7 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 var i : integer;
   LColors : TArrayOfTColor;
 begin
+
   FStitchs := TStitchCollection.Create(Self) ;
 
 
@@ -24339,5 +24371,12 @@ begin
   end;  
 end;
 
+
+
+
+procedure TfrmMain.Line1Click(Sender: TObject);
+begin
+//
+end;
 
 end.
