@@ -23,8 +23,8 @@ object frmMain: TfrmMain
   TextHeight = 13
   object spl1: TSplitter
     Left = 0
-    Top = 486
-    Width = 709
+    Top = 518
+    Width = 725
     Height = 2
     Cursor = crVSplit
     Align = alBottom
@@ -203,7 +203,7 @@ object frmMain: TfrmMain
     Left = 0
     Top = 0
     Width = 30
-    Height = 486
+    Height = 518
     Align = alLeft
     SwatchList = swlDefault
     ThumbWidth = 30
@@ -220,7 +220,7 @@ object frmMain: TfrmMain
     Left = 30
     Top = 0
     Width = 33
-    Height = 486
+    Height = 518
     Align = alLeft
     SwatchList = swlCustom
     ThumbWidth = 30
@@ -236,8 +236,8 @@ object frmMain: TfrmMain
   end
   object pgscrlr1: TPageScroller
     Left = 0
-    Top = 488
-    Width = 709
+    Top = 520
+    Width = 725
     Height = 46
     Align = alBottom
     Control = swa1
@@ -264,12 +264,10 @@ object frmMain: TfrmMain
     end
   end
   object pb: TPaintBox32
-    Left = 248
-    Top = 72
-    Width = 461
-    Height = 414
-    Align = alCustom
-    Anchors = [akLeft, akTop, akRight, akBottom]
+    Left = 79
+    Top = 32
+    Width = 646
+    Height = 486
     TabOrder = 8
     OnPaintBuffer = pbPaintBuffer
   end
@@ -1137,13 +1135,6 @@ object frmMain: TfrmMain
   end
   object dlgColor1: TColorDialog
     Left = 128
-    Top = 88
-  end
-  object grdlst1: TgmGradientList
-    Gradients = <>
-    ForegroundColor = clBlack
-    BackgroundColor = clWhite
-    Left = 480
     Top = 88
   end
   object pmForm: TPopupMenu

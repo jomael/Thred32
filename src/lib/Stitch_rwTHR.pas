@@ -47,7 +47,7 @@ type
     constructor Create; override;
     procedure LoadFromStream(const AStream: TStream; const ACollection: TCollection); override;
     //procedure LoadItemFromString(Item :TgmSwatchItem; S : string);
-    procedure LoadItemFromStream(AStream: TStream; AItem: TCollectionItem); virtual;
+    //procedure LoadItemFromStream(Stream: TStream; AItem: TCollectionItem); virtual;
     procedure SaveToStream(const AStream: TStream; const ACollection: TCollection); override;
     //procedure SaveItemToStream(Stream: TStream; AItem: TCollectionItem); virtual; abstract;
     class function WantThis(const AStream: TStream): Boolean; override;
@@ -72,13 +72,16 @@ begin
 end;
 
 
-procedure TStitchTHRConverter.LoadFromStream(const AStream: TStream;
+procedure TStitchTHRConverter.LoadFromStream(Const AStream: TStream;
   const ACollection: TCollection);
+
+const
+  LMAXFORMS = 64;  
 var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data
   formpnt,
-  vervar,i,red : Integer;
+  vervar,i,j,red : Integer;
   sthed : TSTRHED;
   item  : TSHRTPNT;
   hedx : TSTREX;
@@ -99,7 +102,8 @@ var
   Lfrmlstx : array of TFRMHEDO;
   Lfrmx : TFRMHEDO;
 
-  LTempFormlst: Array[0..255] Of TFRMHED; 
+  LTempFormlst: Array[0..LMAXFORMS-1] Of TFRMHED_STREAM;
+  LFormCount,LFormStreamCount : integer;
   Lformlst : TArrayOfTFRMHED;
   Lform : TFRMHED;
   clpad,satkad,fltad : Integer;
@@ -141,7 +145,7 @@ var
     //P := @LFLTS[0];
     //inc(p,ind);
     //move(p^, result[0], sizeof(TFloatPoint) * cnt);
-    for i := 0 to cnt-2 do
+    for i := 0 to cnt-1 do
     begin
       result [i] := Lflts[i + ind];
     end;
@@ -499,24 +503,32 @@ begin
 //#5831                            else{                                               
 //#5832
       SetLength(Lformlst, formpnt);
-      //SetLength(LTempFormlst, formpnt);
-      //fillchar(lformlst[0], sizeof(tfrmhed) * formpnt, 0);
-      AStream.Read(Lformlst[0], SizeOf(TFRMHED)* formpnt);
-      //SetLength(Lformlst, formpnt);
-
-      //clean the memory address valued by stream to zero. it is avoid a "access violation".
-      for i := 0 to formpnt-1 do
+      //SetLength(LTempFormlst, LMAXFORMS); //64
+      LFormCount := 0;
+      while LFormCount < formpnt do
       begin
-        PFRMHEDX(pointer(@Lformlst[I])).flt := 0;
-        PFRMHEDX(@Lformlst[I]).sacang.ang := 0.0;
-        PFRMHEDX(@Lformlst[I]).angclp.fang := 0.0;
-        PFRMHEDX(@Lformlst[I]).clp:= 0;
+        LFormStreamCount := min(LMAXFORMS, formpnt - LFormCount);
+        //fillchar(lformlst[0], sizeof(tfrmhed) * formpnt, 0);
+        AStream.Read(LTempFormlst[0], SizeOf(TFRMHED)* LFormStreamCount);
+        //SetLength(Lformlst, formpnt);
 
-        //Stream.Read(Lformlst[i], SizeOf(TFRMHED) );
-        //lformlst[i].flt := nil;
-        //Stream.Read(LTempFormlst[i], SizeOf(TFRMHED));
-        //CopyHed(Lformlst[i],LTempFormlst[i]);
-//        Lformlst[i] := LTempFormlst[i];
+        //clean the memory address valued by stream to zero. it is avoid a "access violation".
+        for i := 0 to LFormStreamCount-1 do
+        begin
+          LTempFormlst[I].flt := 0;
+          LTempFormlst[I].sacang := 0;
+          LTempFormlst[I].angclp := 0;
+          LTempFormlst[I].clp:= 0;
+
+          
+          Lformlst[LFormCount + i] := PFRMHED(@LTempFormlst[I])^;
+          //Stream.Read(Lformlst[i], SizeOf(TFRMHED) );
+          //lformlst[i].flt := nil;
+          //Stream.Read(LTempFormlst[i], SizeOf(TFRMHED));
+          //CopyHed(Lformlst[i],LTempFormlst[i]);
+  //        Lformlst[i] := LTempFormlst[i];
+        end;
+        inc(LFormCount, LFormStreamCount);
       end;
 
 //#5833                                ReadFile(hFil,(FRMHED*)formlst,formpnt*sizeof(FRMHED),&red,0);
@@ -537,7 +549,10 @@ begin
     begin
       AStream.Read(Lflts[i], SizeOf(TFLPNT));
 
+      //Hey, Thred is updwon side. that is the first Y is in bottom, so we convert to delphi style
+      Lflts[i].y := {hedx.yhup -}(hedx.yhup - Lflts[i].y);
     end;
+
 
 //#5842                            ReadFile(hFil,(FLPNT*)flts,sthed.fcnt*sizeof(FLPNT),&red,0);
 //#5843                            if(red!=sizeof(FLPNT)*sthed.fcnt){
@@ -579,7 +594,7 @@ begin
 //#5865                                bfilmsg();
 
 
-
+    
 //#5866                            for(ind=0;ind<formpnt;ind++){
     for i := 0 to formpnt -1 do
     begin
@@ -597,14 +612,14 @@ begin
 //#5871                                    if(formlst[ind].stpt)
 //#5872                                        formlst[ind].sacang.sac=adsatk(formlst[ind].stpt);
         if LFormlst[i].stpt > 0 then
-          //lformlst[i].sacang.sac := adsatk(Lformlst[i].stpt)
+          lformlst[i].sacang.sac^ := adsatk(Lformlst[i].stpt)
           ;
 //#5873                                }
       end;
 
   //HAS CLIPBOARD?
       if isclp(i) then
-        //Lformlst[i].angclp.clp := adclp(lformlst[i].flencnt.nclp)
+        Lformlst[i].angclp.clp^ := adclp(lformlst[i].flencnt.nclp)
         ;
 //#5874                                if(isclp(ind))
 //#5875                                    formlst[ind].angclp.clp=adclp(formlst[ind].flencnt.nclp);
@@ -630,7 +645,7 @@ begin
 //#5884                }
 end;
 
-procedure TStitchTHRConverter.LoadItemFromStream(AStream: TStream;
+{procedure TStitchTHRConverter.LoadItemFromStream(const AStream: TStream; const
   AItem: TCollectionItem);
 var d : integer;
   b : TSHRTPNT;
@@ -644,12 +659,12 @@ begin
     //at := b.at;
     ColorIndex := b.at and COLMSK;
     LayerStackIndex := (b.at and LAYMSK) shr LAYSHFT;
-  end;}
+  end;
 
-end;
+end;}
 
-procedure TStitchTHRConverter.SaveToStream(const AStream: TStream;
-  const ACollection: TCollection);
+procedure TStitchTHRConverter.SaveToStream(const AStream: TStream; const
+  ACollection: TCollection);
 var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data

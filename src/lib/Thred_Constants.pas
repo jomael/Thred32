@@ -263,6 +263,10 @@ const
 	EGCLPX  =12;
 
 
+//edge underlay bit #1573
+  EGUND   = $80;
+  NEGUND  = $7f;
+  
   //#1632
   //fill types enum{
 

@@ -6,11 +6,12 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, XPMan,
   Thred_Types, stitch_Items,
-  StdCtrls, gmGridBased_List, gmSwatch_List,
+  StdCtrls, //gmGridBased_List,
+  gmSwatch_List,
   GR32_Image, GR32,
   gmGridBased_ListView, gmSwatch_ListView, gmGridBased_FileDlg,
   gmSwatch_FileDlgs, ComCtrls, {JvExComCtrls, JvPageScroller,} ExtCtrls,
-  gmGradient_List;
+  gmGridBased_List;
 
 type
   TfrmMain = class(TForm)
@@ -260,7 +261,6 @@ type
     spl1: TSplitter;
     pgscrlr1: TPageScroller;
     pb: TPaintBox32;
-    grdlst1: TgmGradientList;
     pmForm: TPopupMenu;
     Line1: TMenuItem;
     Freehand1: TMenuItem;
@@ -321,7 +321,9 @@ var
 
 implementation
 
-uses Thred_Constants, Thred_Defaults,
+uses
+  GR32_polygons,
+  Thred_Constants, Thred_Defaults,
   gmSwatch_rwTHR, gmSwatch_rwACO, gmSwatch_rwSWA,
   Stitch_FileDlg, Stitch_rwTHR, Stitch_rwPCS, Stitch_rwPES,
   Stitch_Lines32;
@@ -24083,8 +24085,11 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 var i : integer;
   LColors : TArrayOfTColor;
 begin
+//  showmessage(inttostr( sizeof(TFormStyle)));
+
 
   FStitchs := TStitchCollection.Create(Self) ;
+  pb.Align := alClient;
 
 
 
@@ -24310,12 +24315,13 @@ end;
 
 
 procedure TfrmMain.pbPaintBuffer(Sender: TObject);
-var i : Integer;
+var i,j : Integer;
   zRat : TFloatPoint;
   ColorAt :Cardinal;
   LastColor,CurrentColor : TColor32;
   R : TFloatRect;
   DrawLine : TStitch_LineProc;
+  first : boolean;
 begin
   DrawLine := Draw3DLine;//DrawLineStippled;//DrawLineFS;
 
@@ -24365,6 +24371,29 @@ begin
           pb.Buffer.LineToFS(x * zRat.X, y * zRat.Y);}
       end;
     end;
+    
+    //FORMS
+    pb.Buffer.PenColor:= clred32;
+    for i := 0 to FStitchs.Header.fpnt -1 do
+    begin
+      if length(FStitchs.Forms[i].flt) = 0 then continue;
+      
+      first := true;
+      for j := 0 to high(FStitchs.Forms[i].flt)  do
+      begin
+        with FStitchs.Forms[i].flt[j] do
+        if first then
+          pb.Buffer.MoveToF(x * zRat.X, y * zRat.Y)
+        else
+          pb.Buffer.LineToFS(x * zRat.X, y * zRat.Y);
+
+        first := false;
+      end;
+      //back to first point
+        with FStitchs.Forms[i].flt[0] do
+          pb.Buffer.LineToFS(x * zRat.X, y * zRat.Y)
+    end;
+
 
 
 

@@ -12,8 +12,34 @@ uses
 type
   TOldNameCharArray = array [0..OLDNUM - 1, 0..MAX_PATH - 1] of Char;
   TArrayOfTColor = array of TColor;
+  TArrayOfCardinal = array of Cardinal;
   T16Colors = array [0..15] of TColor;
   T16Byte   = array [0..15] of Byte;
+
+  TDoublePoint = record
+    x, y : Double;
+  end;
+
+  TSMALPNTL = record //smallpoint Line
+    lin,	//lin and grp must remain in this order for sort to work
+    grp : word;
+    x, y : TFloat;
+  end;//SMALPNTL;
+
+  TArrayOfSMALPNTL = array of TSMALPNTL;
+
+  PDUBPNTL = ^TDUBPNTL;
+  TDUBPNTL = record
+    x, y : Double;
+    lin : word;
+  end;//DUBPNTL;
+
+  //PArrayOfTDUBPNTL = ^TArrayOfDUBPNTL;
+  TArrayOfTDUBPNTL = array of TDUBPNTL;
+  TArrayOfPDUBPNTL = array of PDUBPNTL;
+
+
+
 
   TFLPNT = type TFloatPoint;
   TFLRCT = type TFloatRect;
@@ -230,7 +256,7 @@ TSATCON = record
 	fin : Word; //finish
 end; //SATCON;
 
-//PArrayOfTSATCON = ^TArrayOfTSATCON;
+PArrayOfTSATCON = ^TArrayOfTSATCON;
 TArrayOfTSATCON = array of TSATCON;
 
 
@@ -239,7 +265,7 @@ TFANGCLP = packed record
   case integer of
     0 :	(fang : Single);
 	  //1 : (clp : TArrayOfFloatPoint);
-    1 : (clp : PFloatPoint;);
+    1 : (clp : PArrayOfFloatPoint);// PFloatPoint;);
 	  2 : (sat : TSATCON);
 end; //FANGCLP;
 
@@ -253,7 +279,7 @@ end; //FLENCNT;
 //PSACANG = ^TSACANG;
 TSACANG = packed record
   case boolean of
-	  false : (sac : PSATCON);
+	  false : (sac : PArrayOfTSATCON);//PSATCON);
 	  true  : (ang : Single); //anle
 end; //SACANG;
 
@@ -272,7 +298,8 @@ TArrayOfTSACANG = array of TSACANG;
 	EGPIC	elen			esiz	nclp	espac		res		
 }
 
- TFRMHED = packed record
+  PFRMHED = ^TFRMHED;
+  TFRMHED = packed record
     at : Byte;		//attribute
     sids : Word;	//number of sides
     typ : Byte;	//type
@@ -338,30 +365,46 @@ TArrayOfTSACANG = array of TSACANG;
     res : word;	//pico length
   end;//FRMHEDO;
 
-  PFRMHEDX = ^TFRMHEDX;
-  TFRMHEDX = packed record
+  PFRMHED_STREAM = ^TFRMHED_STREAM;
+  TFRMHED_STREAM = packed record
     at : Byte;		//attribute
     sids : Word;	//number of sides
     typ : Byte;	//type
     fcol : byte;	//fill color
     bcol : Byte;	//border color
     nclp : Word;	//number of border clipboard entries
-    flt : CARDINAL ;	//points*
-    sacang : TSACANG;	//satin guidlines or angle clipboard fill angle
-    clp : CARDINAL;	//border clipboard data*
+    flt : Cardinal ;	//points*
+    sacang : Cardinal;	//satin guidlines or angle clipboard fill angle
+    clp : Cardinal;	//border clipboard data*
     stpt : Word;	//number of satin guidlines
     wpar : Word;	//word parameter
     rct : TFloatRect;	//rectangle
     ftyp : Byte;	//fill type
     etyp : Byte;	//edge type
     fspac : Single;	//fill spacing
-    flencnt : TFLENCNT ;//fill stitch length or clpboard count
-    angclp : TFANGCLP;	//fill angle or clpboard data pointer
+    flencnt : Cardinal ;//fill stitch length or clpboard count
+    angclp : Cardinal;	//fill angle or clpboard data pointer
     esiz,	//border size
     espac,	//edge spacing
     elen : TFloat;	//edge stitch length
     res : word;	//pico length
-  end;
+
+    xat: Cardinal;	//attribute extension
+    fmax,	//maximum fill stitch length
+    fmin,	//minimum fill stitch length
+    emax,	//maximum border stitch length
+    emin: Single;	//minimum border stitch length
+    dhx : TTFHED;	//feather/texture info
+    strt,	//fill strt point
+    endp : Word;	//fill end point {end}
+    uspac,//underlay spacing
+    ulen,	//underlay stitch length
+    uang,	//underlay stitch angle
+    wind,	//underlay/edge walk indent
+    txof : Single;	//gradient end density
+    ucol,	//underlay color
+    cres : Byte	//reserved
+  end; //FRMHED;
 
 implementation
 
