@@ -41,12 +41,12 @@ uses
 type
   TgmPALConverter = class(TgmConverter)
   public
-    procedure LoadFromStream(Stream: TStream; ACollection: TCollection); override;
+    procedure LoadFromStream(const AStream: TStream; const ACollection: TCollection); override;
     procedure LoadItemFromString(Item :TgmSwatchItem; S : string);
     //procedure LoadItemFromStream(Stream: TStream; AItem: TCollectionItem); virtual; abstract;
-    procedure SaveToStream(Stream: TStream; ACollection: TCollection); override;
+    procedure SaveToStream(const AStream: TStream; const ACollection: TCollection); override;
     //procedure SaveItemToStream(Stream: TStream; AItem: TCollectionItem); virtual; abstract;
-    class function WantThis(AStream: TStream): Boolean; override;
+    class function WantThis(const AStream: TStream): Boolean; override;
     //constructor Create; virtual;
   end;
 
@@ -57,8 +57,8 @@ uses
   
 { TgmPALConverter }
 
-procedure TgmPALConverter.LoadFromStream(Stream: TStream;
-  ACollection: TCollection);
+procedure TgmPALConverter.LoadFromStream(const AStream: TStream;
+  const ACollection: TCollection);
 var
   LStrList : TStrings;
   z,i : Integer;
@@ -66,7 +66,7 @@ var
 begin
   LCollection := TgmSwatchCollection(ACollection);
   LStrList := TStringList.Create;
-  LStrList.LoadFromStream(Stream);
+  LStrList.LoadFromStream(AStream);
   try
 
     if LStrList.Count > 0 then
@@ -100,8 +100,8 @@ begin
   //Item.DisplayName := s2;
 end;
 
-procedure TgmPALConverter.SaveToStream(Stream: TStream;
-  ACollection: TCollection);
+procedure TgmPALConverter.SaveToStream(const AStream: TStream;
+  const ACollection: TCollection);
 var
   LStrList : TStrings;
   i : Integer;
@@ -129,7 +129,7 @@ begin
           GreenComponent(Color),BlueComponent(Color),LItem.DisplayName]))
       end;
 
-    LStrList.SaveToStream(Stream);
+    LStrList.SaveToStream(AStream);
   finally
     LStrList.Free;
   end;
@@ -137,8 +137,9 @@ begin
 
 end;
 
-class function TgmPALConverter.WantThis(AStream: TStream): Boolean;
-var s8 : string[8];
+class function TgmPALConverter.WantThis(const AStream: TStream): Boolean;
+var
+  s8 : string[8];
 begin
   Result := false;
   AStream.Read(s8[1],8);

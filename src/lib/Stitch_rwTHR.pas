@@ -45,12 +45,12 @@ type
   private
   public
     constructor Create; override;
-    procedure LoadFromStream(Stream: TStream; ACollection: TCollection); override;
+    procedure LoadFromStream(const AStream: TStream; const ACollection: TCollection); override;
     //procedure LoadItemFromString(Item :TgmSwatchItem; S : string);
-    procedure LoadItemFromStream(Stream: TStream; AItem: TCollectionItem); virtual;
-    procedure SaveToStream(Stream: TStream; ACollection: TCollection); override;
+    procedure LoadItemFromStream(AStream: TStream; AItem: TCollectionItem); virtual;
+    procedure SaveToStream(const AStream: TStream; const ACollection: TCollection); override;
     //procedure SaveItemToStream(Stream: TStream; AItem: TCollectionItem); virtual; abstract;
-    class function WantThis(AStream: TStream): Boolean; override;
+    class function WantThis(const AStream: TStream): Boolean; override;
     //constructor Create; virtual;
   end;
 
@@ -72,8 +72,8 @@ begin
 end;
 
 
-procedure TStitchTHRConverter.LoadFromStream(Stream: TStream;
-  ACollection: TCollection);
+procedure TStitchTHRConverter.LoadFromStream(const AStream: TStream;
+  const ACollection: TCollection);
 var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data
@@ -264,7 +264,7 @@ begin
 //#5713                    ReadFile(hFil,(STRHED*)&sthed,sizeof(STRHED),&red,NULL);
 //  red := Stream.Read(buf[0],SizeOf(buf));
 
-  Stream.Read(sthed,SizeOf(TSTRHED) );
+  AStream.Read(sthed,SizeOf(TSTRHED) );
   LDesign.Header := sthed;
   if sthed.led and $ffffff <> $746872 then                   //#5714                    if((sthed.led&0xffffff)==0x746872){
         raise Exception.Create({IDS_SHRTF} IDS_NOTHR);        //#5717
@@ -325,7 +325,7 @@ begin
     begin
 //#5744
 //#5745                            ReadFile(hFil,(STREX*)&hedx,sizeof(STREX),&red,NULL);
-    Stream.Read(hedx, SizeOf(TSTREX));
+    AStream.Read(hedx, SizeOf(TSTREX));
 //#5746                            if(red!=sizeof(STREX)){
 //#5747
 //#5748                                tabmsg(IDS_SHRTF);
@@ -360,7 +360,7 @@ begin
 //#5764                        hed.stchs=sthed.stchs;
 //#5765                        ReadFile(hFil, (SHRTPNT*)stchs, hed.stchs*sizeof(SHRTPNT), &red, NULL);
   SetLength(Lstchs, sthed.stchs);
-  Stream.Read(Lstchs[0], sthed.stchs * SizeOf(TSHRTPNT));
+  AStream.Read(Lstchs[0], sthed.stchs * SizeOf(TSHRTPNT));
   for i := 0 to sthed.stchs do
   begin
     //Hey, Thred is updwon side. that is the first Y is in bottom, so we convert to delphi style
@@ -390,7 +390,7 @@ begin
 //#5777                            prtred();
 //#5778                            return;
 //#5779                        }
-  red := Stream.Read(buf[0],16);
+  red := AStream.Read(buf[0],16);
   LDesign.BName := buf;
 //  if red <> 16 then    Exit;
 
@@ -402,7 +402,7 @@ begin
 //#5785                            prtred();
 //#5786                            return;
 //#5787                        }
-  Stream.Read(c,4);
+  AStream.Read(c,4);
   LDesign.BgColor := c;
 //#5788                        hStchBak=CreateSolidBrush(stchBak);
 
@@ -415,7 +415,7 @@ begin
 //#5794                            return;
 //#5795                        }
   SetLength(LColors, 16);
-  Stream.Read(c16[0], 64);
+  AStream.Read(c16[0], 64);
   for i := 0 to 15 do
   begin
     LColors[i] := c16[i];
@@ -430,7 +430,7 @@ begin
 //#5800                            prtred();
 //#5801                            return;
 //#5802                        }
-  Stream.Read(c16[0], 64);
+  AStream.Read(c16[0], 64);
 //  LDesign.CustomColors := LColors;
 
   //THREAD SIZE (ON SCREEN)
@@ -441,7 +441,7 @@ begin
 //#5807                            prtred();
 //#5808                            return;
 //#5809                        }
-  red := Stream.Read(LBytes[0],16);
+  red := AStream.Read(LBytes[0],16);
   //LCollection.BName := Bytes;
   if red <> 16 then
     Exit;
@@ -481,7 +481,7 @@ begin
       //Stream.Read(Lfrmlstx[0], SizeOf(TFRMHEDO) * formpnt);
       for i := 0 to formpnt-1 do
       begin
-        Stream.Read(Lfrmlstx[i], SizeOf(TFRMHEDO) );
+        AStream.Read(Lfrmlstx[i], SizeOf(TFRMHEDO) );
       end;
 
 //#5823                                ReadFile(hFil,(FRMHEDO*)frmlstx,formpnt*sizeof(FRMHEDO),&red,0);
@@ -501,7 +501,7 @@ begin
       SetLength(Lformlst, formpnt);
       //SetLength(LTempFormlst, formpnt);
       //fillchar(lformlst[0], sizeof(tfrmhed) * formpnt, 0);
-      Stream.Read(Lformlst[0], SizeOf(TFRMHED)* formpnt);
+      AStream.Read(Lformlst[0], SizeOf(TFRMHED)* formpnt);
       //SetLength(Lformlst, formpnt);
 
       //clean the memory address valued by stream to zero. it is avoid a "access violation".
@@ -535,7 +535,7 @@ begin
     //red := Stream.Read(Lflts[0], SizeOf(TFLPNT) * sthed.fcnt);
     for i := 0 to sthed.fcnt -1 do
     begin
-      Stream.Read(Lflts[i], SizeOf(TFLPNT));
+      AStream.Read(Lflts[i], SizeOf(TFLPNT));
 
     end;
 
@@ -552,7 +552,7 @@ begin
 
   //dline data count
     SetLength(Lsatks, sthed.fcnt);
-    Stream.Read(Lsatks[0], SizeOf(TSATCON) * sthed.scnt);
+    AStream.Read(Lsatks[0], SizeOf(TSATCON) * sthed.scnt);
 //#5850                            ReadFile(hFil,(SATCON*)satks,sthed.scnt*sizeof(SATCON),&red,0);                                               
 //#5851                            if(red!=sthed.scnt*sizeof(SATCON)){
 //#5852                                                                           
@@ -562,7 +562,7 @@ begin
 
   //points to clipboard data
     SetLength(Lclps, sthed.fcnt);
-    Stream.Read(Lclps[0], SizeOf(TFLPNT) * sthed.ecnt);
+    AStream.Read(Lclps[0], SizeOf(TFLPNT) * sthed.ecnt);
 //#5856                            ReadFile(hFil,(FLPNT*)clps,sthed.ecnt*sizeof(FLPNT),&red,0);
 //#5857                            if(red!=sthed.ecnt*sizeof(FLPNT)){
 //#5858
@@ -572,7 +572,7 @@ begin
 
   //textured fill point count
     SetLength(Ltxpnts, sthed.fcnt);
-    Stream.Read(Ltxpnts[0], SizeOf(TTXPNT) * hedx.txcnt);
+    AStream.Read(Ltxpnts[0], SizeOf(TTXPNT) * hedx.txcnt);
 //#5862                            ReadFile(hFil,(TXPNT*)txpnts,hedx.txcnt*sizeof(TXPNT),&red,0);
 //#5863                            txad=red/sizeof(TXPNT);
 //#5864                            if(rstMap(BADFIL))
@@ -630,7 +630,7 @@ begin
 //#5884                }
 end;
 
-procedure TStitchTHRConverter.LoadItemFromStream(Stream: TStream;
+procedure TStitchTHRConverter.LoadItemFromStream(AStream: TStream;
   AItem: TCollectionItem);
 var d : integer;
   b : TSHRTPNT;
@@ -648,8 +648,8 @@ begin
 
 end;
 
-procedure TStitchTHRConverter.SaveToStream(Stream: TStream;
-  ACollection: TCollection);
+procedure TStitchTHRConverter.SaveToStream(const AStream: TStream;
+  const ACollection: TCollection);
 var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data
@@ -687,7 +687,7 @@ begin
     hup := LDesign.Header.hup;
     stchs := Length(LDesign.Stitchs);
   end;
-  Stream.Write(sthed, SizeOf(sthed));
+  AStream.Write(sthed, SizeOf(sthed));
 
   FillChar(hedx, SizeOf(TSTREX),0);
   with hedx do
@@ -695,7 +695,7 @@ begin
     xhup := LDesign.HeaderEx.xhup;
     yhup := LDesign.HeaderEx.yhup;
   end;
-  Stream.Write(hedx, SizeOf(TSTREX));
+  AStream.Write(hedx, SizeOf(TSTREX));
 
   
   //LDesign.Stitchs := Lstchs;
@@ -707,7 +707,7 @@ begin
 
     Lstchs[i].y := hedx.yhup - Lstchs[i].y;
   end;
-  Stream.Write(Lstchs[0], sthed.stchs * SizeOf(TSHRTPNT));
+  AStream.Write(Lstchs[0], sthed.stchs * SizeOf(TSHRTPNT));
   SetLength(Lstchs, 0);
   lstchs := nil;
 
@@ -716,21 +716,21 @@ begin
   //Stitch Sizes
   //pchar(buf[0])^ := pchar(LDesign.BName);
   fillchar(buf[0],16,0);
-  Stream.Write(buf, 16);
+  AStream.Write(buf, 16);
 
 
   //BG COLOR
-  Stream.Write(LDesign.BgColor,4);
+  AStream.Write(LDesign.BgColor,4);
 
   //Colors
   for i := 0 to 15 do
   begin
     c16[i] := LDesign.Colors[i];
   end;
-  Stream.Write(c16[0], 64);
+  AStream.Write(c16[0], 64);
 
   //custom color
-  Stream.Write(c16[0], 64);
+  AStream.Write(c16[0], 64);
 
 
   //THREAD SIZE (ON SCREEN)
@@ -738,7 +738,7 @@ begin
   begin
      LBytes[i] := LDesign.ThreadSize[i] div 10;
   end;
-  Stream.Write(LBytes[0], 16);
+  AStream.Write(LBytes[0], 16);
 
 //#9816    void thrsav(){
 //#9817                                                                           
@@ -804,7 +804,7 @@ begin
 end;
 
 
-class function TStitchTHRConverter.WantThis(AStream: TStream): Boolean;
+class function TStitchTHRConverter.WantThis(const AStream: TStream): Boolean;
 var
   hed : TSTRHED;
 	led : Cardinal;

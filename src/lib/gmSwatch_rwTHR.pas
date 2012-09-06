@@ -45,8 +45,8 @@ type
   private
   public
     constructor Create; override;
-    procedure LoadFromStream(Stream: TStream; ACollection: TCollection); override;
-    class function WantThis(AStream: TStream): Boolean; override;
+    procedure LoadFromStream(const AStream: TStream; const ACollection: TCollection); override;
+    class function WantThis(const AStream: TStream): Boolean; override;
   end;
 
 implementation
@@ -64,8 +64,8 @@ begin
 end;
 
 
-procedure TStitchTHRConverter.LoadFromStream(Stream: TStream;
-  ACollection: TCollection);
+procedure TStitchTHRConverter.LoadFromStream(const AStream: TStream;
+  const ACollection: TCollection);
 var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data
@@ -91,7 +91,7 @@ begin
 //#5713                    ReadFile(hFil,(STRHED*)&sthed,sizeof(STRHED),&red,NULL);
 //  red := Stream.Read(buf[0],SizeOf(buf));
 
-  Stream.Read(sthed,SizeOf(TSTRHED) );
+  AStream.Read(sthed,SizeOf(TSTRHED) );
   //LCollection.Header := sthed;
   if sthed.led and $ffffff <> $746872 then                   //#5714                    if((sthed.led&0xffffff)==0x746872){
         raise Exception.Create({IDS_SHRTF} IDS_NOTHR);        //#5717
@@ -139,7 +139,7 @@ begin
 //#5744
 //#5745                            ReadFile(hFil,(STREX*)&hedx,sizeof(STREX),&red,NULL);
     //Stream.Read(hedx, SizeOf(TSTREX));
-    Stream.Seek(SizeOf(TSTREX), soFromCurrent);
+    AStream.Seek(SizeOf(TSTREX), soFromCurrent);
 //#5746                            if(red!=sizeof(STREX)){
 //#5747
 //#5748                                tabmsg(IDS_SHRTF);
@@ -168,7 +168,7 @@ begin
 //#5764                        hed.stchs=sthed.stchs;
 //#5765                        ReadFile(hFil, (SHRTPNT*)stchs, hed.stchs*sizeof(SHRTPNT), &red, NULL);
 
-    Stream.Seek(SizeOf(TSHRTPNT) * sthed.stchs, soFromCurrent );
+    AStream.Seek(SizeOf(TSHRTPNT) * sthed.stchs, soFromCurrent );
 
 //#5766                        if(red!=hed.stchs*sizeof(SHRTPNT)){
 //#5767
@@ -185,7 +185,7 @@ begin
 //#5777                            prtred();
 //#5778                            return;
 //#5779                        }
-  red := Stream.Read(buf[0],16);
+  red := AStream.Read(buf[0],16);
   //LCollection.BName := buf;
 //  if red <> 16 then    Exit;
 
@@ -197,7 +197,7 @@ begin
 //#5785                            prtred();
 //#5786                            return;
 //#5787                        }
-  Stream.Read(c,4);
+  AStream.Read(c,4);
 //#5788                        hStchBak=CreateSolidBrush(stchBak);
 
 
@@ -208,7 +208,7 @@ begin
 //#5793                            prtred();
 //#5794                            return;
 //#5795                        }
-  Stream.Read(c16[0], 64);
+  AStream.Read(c16[0], 64);
   //LCollection.Colors := c16;
   for i := 0 to 15 do
     LCollection.Add.Color := c16[i];
@@ -221,7 +221,7 @@ begin
 //#5800                            prtred();
 //#5801                            return;
 //#5802                        }
-  Stream.Read(c16, 64);
+  AStream.Read(c16, 64);
   //LCollection.CustomColors := c16;
   for i := 0 to 15 do
     LCollection.Add.Color := c16[i];
@@ -229,7 +229,7 @@ begin
 end;
 
 
-class function TStitchTHRConverter.WantThis(AStream: TStream): Boolean;
+class function TStitchTHRConverter.WantThis(const AStream: TStream): Boolean;
 var
   hed : TSTRHED;
 	led : Cardinal;

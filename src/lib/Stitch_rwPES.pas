@@ -59,12 +59,12 @@ type
     procedure hupfn(ADesign: TStitchCollection; chkhuprct: TFloatRect);
   public
     constructor Create; override;
-    procedure LoadFromStream(Stream: TStream; ACollection: TCollection); override;
+    procedure LoadFromStream(const AStream: TStream; const ACollection: TCollection); override;
     //procedure LoadItemFromString(Item :TgmSwatchItem; S : string);
     //procedure LoadItemFromStream(Stream: TStream; AItem: TCollectionItem); virtual;
-    procedure SaveToStream(Stream: TStream; ACollection: TCollection); override;
+    procedure SaveToStream(const AStream: TStream; const ACollection: TCollection); override;
     //procedure SaveItemToStream(Stream: TStream; AItem: TCollectionItem); virtual; abstract;
-    class function WantThis(AStream: TStream): Boolean; override;
+    class function WantThis(const AStream: TStream): Boolean; override;
     //constructor Create; virtual;
   end;
 
@@ -83,8 +83,8 @@ begin
 end;
 
 
-procedure TStitchPESConverter.LoadFromStream(Stream: TStream;
-  ACollection: TCollection);
+procedure TStitchPESConverter.LoadFromStream(const AStream: TStream;
+  const ACollection: TCollection);
 var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data
@@ -195,7 +195,7 @@ var
 {$ENDIF}  
 
 begin
-  FStream := Stream;
+  FStream := AStream;
   LDesign := TStitchCollection(ACollection);
   LDesign.Clear;
   SetLength(Lstchs,0);
@@ -212,7 +212,7 @@ begin
 //#5967    #if PESACT                                                                       
 //#5968                        else{                                                   
 //#5969
-  Stream.Read(peshed, SizeOf(TPESHED));
+  AStream.Read(peshed, SizeOf(TPESHED));
   if peshed.led <> '#PES00' then
     raise Exception.Create('Not a PES file');
 
@@ -232,12 +232,12 @@ begin
 //#5981                            xpnt=0;
 
   //COLORS===
-  Stream.Position :=pecof + 48;
+  AStream.Position :=pecof + 48;
   pcolcnt := ReadByte; // should +1 !
   //for i := 0 to FnumColors do
       //colorList[i] := ReadByte;
   SetLength(colorList,pcolcnt + 1);
-  Stream.Read(colorList[0], pcolcnt + 1);
+  AStream.Read(colorList[0], pcolcnt + 1);
 //#5982                            pcolcnt=(unsigned char*)&peschr[pecof+48];
 
   FStream.Position := pecof + 532;
@@ -627,8 +627,8 @@ begin
   FStream.Read(Result,4)
 end;
 
-procedure TStitchPESConverter.SaveToStream(Stream: TStream;
-  ACollection: TCollection);
+procedure TStitchPESConverter.SaveToStream(const AStream: TStream;
+  const ACollection: TCollection);
 begin
 //#6629    #if PESACT                                                                       
 //#6630                                                                           
@@ -947,7 +947,7 @@ begin
 end;
 
 
-class function TStitchPESConverter.WantThis(AStream: TStream): Boolean;
+class function TStitchPESConverter.WantThis(const AStream: TStream): Boolean;
 var
   peshed : TPESHED;
   red : Integer;

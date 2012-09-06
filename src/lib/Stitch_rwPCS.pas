@@ -49,12 +49,12 @@ type
   private
   public
     constructor Create; override;
-    procedure LoadFromStream(Stream: TStream; ACollection: TCollection); override;
+    procedure LoadFromStream(const AStream: TStream; const ACollection: TCollection); override;
     //procedure LoadItemFromString(Item :TgmSwatchItem; S : string);
-    procedure LoadItemFromStream(Stream: TStream; AItem: TCollectionItem); virtual;
+    procedure LoadItemFromStream(AStream: TStream; AItem: TCollectionItem); virtual;
     //procedure SaveToStream(Stream: TStream; ACollection: TCollection); override;
     //procedure SaveItemToStream(Stream: TStream; AItem: TCollectionItem); virtual; abstract;
-    class function WantThis(AStream: TStream): Boolean; override;
+    class function WantThis(const AStream: TStream): Boolean; override;
     //constructor Create; virtual;
   end;
 
@@ -73,8 +73,8 @@ begin
 end;
 
 
-procedure TStitchPCSConverter.LoadFromStream(Stream: TStream;
-  ACollection: TCollection);
+procedure TStitchPCSConverter.LoadFromStream(const AStream: TStream;
+  const ACollection: TCollection);
 var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data
@@ -109,13 +109,13 @@ begin
 //#5897                            }
 //#5898                            if(hed.ledIn==0x32&&hed.fColCnt==16){
 
-  Stream.Read(sthed,SizeOf(THED) );
+  AStream.Read(sthed,SizeOf(THED) );
   //LCollection.Header := sthed;
   if not ( (sthed.ledIn = $32) and (sthed.fColCnt = 16)) then
         raise Exception.Create(IDS_SHRTF);
 
   SetLength(LColors, 16);
-  Stream.Read(c16[0], 64);
+  AStream.Read(c16[0], 64);
   for i := 0 to 15 do
   begin
     LColors[i] := c16[i];
@@ -199,13 +199,14 @@ begin
 //#5966                        }
 end;
 
-procedure TStitchPCSConverter.LoadItemFromStream(Stream: TStream;
+procedure TStitchPCSConverter.LoadItemFromStream(AStream: TStream;
   AItem: TCollectionItem);
-var d : integer;
+var
+  d : integer;
   b : SHRTPNT;
   i : TStitchItem;
 begin
-  Stream.Read(b,SizeOf(SHRTPNT));
+  AStream.Read(b,SizeOf(SHRTPNT));
   with TStitchItem(AItem) do
   begin
     x := b.x;
@@ -215,7 +216,7 @@ begin
 
 end;
 
-class function TStitchPCSConverter.WantThis(AStream: TStream): Boolean;
+class function TStitchPCSConverter.WantThis(const AStream: TStream): Boolean;
 var
   hed : THED;
   red : Integer;
