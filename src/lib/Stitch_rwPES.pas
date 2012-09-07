@@ -59,12 +59,12 @@ type
     procedure hupfn(ADesign: TStitchCollection; chkhuprct: TFloatRect);
   public
     constructor Create; override;
-    procedure LoadFromStream(const AStream: TStream; const ACollection: TCollection); override;
+    procedure LoadFromStream(AStream: TStream; ACollection: TCollection); override;
     //procedure LoadItemFromString(Item :TgmSwatchItem; S : string);
     //procedure LoadItemFromStream(Stream: TStream; AItem: TCollectionItem); virtual;
-    procedure SaveToStream(const AStream: TStream; const ACollection: TCollection); override;
+    procedure SaveToStream(AStream: TStream; ACollection: TCollection); override;
     //procedure SaveItemToStream(Stream: TStream; AItem: TCollectionItem); virtual; abstract;
-    class function WantThis(const AStream: TStream): Boolean; override;
+    class function WantThis(AStream: TStream): Boolean; override;
     //constructor Create; virtual;
   end;
 
@@ -83,8 +83,8 @@ begin
 end;
 
 
-procedure TStitchPESConverter.LoadFromStream(const AStream: TStream;
-  const ACollection: TCollection);
+procedure TStitchPESConverter.LoadFromStream(AStream: TStream;
+  ACollection: TCollection);
 var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data
@@ -627,8 +627,8 @@ begin
   FStream.Read(Result,4)
 end;
 
-procedure TStitchPESConverter.SaveToStream(const AStream: TStream;
-  const ACollection: TCollection);
+procedure TStitchPESConverter.SaveToStream(AStream: TStream;
+  ACollection: TCollection);
 begin
 //#6629    #if PESACT                                                                       
 //#6630                                                                           
@@ -947,7 +947,7 @@ begin
 end;
 
 
-class function TStitchPESConverter.WantThis(const AStream: TStream): Boolean;
+class function TStitchPESConverter.WantThis(AStream: TStream): Boolean;
 var
   peshed : TPESHED;
   red : Integer;

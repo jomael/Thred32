@@ -49,12 +49,12 @@ type
   private
   public
     constructor Create; override;
-    procedure LoadFromStream(const AStream: TStream; const ACollection: TCollection); override;
+    procedure LoadFromStream(AStream: TStream; ACollection: TCollection); override;
     //procedure LoadItemFromString(Item :TgmSwatchItem; S : string);
     procedure LoadItemFromStream(AStream: TStream; AItem: TCollectionItem); virtual;
     //procedure SaveToStream(Stream: TStream; ACollection: TCollection); override;
     //procedure SaveItemToStream(Stream: TStream; AItem: TCollectionItem); virtual; abstract;
-    class function WantThis(const AStream: TStream): Boolean; override;
+    class function WantThis(AStream: TStream): Boolean; override;
     //constructor Create; virtual;
   end;
 
@@ -73,8 +73,8 @@ begin
 end;
 
 
-procedure TStitchPCSConverter.LoadFromStream(const AStream: TStream;
-  const ACollection: TCollection);
+procedure TStitchPCSConverter.LoadFromStream(AStream: TStream;
+  ACollection: TCollection);
 var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data
@@ -216,7 +216,7 @@ begin
 
 end;
 
-class function TStitchPCSConverter.WantThis(const AStream: TStream): Boolean;
+class function TStitchPCSConverter.WantThis(AStream: TStream): Boolean;
 var
   hed : THED;
   red : Integer;

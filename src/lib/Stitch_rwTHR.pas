@@ -45,12 +45,12 @@ type
   private
   public
     constructor Create; override;
-    procedure LoadFromStream(const AStream: TStream; const ACollection: TCollection); override;
+    procedure LoadFromStream(AStream: TStream; ACollection: TCollection); override;
     //procedure LoadItemFromString(Item :TgmSwatchItem; S : string);
     //procedure LoadItemFromStream(Stream: TStream; AItem: TCollectionItem); virtual;
-    procedure SaveToStream(const AStream: TStream; const ACollection: TCollection); override;
+    procedure SaveToStream(AStream: TStream; ACollection: TCollection); override;
     //procedure SaveItemToStream(Stream: TStream; AItem: TCollectionItem); virtual; abstract;
-    class function WantThis(const AStream: TStream): Boolean; override;
+    class function WantThis(AStream: TStream): Boolean; override;
     //constructor Create; virtual;
   end;
 
@@ -72,8 +72,8 @@ begin
 end;
 
 
-procedure TStitchTHRConverter.LoadFromStream(Const AStream: TStream;
-  const ACollection: TCollection);
+procedure TStitchTHRConverter.LoadFromStream(AStream: TStream;
+  ACollection: TCollection);
 
 const
   LMAXFORMS = 64;  
@@ -663,7 +663,7 @@ begin
 
 end;}
 
-procedure TStitchTHRConverter.SaveToStream(const AStream: TStream; const
+procedure TStitchTHRConverter.SaveToStream(AStream: TStream;
   ACollection: TCollection);
 var
 	led : Cardinal;
@@ -819,7 +819,7 @@ begin
 end;
 
 
-class function TStitchTHRConverter.WantThis(const AStream: TStream): Boolean;
+class function TStitchTHRConverter.WantThis(AStream: TStream): Boolean;
 var
   hed : TSTRHED;
 	led : Cardinal;
