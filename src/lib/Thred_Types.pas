@@ -94,7 +94,7 @@ type
   end; //STREX
 
   //pcs file header structure
-  THED = packed record
+  THED = packed record  thred.h #681
     ledIn,
     hup : Byte;
     fColCnt : Word;
@@ -227,63 +227,63 @@ type
   end;
 
 
-TFTHED =packed record
-	fthtyp,	//feather fill type
-	fthup,	//feather up count
-	fthdwn,	//feather down count
-	fthcol: Byte;	//feather blend col
-	fthrat,	//feather ratio
-	fthflr: single;	//feather floor
-	fthnum: Word; //feather fill psg granularity
-end; //FTHED;
+  TFTHED =packed record
+   	fthtyp,	//feather fill type
+   	fthup,	//feather up count
+   	fthdwn,	//feather down count
+	  fthcol: Byte;	//feather blend col
+	  fthrat,	//feather ratio
+	  fthflr: single;	//feather floor
+	  fthnum: Word; //feather fill psg granularity
+  end; //FTHED;
 
-TTXHED = packed record
-	lins: SmallInt ;
-	ind,
-	cnt: word;
-	hi : Single;
-end; //TXHED;
+  TTXHED = packed record
+   	lins: SmallInt ;
+   	ind,
+	  cnt: Word;
+	  hi : Single;
+  end; //TXHED;
 
-TTFHED = packed record   //union
-  case integer of
-    0 :(	fth : TFTHED);
-	  1 :(txt : TTXHED);
-end;//TFHED;
+  TTFHED = packed record   //union
+    case Integer of
+      0 : (fth : TFTHED);
+	    1 : (txt : TTXHED);
+  end;//TFHED;
 
-PSATCON = ^TSATCON;
-TSATCON = record
-	strt,
-	fin : Word; //finish
-end; //SATCON;
+  PSATCON = ^TSATCON;
+  TSATCON = record
+	  strt,
+	  fin : Word; //finish
+  end; //SATCON;
 
-PArrayOfTSATCON = ^TArrayOfTSATCON;
-TArrayOfTSATCON = array of TSATCON;
+  PArrayOfTSATCON = ^TArrayOfTSATCON;
+  TArrayOfTSATCON = array of TSATCON;
 
 
-//PFANGCLP = ^TFANGCLP;
-TFANGCLP = packed record
-  case integer of
-    0 :	(fang : Single);
-	  //1 : (clp : TArrayOfFloatPoint);
-    1 : (clp : PArrayOfFloatPoint);// PFloatPoint;);
-	  2 : (sat : TSATCON);
-end; //FANGCLP;
+  //PFANGCLP = ^TFANGCLP;
+  TFANGCLP = packed record
+    case Integer of
+      0 :	(fang : Single);
+	    //1 : (clp : TArrayOfFloatPoint);
+      1 : (clp : PArrayOfFloatPoint);// PFloatPoint;);
+	    2 : (sat : TSATCON);
+  end; //FANGCLP;
 
-//PFLENCNT = ^TFLENCNT;
-TFLENCNT = packed record
-  case boolean of
-    true : (flen : Single);
-	  false : (nclp : Cardinal);
-end; //FLENCNT;
+  //PFLENCNT = ^TFLENCNT;
+  TFLENCNT = packed record
+    case Boolean of
+      True  : (flen : Single);
+	    False : (nclp : Cardinal);
+  end; //FLENCNT;
 
-//PSACANG = ^TSACANG;
-TSACANG = packed record
-  case boolean of
-	  false : (sac : PArrayOfTSATCON);//PSATCON);
-	  true  : (ang : Single); //anle
-end; //SACANG;
+  //PSACANG = ^TSACANG;
+  TSACANG = packed record
+    case boolean of
+	    False : (sac : PArrayOfTSATCON);//PSATCON);
+	    True  : (ang : Single); //anle
+  end; //SACANG;
 
-TArrayOfTSACANG = array of TSACANG;
+  TArrayOfTSACANG = array of TSACANG;
 
 {
 	fill	elen	espac	esiz	nclp	picspac		crnrsiz		brdend
@@ -295,7 +295,7 @@ TArrayOfTSACANG = array of TSACANG;
 	EGAP	elen	espac	esiz									at
 	EGPRP	elen	espac	esiz									at
 	EGHOL	elen	espac	esiz						nclp,res
-	EGPIC	elen			esiz	nclp	espac		res		
+	EGPIC	elen			esiz	nclp	espac		res
 }
 
   PFRMHED = ^TFRMHED;
@@ -340,6 +340,21 @@ TArrayOfTSACANG = array of TSACANG;
   end; //FRMHED;
 
   TArrayOfTFRMHED = array of TFRMHED;
+
+  TRNGC = packed record  // thred.h #786
+    strt : Cardinal;
+    cnt  : Cardinal;
+	  fin  : Cardinal;
+	  frm  : Cardinal;
+  end; //RNGC;
+
+  // it identifys Double rect
+  TDUBRCT = packed record  // thred.h #907
+    top    : Double;
+    left   : Double;
+	  right  : Double;
+	  bottom : Double;
+  end; //DUBRCT;
 
   TFRMHEDO = packed record // #995
     at : Byte;		//attribute
@@ -405,6 +420,29 @@ TArrayOfTSACANG = array of TSACANG;
     ucol,	//underlay color
     cres : Byte	//reserved
   end; //FRMHED;
+
+  TFSTRTS = packed record  // thred.h #1782
+    apl    : Cardinal;
+	  fil    : Cardinal;
+	  fth    : Cardinal;
+	  brd    : Cardinal;
+	  apcol  : Cardinal;
+	  fcol   : Cardinal;
+	  fthcol : Cardinal;
+	  ecol   : Cardinal;
+  end; //FSTRTS;
+
+  TINSREC = packed record  // thred.h #1822
+    cod : Cardinal;
+	  col : Cardinal;
+	  ind : Cardinal;
+	  seq : Cardinal;
+  end; //INSREC;
+
+  TRNGCNT = packed record  // thred.h #1884
+    lin : Integer;
+	  cnt : Integer;
+  end; //RNGCNT;
 
 implementation
 
