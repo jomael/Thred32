@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 215
-  Top = 163
+  Left = 297
+  Top = 167
   Width = 721
   Height = 588
   Caption = 'frmMain'
@@ -23,8 +23,8 @@ object frmMain: TfrmMain
   TextHeight = 13
   object spl1: TSplitter
     Left = 0
-    Top = 518
-    Width = 725
+    Top = 494
+    Width = 733
     Height = 2
     Cursor = crVSplit
     Align = alBottom
@@ -203,7 +203,7 @@ object frmMain: TfrmMain
     Left = 0
     Top = 0
     Width = 30
-    Height = 518
+    Height = 494
     Align = alLeft
     SwatchList = swlDefault
     ThumbWidth = 30
@@ -220,7 +220,7 @@ object frmMain: TfrmMain
     Left = 30
     Top = 0
     Width = 33
-    Height = 518
+    Height = 494
     Align = alLeft
     SwatchList = swlCustom
     ThumbWidth = 30
@@ -236,8 +236,8 @@ object frmMain: TfrmMain
   end
   object pgscrlr1: TPageScroller
     Left = 0
-    Top = 520
-    Width = 725
+    Top = 496
+    Width = 733
     Height = 46
     Align = alBottom
     Control = swa1
@@ -264,8 +264,8 @@ object frmMain: TfrmMain
     end
   end
   object pb: TPaintBox32
-    Left = 79
-    Top = 32
+    Left = 87
+    Top = 8
     Width = 646
     Height = 486
     TabOrder = 8
@@ -995,6 +995,7 @@ object frmMain: TfrmMain
       end
       object mnu_FILL_VERT: TMenuItem
         Caption = 'Vertical'
+        OnClick = mnu_FILL_VERTClick
       end
       object mnu_FILL_HOR: TMenuItem
         Caption = 'Horizontal'
@@ -1009,6 +1010,7 @@ object frmMain: TfrmMain
         end
         object mnu_VRTCLP: TMenuItem
           Caption = 'Vertical'
+          OnClick = mnu_VRTCLPClick
         end
         object mnu_HORCLP: TMenuItem
           Caption = 'Horizontal'
@@ -1143,7 +1145,6 @@ object frmMain: TfrmMain
     object Line1: TMenuItem
       Caption = 'Lin&e'
       ShortCut = 76
-      OnClick = Line1Click
     end
     object Freehand1: TMenuItem
       Caption = '&Freehand'

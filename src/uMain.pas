@@ -6,12 +6,12 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Menus, XPMan,
   Thred_Types, stitch_Items,
-  StdCtrls, //gmGridBased_List,
-  gmSwatch_List,
+  StdCtrls,
   GR32_Image, GR32,
-  gmGridBased_ListView, gmSwatch_ListView, gmGridBased_FileDlg,
-  gmSwatch_FileDlgs, ComCtrls, {JvExComCtrls, JvPageScroller,} ExtCtrls,
-  gmGridBased_List;
+  ComCtrls, {JvExComCtrls, JvPageScroller,} ExtCtrls,
+  gmGridBased_FileDlg,
+  gmSwatch_FileDlgs, gmGridBased_List, gmSwatch_List, gmGridBased_ListView,
+  gmSwatch_ListView;
 
 type
   TfrmMain = class(TForm)
@@ -295,7 +295,8 @@ type
     procedure mnu_FILE_SAVE2Click(Sender: TObject);
     procedure mnu_FILE_SAVE3Click(Sender: TObject);
     procedure mnu_FORMClick(Sender: TObject);
-    procedure Line1Click(Sender: TObject);
+    procedure mnu_FILL_VERTClick(Sender: TObject);
+    procedure mnu_VRTCLPClick(Sender: TObject);
   private
     filnam : TFileName;
     FIni: TThredIniFile;
@@ -306,11 +307,15 @@ type
     bakCust,
     bakBit : T16Colors;
 
+    FPainting : boolean;
+
     procedure redini;
     procedure nuFil();
     procedure defpref;
     procedure save;
     { Private declarations }
+  protected
+    procedure FileOpen(Afilename : TFileName);
   public
     { Public declarations }
     property ini : TThredIniFile read FIni;// write FIni;
@@ -326,7 +331,8 @@ uses
   Thred_Constants, Thred_Defaults,
   gmSwatch_rwTHR, gmSwatch_rwACO, gmSwatch_rwSWA,
   Stitch_FileDlg, Stitch_rwTHR, Stitch_rwPCS, Stitch_rwPES,
-  Stitch_Lines32;
+  Stitch_Lines32,
+  Form_cpp;
 
 {$R *.dfm}
 
@@ -2799,9 +2805,10 @@ end;
 //#2452        tpnt.y=pnt->y;                                                                   
 //#2453        ritfcor(&tpnt);                                                                   
 //#2454    }                                                                       
-//#2455                                                                           
-//#2456    void coltab(){                                                                       
-//#2457                                                                           
+//#2455
+procedure coltab();
+//#2456    void coltab(){
+begin                                                               
 //#2458        unsigned    ind,col,tuns;                                                               
 //#2459        unsigned    ocol;                                                               
 //#2460        DUBRCT        rng;                                                           
@@ -2839,11 +2846,13 @@ end;
 //#2492                if(ts->x<rng.left)                                                           
 //#2493                    ts->x=(float)rng.left;                                                       
 //#2494                if(ts->x>rng.right)                                                           
-//#2495                    ts->x=(float)rng.right;                                                       
+//#2495                    ts->x=(float)rng.right;
+
 //#2496                if(ts->y>rng.top)                                                           
 //#2497                    ts->y=(float)rng.top;                                                       
 //#2498                if(ts->y<rng.bottom)                                                           
-//#2499                    ts->y=(float)rng.bottom;                                                       
+//#2499                    ts->y=(float)rng.bottom;
+
 //#2500                tuns=ts->at&COLMSK;                                                           
 //#2501                if(ocol!=tuns)                                                           
 //#2502                {                                                           
@@ -2856,10 +2865,11 @@ end;
 //#2509            colch[col].stind=(unsigned short)ind;                                                               
 //#2510            if(cloInd>(unsigned)hed.stchs-1)                                                               
 //#2511                cloInd=hed.stchs-1;                                                           
-//#2512            fndknt();                                                               
+//#2512            fndknt();
 //#2513        }                                                                   
 //#2514    }                                                                       
-//#2515                                                                           
+end;
+                                                                       
 //#2516    void ladj(){                                                                       
 //#2517                                                                           
 //#2518        unsigned ind;                                                                   
@@ -2938,7 +2948,7 @@ end;
 //#2591            free(bakdat[dupnt0]);                                                               
 //#2592        siz=sizeof(BAKHED)+sizeof(FRMHED)*formpnt+sizeof(SHRTPNT)*hed.stchs                                                                   
 //#2593            +sizeof(FLPNT)*(fltad+clpad)+sizeof(SATCON)*satkad+sizeof(COLORREF)*16+                                                               
-//#2594            sizeof(TXPNT)*txad;                                                               
+//#2594            sizeof(TXPNT)*txad;
 //#2595        bakdat[dupnt0]=malloc(siz);                                                                   
 //#2596        bdat=(BAKHED*)bakdat[dupnt0];                                                                   
 //#2597        if(bdat){                                                                   
@@ -4017,7 +4027,7 @@ end;
 //#3670                                                                           
 //#3671            ReadFile(btfil,(BALHED*)&bhed,sizeof(BALHED),&red,0);                                                               
 //#3672            if(red==sizeof(BALHED)){                                                               
-//#3673                                                                           
+//#3673
 //#3674                pbal=(BALSTCH*)&bseq;                                                           
 //#3675                ReadFile(btfil,(BALSTCH*)pbal,sizeof(bseq),&red,0);                                                           
 //#3676                bcnt=red/sizeof(BALSTCH);                                                           
@@ -5358,7 +5368,7 @@ end;
 //#5011    }                                                                       
 //#5012                                                                           
 //#5013    void bak(){                                                                       
-//#5014                                                                           
+//#5014
 //#5015        unsigned ind;                                                                   
 //#5016                                                                           
 //#5017        unmsg();                                                                   
@@ -7236,10 +7246,10 @@ begin
     FStitchs.SaveToFile(FStitchs.FileName);
 //#6858        }
   end
-  else
-    mnu_FILE_SAVE3Click(Sender); //SaveAs 
 //#6859        else
 //#6860            savAs();
+  else
+    mnu_FILE_SAVE3Click(Sender); //SaveAs 
 //#6861    }
 end;
 
@@ -9736,7 +9746,7 @@ end;
 //#9352        return 0;                                                                   
 //#9353    }                                                                       
 //#9354                                                                           
-//#9355    void fndknt(){                                                                       
+//#9355    void fndknt(){
 //#9356                                                                           
 //#9357        unsigned    ind;                                                               
 //#9358        BOOL        flg;                                                           
@@ -13041,7 +13051,9 @@ begin
   with TOpenStitchsDialog.Create(Self) do
   begin
     if Execute then
-    FStitchs.LoadFromFile(FileName);
+      self.FileOpen(filename);
+      
+    {FStitchs.LoadFromFile(FileName);
     //Caption := IntToStr(FStitchs.Count);
 //    FStitchs.Header.
   //  Caption := Caption +
@@ -13058,7 +13070,9 @@ begin
 
 
     lstCustomColor.Invalidate;
-    pb.Invalidate;
+    FPainting := true;
+    pb.Repaint;
+    FPainting := false;}
 
     Free;
   end;
@@ -20939,13 +20953,18 @@ end;
 //#20459                    savdo();                                                       
 //#20460                angclp();                                                           
 //#20461                break;                                                           
-//#20462                                                                           
-//#20463            case ID_VRTCLP:                                                               
-//#20464                                                                           
-//#20465                if(chkMap(FORMSEL)||fselpnt)                                                           
-//#20466                    savdo();                                                       
-//#20467                vrtclp();                                                           
-//#20468                break;                                                           
+//#20462
+procedure TfrmMain.mnu_VRTCLPClick(Sender: TObject);
+begin
+
+
+//#20463            case ID_VRTCLP:
+//#20464
+//#20465                if(chkMap(FORMSEL)||fselpnt)
+//#20466                    savdo();
+//#20467                vrtclp();
+//#20468                break;
+end;                                                           
 //#20469                                                                           
 //#20470            case ID_LINBEXACT:                                                               
 //#20471                                                                           
@@ -21543,13 +21562,19 @@ end;
 //#21059                delstch();
 //#21060                break;
 //#21061
+procedure TfrmMain.mnu_FILL_VERTClick(Sender: TObject);
+begin
 //#21062            case ID_FILL_VERT:
 //#21063
 //#21064                if(chkMap(FORMSEL)||fselpnt)
 //#21065                    savdo();
 //#21066                filvrt();
+
+  filvrt(FStitchs.Forms[0]);
 //#21067                break;
 //#21068
+end;
+
 //#21069            case ID_FILL_HOR:
 //#21070
 //#21071                if(chkMap(FORMSEL))
@@ -24085,7 +24110,6 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 var i : integer;
   LColors : TArrayOfTColor;
 begin
-//  showmessage(inttostr( sizeof(TFormStyle)));
 
 
   FStitchs := TStitchCollection.Create(Self) ;
@@ -24193,11 +24217,11 @@ begin
 //#23668                if(!chkMsg())                                                           
 //#23669                    DispatchMessage(&msg);                                                       
 //#23670                if(rstMap(FCHK))                                                           
-//#23671                    frmchkx();                                                       
-//#23672                if(rstMap(RESTCH))                                                           
-//#23673                    redraw(hStch);                                                       
-//#23674                if(rstMap(RELAYR))                                                           
-//#23675                    ritlayr();                                                       
+//#23671                    frmchkx();            //SUCH REPAIR
+//#23672                if(rstMap(RESTCH))
+//#23673                    redraw(hStch);
+//#23674                if(rstMap(RELAYR))
+//#23675                    ritlayr();            ///                                           
 //#23676                if(!chkMap(TXTRED))                                                           
 //#23677                    sachk();                                                       
 //#23678                if(rstMap(DUMEN))                                                           
@@ -24207,7 +24231,8 @@ begin
 //#23682        }                                                                   
 //#23683        return -1;                                                                   
 //#23684    }
-
+  if paramcount > 0 then
+  self.FileOpen(paramstr(1));
 end;
 
 
@@ -24322,7 +24347,9 @@ var i,j : Integer;
   R : TFloatRect;
   DrawLine : TStitch_LineProc;
   first : boolean;
+  b : byte;
 begin
+  //if not FPainting then exit;
   DrawLine := Draw3DLine;//DrawLineStippled;//DrawLineFS;
 
   if Length(FStitchs.Stitchs) > 0 then
@@ -24330,14 +24357,16 @@ begin
     zRat.X := (pb.Width / FStitchs.HeaderEx.xhup );
     zRat.Y := (pb.Height / FStitchs.HeaderEx.yhup );
 
-    //zRat.x := 0.6; //debug
     if zRat.X < zRat.Y then
       zRat.Y := zRat.X
     else
       zRat.X := zRat.Y;
+    zRat.x := 1; //debug
+    zRat.Y := 1; //debug
 
     pb.Buffer.Clear(clWhite32);
     pb.Buffer.FillRectTS(MakeRect(FloatRect(0,0, FStitchs.HeaderEx.xhup * zRat.X, FStitchs.HeaderEx.yhup * zRat.Y)), Color32(FStitchs.BgColor));
+    //STITCH
     for i := 0 to High(FStitchs.stitchs) do
     begin
       pb.Buffer.PenColor:= clBlack32;
@@ -24359,7 +24388,7 @@ begin
 
           //JUMP STITCH + COLOR CHANGED.
           if CurrentColor = LastColor then
-          DrawLine(pb.Buffer, R, CurrentColor);
+          DrawLine(pb.Buffer, R, CurrentColor, sdlLine);
 
           R.TopLeft := R.BottomRight;
 
@@ -24370,17 +24399,29 @@ begin
         else
           pb.Buffer.LineToFS(x * zRat.X, y * zRat.Y);}
       end;
-    end;
-    
+    end; 
+
     //FORMS
-    pb.Buffer.PenColor:= clred32;
+    pb.Buffer.PenColor:= clTrRed32;
+    if length(FStitchs.Forms) > 0 then
     for i := 0 to FStitchs.Header.fpnt -1 do
     begin
       if length(FStitchs.Forms[i].flt) = 0 then continue;
-      
+
       first := true;
       for j := 0 to high(FStitchs.Forms[i].flt)  do
       begin
+
+        //color
+        if length(FStitchs.Forms[i].clp) > 0 then
+        begin
+          b := round(FStitchs.Forms[i].clp[j].X);
+          if b > 15 then
+             b := b mod 16;
+          pb.Buffer.PenColor:= Color32( FStitchs.Colors[ b ] );
+
+        end;
+        
         with FStitchs.Forms[i].flt[j] do
         if first then
           pb.Buffer.MoveToF(x * zRat.X, y * zRat.Y)
@@ -24403,9 +24444,33 @@ end;
 
 
 
-procedure TfrmMain.Line1Click(Sender: TObject);
+procedure TfrmMain.FileOpen(Afilename : TFileName);
+var i : Integer;
 begin
-//
+  if not fileExists(AfileName) then exit;
+    FStitchs.LoadFromFile(AFileName);
+    //Caption := IntToStr(FStitchs.Count);
+//    FStitchs.Header.
+  //  Caption := Caption +
+    //    self.Color := FStitchs.BgColor;
+    for i := 0 to High(FStitchs.Colors) do
+    begin
+      if swlCustom.Count < i +1 then
+        swlCustom.Add;
+      swlCustom[i].Color := FStitchs.Colors[i];
+    end;
+    swa2.Changed;
+
+
+
+
+    lstCustomColor.Invalidate;
+    FPainting := true;
+    pb.Repaint;
+    FPainting := false;
+
 end;
+
+
 
 end.

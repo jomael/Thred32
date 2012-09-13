@@ -51,7 +51,7 @@ type
     constructor Create; override;
     procedure LoadFromStream(AStream: TStream; ACollection: TCollection); override;
     //procedure LoadItemFromString(Item :TgmSwatchItem; S : string);
-    procedure LoadItemFromStream(AStream: TStream; AItem: TCollectionItem); virtual;
+    //procedure LoadItemFromStream(AStream: TStream; AItem: TCollectionItem); virtual;
     //procedure SaveToStream(Stream: TStream; ACollection: TCollection); override;
     //procedure SaveItemToStream(Stream: TStream; AItem: TCollectionItem); virtual; abstract;
     class function WantThis(AStream: TStream): Boolean; override;
@@ -61,8 +61,9 @@ type
 implementation
 
 uses
-  Thred_h, Thred_rc, Thred_Types;
-//  GR32, GR32_LowLevel;
+  Math,
+  Thred_Constants, Thred_Types,
+  GR32 ;//, GR32_LowLevel;
 
 { TStitchPCSConverter }
 
@@ -78,20 +79,25 @@ procedure TStitchPCSConverter.LoadFromStream(AStream: TStream;
 var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data
-  inf,i,red : Integer;
-  sthed : THED;
-  item  : SHRTPNT;
+  ind,inf,i,siz,red,stind,cpnt,tcol : Integer;
+  hed : THED;
+  sthed : TSTRHED;
   hedx : TSTREX;
+  stchs  : TArrayOfTSHRTPNT;
   LColors : tarrayoftcolor;
   LDesign : TStitchCollection;
   c : TColor;
   c16 : T16Colors;
   buf : array[0..17] of Char;
-
+  //inf : integer;
+  filBuf : array of TPCSTCH;
+  colch : array of TCOLCHNG;
+  strct : TFloatRect;
 begin
   LDesign := TStitchCollection(ACollection);
   LDesign.Clear;
-  
+  strct := FloatRect(makerect(0,0,0,0));
+
   //here we go!
   //validation of stream is already done.
 
@@ -109,17 +115,19 @@ begin
 //#5897                            }
 //#5898                            if(hed.ledIn==0x32&&hed.fColCnt==16){
 
-  AStream.Read(sthed,SizeOf(THED) );
+  AStream.Read(hed,SizeOf(THED) );
   //LCollection.Header := sthed;
-  if not ( (sthed.ledIn = $32) and (sthed.fColCnt = 16)) then
+  if not ( (hed.ledIn = $32) and (hed.fColCnt = 16)) then
         raise Exception.Create(IDS_SHRTF);
 
   SetLength(LColors, 16);
-  AStream.Read(c16[0], 64);
+  //AStream.Read(c16[0], 64);
+
   for i := 0 to 15 do
   begin
-    LColors[i] := c16[i];
+    LColors[i] := hed.fCols[i];
   end;
+
 
   LDesign.Colors := LColors;
 
@@ -132,63 +140,132 @@ begin
 //#5901                                    useCol[ind]=hed.fCols[ind];                                       
 //#5902                                siz-=0x46;                                           
 //#5903                                inf=siz/sizeof(PCSTCH)+2;
-//  inf := (Stream.Size - Stream.Position) div SizeOf(
+  siz := astream.Size - $46;
+  inf := siz div SizeOf(TPCSTCH) + 2;
+  setlength(filBuf, inf);
+
 //#5904                                filBuf=new PCSTCH[inf];                                           
 //#5905                                ReadFile(hFil,filBuf,siz,&red,NULL);
-                                           
+  AStream.Read(filBuf[0], siz);
+
 //#5906                                stind=0;                                           
 //#5907                                cPnt=0;                                           
 //#5908                                tcol=0;                                           
-//#5909                                ind=0;                                           
+//#5909                                ind=0;
+  stind := 0;
+  cPnt := 0;
+  tcol := 0;
+  ind  := 0;
+  setlength(colch,siz);
+  setlength(stchs,hed.stchs);
+  while (stind < hed.stchs) and (ind < inf) do
+  begin
 //#5910                                while(stind<hed.stchs&&ind<inf){                                           
-//#5911                                                                           
-//#5912                                    if(filBuf[ind].typ==3){                                       
-//#5913                                                                           
-//#5914                                        colch[cPnt].colind=filBuf[ind].fx;                                   
-//#5915                                        colch[cPnt++].stind=stind;                                   
-//#5916                                        tcol=NOTFRM|filBuf[ind++].fx;                                   
-//#5917                                    }                                       
+//#5911
+    if filBuf[ind].typ = 3 then
+    begin
+//#5912                                    if(filBuf[ind].typ==3){
+//#5913
+      colch[cpnt].colind := filBuf[ind].fx;
+      colch[cpnt].stind := stind;
+      inc(cPnt);
+      tcol := NOTFRM or filBuf[ind].fx;
+      inc(ind);
+//#5914                                        colch[cPnt].colind=filBuf[ind].fx;
+//#5915                                        colch[cPnt++].stind=stind;
+//#5916                                        tcol=NOTFRM|filBuf[ind++].fx;
+//#5917                                    }
+    end
+    else
+    begin
 //#5918                                    else{                                       
-//#5919                                                                           
+//#5919
+      stchs[stind].x := filBuf[ind].x+ filBuf[ind].fx/256;
+      stchs[stind].y := filBuf[ind].y+filBuf[ind].fy/256;
+      stchs[stind].at := tcol;
+
+      strct.Left := min(strct.Left, stchs[stind].x);
+      strct.Right := max(strct.Right, stchs[stind].x);
+      strct.Top := min(strct.Top, stchs[stind].y);
+      strct.Bottom := max(strct.Bottom, stchs[stind].y);
+
+
+      inc(stind);
+      inc(ind);
 //#5920                                        stchs[stind].x=filBuf[ind].x+(float)filBuf[ind].fx/256;                                   
 //#5921                                        stchs[stind].y=filBuf[ind].y+(float)filBuf[ind].fy/256;                                   
 //#5922                                        stchs[stind++].at=tcol;                                   
 //#5923                                        ind++;                                   
-//#5924                                    }                                       
-//#5925                                }                                           
-//#5926                                hed.stchs=stind;                                           
-//#5927                                tnam=(TCHAR*)&filBuf[ind];                                           
+//#5924                                    }
+    end;                                  
+//#5925                                }
+  end;                                           
+//#5926                                hed.stchs=stind;
+  //hed.stchs := stind;
+  fillchar(sthed,sizeof(TSTRHED),0);
+  sthed.stchs := stind;
+  setlength(stchs,stind);
+
+  LDesign.Header := sthed;
+//#5927                                tnam=(TCHAR*)&filBuf[ind];
 //#5928                                strcpy(bnam,tnam);                                           
 //#5929                                delete filBuf;                                           
 //#5930                                strcpy(pext,"thr");                                           
 //#5931                                ini.auxfil=AUXPCS;                                           
 //#5932                                if(hed.hup!=LARGHUP&&hed.hup!=SMALHUP)                                           
 //#5933                                    hed.hup=LARGHUP;                                       
-//#5934                                sizstch(&strct);                                           
-//#5935                                if(strct.left<0||strct.right>LHUPY||strct.bottom<0||strct.top>LHUPY){                                           
-//#5936                                                                           
-//#5937                                    ini.hupx=LHUPX;                                       
-//#5938                                    ini.hupy=LHUPY;                                       
-//#5939                                    chkhup();                                       
-//#5940                                }                                           
-//#5941                                else{                                           
-//#5942                                                                           
-//#5943                                    if(hed.hup==LARGHUP){                                       
-//#5944                                                                           
-//#5945                                        ini.hup=LARGHUP;                                   
-//#5946                                        ini.hupx=LHUPX;                                   
-//#5947                                        ini.hupy=LHUPY;                                   
-//#5948                                    }                                       
-//#5949                                    else{                                       
-//#5950                                                                           
-//#5951                                        if(strct.right>SHUPX||strct.top>SHUPY||hed.hup==LARGHUP){                                   
-//#5952                                                                           
-//#5953                                            ini.hup=LARGHUP;                               
-//#5954                                            ini.hupx=SHUPX;                               
-//#5955                                            ini.hupy=SHUPY;                               
-//#5956                                        }                                   
-//#5957                                        else{                                   
-//#5958                                                                           
+//#5934                                sizstch(&strct);
+
+  fillchar(hedx, sizeof( TSTREX),0);
+  if(strct.left<0) or(strct.right>LHUPY) or (strct.bottom<0) or(strct.top>LHUPY) then
+//#5935                                if(strct.left<0||strct.right>LHUPY||strct.bottom<0||strct.top>LHUPY){
+  begin
+    hedx.xhup := LHUPX;
+    hedx.yhup := LHUPY;
+  end
+//#5936
+//#5937                                    ini.hupx=LHUPX;
+//#5938                                    ini.hupy=LHUPY;
+//#5939                                    chkhup();
+//#5940                                }
+//#5941                                else{
+  else
+  if hed.hup = LARGHUP then
+  begin
+    hedx.xhup := LHUPX;
+    hedx.yhup := LHUPY;
+  end
+
+//#5942
+//#5943                                    if(hed.hup==LARGHUP){
+//#5944
+//#5945                                        ini.hup=LARGHUP;
+//#5946                                        ini.hupx=LHUPX;
+//#5947                                        ini.hupy=LHUPY;
+//#5948                                    }
+//#5949                                    else{
+  else
+  if (strct.Right > SHUPX) or (strct.Bottom >SHUPY) or (hed.hup = LARGHUP) then
+  begin
+    hedx.xhup := SHUPX;
+    hedx.yhup := SHUPY;
+  end
+
+//#5950
+//#5951                                        if(strct.right>SHUPX||strct.top>SHUPY||hed.hup==LARGHUP){
+//#5952
+//#5953                                            ini.hup=LARGHUP;
+//#5954                                            ini.hupx=SHUPX;
+//#5955                                            ini.hupy=SHUPY;
+//#5956                                        }
+//#5957                                        else{
+//#5958
+  else
+  begin
+    hedx.xhup := SHUPX;
+    hedx.yhup := SHUPY;
+  end;
+
 //#5959                                            ini.hup=SMALHUP;                               
 //#5960                                            ini.hupx=SHUPX;                               
 //#5961                                            ini.hupy=SHUPY;                               
@@ -197,24 +274,19 @@ begin
 //#5964                                }                                           
 //#5965                            }                                               
 //#5966                        }
-end;
-
-procedure TStitchPCSConverter.LoadItemFromStream(AStream: TStream;
-  AItem: TCollectionItem);
-var
-  d : integer;
-  b : SHRTPNT;
-  i : TStitchItem;
-begin
-  AStream.Read(b,SizeOf(SHRTPNT));
-  with TStitchItem(AItem) do
+  for i := 0 to stind -1 do
   begin
-    x := b.x;
-    y := b.y;
-    //at := b.at;
+
+    //Hey, Thred is updwon side. that is the first Y is in bottom, so we convert to delphi style
+    stchs[i].y := {hedx.yhup -}(hedx.yhup - stchs[i].y);
   end;
 
+  LDesign.Stitchs := stchs;
+      
+  LDesign.HeaderEx := hedx;
 end;
+
+
 
 class function TStitchPCSConverter.WantThis(AStream: TStream): Boolean;
 var

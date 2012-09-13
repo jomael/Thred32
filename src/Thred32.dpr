@@ -3,9 +3,7 @@ program Thred32;
 uses
   Forms,
   uMain in 'uMain.pas' {frmMain},
-  uMenu in 'uMenu.pas' {Form2},
   Thred_rc in 'Thred_rc.pas',
-  uResourceString in 'uResourceString.pas' {Form3},
   Thred_h in 'Thred_h.pas',
   Thred_Constants in 'lib\Thred_Constants.pas',
   Thred_Defaults in 'lib\Thred_Defaults.pas',
@@ -13,14 +11,13 @@ uses
   Stitch_rwTHR in 'lib\Stitch_rwTHR.pas',
   Stitch_rwPES in 'lib\Stitch_rwPES.pas',
   Stitch_Lines32 in 'lib\Stitch_Lines32.pas',
-  Form_cpp in 'Form_cpp.pas';
+  Form_cpp in 'Form_cpp.pas',
+  Stitch_rwDST in 'lib\Stitch_rwDST.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TForm3, Form3);
-  Application.CreateForm(TForm2, Form2);
   Application.Run;
 end.

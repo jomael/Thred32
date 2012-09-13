@@ -5,10 +5,9 @@ interface
 
 const
 // compile switches (thred.h #1)
-  // TODO: maybe these should be defined in a *.inc file.
-  PESACT     = 0;		// compile pes code
+  //PESACT     = 0;		// compile pes code. we use PES in different approach.
 
-  BUGBAK     = 0;		// turn bakseq off
+  BUGBAK     = 0;		// turn bakseq off. perhap it is UNDO/REDO debugging.
   //MAXFORMS	=1024;	//maximum number of forms (thred.h #81)
 
 //form types enum
@@ -200,12 +199,29 @@ const
   ITXSPAC	   = 0.40 * PFGRAN;	      // default texture editor spacing
   ITXPIX     = 5;
 
+  //bit attribute set of stitch
+  ftyps : Array[0..12] of byte =    //xt.cpp #280
+  (
+    0,	// 0 no type
+    1,	// 1 applique
+    2,	// 2 center walk
+    3,	// 3 edge walk
+    4,	// 4 underlay
+    0,	// 5 knot
+    5,	// 6 feather
+    0,	// 7 layer
+    0,	// 8 layer
+    0,	// 9 layer
+    0,	//10 reserved
+    6,	//11 fill
+    7	  //12 border
+  );
   //stitch mask //thred.h 831
-  COLMSK		= $0000000f; //COLOR MASK
-  NCOLMSK		= $fffffff0;
+  COLMSK		= $0000000f; //COLOR_INDEX MASK.    [0..15]
+  NCOLMSK		= $fffffff0; //NON_COLOR MASK
   COLSMSK		= $0000ffff;
 
-  FRMSK		  = $00003ff0;
+  FRMSK		  = $00003ff0; //FORM_INDEX MASK.     [0..1023]
   NFRMSK		= $ffffc00f;
   UFRMSK		= $80003ff0;
   FRMSHFT		= 4;

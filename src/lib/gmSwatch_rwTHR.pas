@@ -45,8 +45,8 @@ type
   private
   public
     constructor Create; override;
-    procedure LoadFromStream(const AStream: TStream; const ACollection: TCollection); override;
-    class function WantThis(const AStream: TStream): Boolean; override;
+    procedure LoadFromStream(AStream: TStream; ACollection: TCollection); override;
+    class function WantThis(AStream: TStream): Boolean; override;
   end;
 
 implementation
@@ -64,8 +64,8 @@ begin
 end;
 
 
-procedure TStitchTHRConverter.LoadFromStream(const AStream: TStream;
-  const ACollection: TCollection);
+procedure TStitchTHRConverter.LoadFromStream(AStream: TStream;
+  ACollection: TCollection);
 var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data
@@ -229,7 +229,7 @@ begin
 end;
 
 
-class function TStitchTHRConverter.WantThis(const AStream: TStream): Boolean;
+class function TStitchTHRConverter.WantThis(AStream: TStream): Boolean;
 var
   hed : TSTRHED;
 	led : Cardinal;

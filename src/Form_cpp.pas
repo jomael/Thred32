@@ -29,7 +29,7 @@ uses Thred_Types, Thred_Constants;
 //#23    extern            void        setxt();                                                   
 //#24    extern            void        angrct(FLRCT* rct);                                                   
 //#25    extern            FLRCT        isrct;                                                   
-//#26    extern            void        deltx();                                                   
+//#26    extern            void        deltx();
 //#27    extern            BOOL        istx(unsigned find);                                                   
 //#28    //extern            void        txseq();
 //#29    extern            void        fntxvrt();                                                   
@@ -248,12 +248,14 @@ uses Thred_Types, Thred_Constants;
 //#242    extern            HDC            bitdc;                                               
 //#243    extern            TCHAR*        stab[STR_LEN];                                                   
 //#244    extern            unsigned    prfsiz;                                                       
-//#245                                                                           
+//#245
+procedure lcon();                                                                           
 //#246    void            lcon();                                                           
-//#247    void            filvrt();                                                           
-//#248    void            filang();                                                           
+//#247    void            filvrt();
+procedure filvrt(var frmpnt : TFRMHED);
+//#248    void            filang();
 //#249    void            fnvrt();
-procedure fnvrt(frmpnt : TFRMHED); far;
+procedure fnvrt(var frmpnt : TFRMHED); 
 //#250    void            satfil();                                                           
 //#251    void            frmsqr(unsigned ind);                                                           
 //#252    void            uncon();                                                           
@@ -427,7 +429,10 @@ const
 //#405    RGSEQ*            rgpth;                    //path to a region
 //#406    unsigned        pthlen;                    //length of the path to the region
 //#407    unsigned        grindpnt;                //number of group indices
+
 //#408    unsigned*        grinds;                    //array of group indices for sequencing
+
+
 //#409    unsigned        lastgrp;                //group of the last line written in the previous region;
 //#410    FSEQ*            mpath;                    //path of sequenced regions
 //#411    RGSEQ*            tmpath;                    //temporary path connections
@@ -687,16 +692,18 @@ const
 //#665                shr        eax,2                                                   
 //#666        }                                                                   
 //#667    }                                                                       
-//#668                                                                           
-//#669    void dusqr(){                                                                       
-//#670                                                                           
-//#671        if(chku(SQRFIL))                                                                   
-//#672            frmpnt->xat|=AT_SQR;                                                               
-//#673        else                                                                   
-//#674            frmpnt->xat&=(~AT_SQR);                                                               
-//#675    }                                                                       
-//#676                                                                           
-//#677    void sacspac(SATCON* strt,unsigned cnt){                                                                       
+
+procedure dusqr();
+//#669    void dusqr(){
+begin
+//#671        if(chku(SQRFIL))
+//#672            frmpnt->xat|=AT_SQR;
+//#673        else
+//#674            frmpnt->xat&=(~AT_SQR);
+//#675    }
+end;
+
+//#677    void sacspac(SATCON* strt,unsigned cnt){
 //#678                                                                           
 //#679        int            strti,cnti;                                                       
 //#680        int            src,dst;                                                       
@@ -1396,7 +1403,7 @@ const
 //#1374        return (hi-lo)/2+lo;                                                                   
 //#1375    }                                                                       
 //#1376                                                                           
-//#1377    void fvars(unsigned ind){                                                                       
+//#1377    void fvars(unsigned ind){
 //#1378                                                                           
 //#1379        frmpnt=&formlst[ind];                                                                   
 //#1380        flt=formlst[ind].flt;                                                                   
@@ -2441,7 +2448,7 @@ const
 //#2419        stspace=tspac;                                                                   
 //#2420    }                                                                       
 //#2421                                                                           
-//#2422    void oclp(FLPNT* clp,unsigned nclp){                                                                       
+//#2422    void oclp(FLPNT* clp,unsigned nclp){
 //#2423                                                                           
 //#2424        unsigned    ind;                                                               
 //#2425                                                                           
@@ -2693,12 +2700,12 @@ const
 //#2671        seqpnt=ine;                                                                   
 //#2672    }                                                                       
 //#2673
-procedure refilfn(frmpnt : TFRMHED);
+procedure refilfn(var frmpnt : TFRMHED);
 //#2674    void refilfn(){
 begin
 //#2675
 //#2676        double        tspac;                                                           
-//#2677        double        tsiz=usesiz;                                                           
+//#2677        double        tsiz=usesiz;
 //#2678        float        tlen;                                                           
 //#2679                                                                           
 //#2680        rstMap(TXFIL);                                                                   
@@ -2706,7 +2713,7 @@ begin
 //#2682        if(frmpnt->typ==LIN)                                                                   
 //#2683            frmpnt->wind=0;                                                               
 //#2684        savdo();                                                                   
-//#2685        fdelstch();                                                                   
+//#2685        fdelstch();    //DELETE STITCH AND SET SOME VARIABLE TO READY FOR REFILL.                                                               
 //#2686        setMap(WASREFIL);                                                                   
 //#2687        delpnt=hed.stchs;                                                                   
 //#2688        if(frmpnt->fspac<0.5&&!isclp(clofind))                                                                   
@@ -2880,17 +2887,20 @@ begin
 //#2840                    filang();                                                       
 //#2841                    lconflt=angfrm.flt;                                                       
 //#2842                    break;                                                       
-//#2843                                                                           
-//#2844                case VCLPF:                                                           
-//#2845                                                                           
-//#2846                    oclp(frmpnt->angclp.clp,frmpnt->flencnt.nclp);                                                       
-//#2847                    setangf(0);                                                       
-//#2848                    fvars(clofind);                                                       
-//#2849                    clpcon();                                                       
-//#2850                    goto skpfil;                                                       
-//#2851                                                                           
-//#2852                case HCLPF:                                                           
-//#2853                                                                           
+//#2843
+            VCLPF : begin
+//#2844                case VCLPF:
+//#2845
+                //oclp();
+//#2846                    oclp(frmpnt->angclp.clp,frmpnt->flencnt.nclp);
+//#2847                    setangf(0);
+//#2848                    fvars(clofind);
+//#2849                    clpcon();
+//#2850                    goto skpfil;
+              end;
+//#2851
+//#2852                case HCLPF:
+//#2853
 //#2854                    oclp(frmpnt->angclp.clp,frmpnt->flencnt.nclp);                                                       
 //#2855                    horclpfn();                                                       
 //#2856                    goto skpfil;                                                       
@@ -2922,7 +2932,9 @@ begin
 //#2882                    angclpfn();                                                       
 //#2883                    goto skpfil;                                                       
 //#2884                }
-          end                                                           
+          end; //case frmpnt.ftyp
+
+          lcon();
 //#2885                lcon();                                                           
 //#2886                bakseq();                                                           
 //#2887                if(frmpnt->ftyp!=VRTF&&frmpnt->ftyp!=TXVRTF){                                                           
@@ -4074,35 +4086,42 @@ end;
 //#3996    }                                                                       
 //#3997                                                                           
 //#3998    #define BUGSEQ 0                                                                       
-//#3999                                                                           
-//#4000    void lcon(){                                                                       
-//#4001                                                                           
-//#4002        unsigned        ind,ine,blin,cnt,sgrp;                                                           
-//#4003        RGN*            trgns;                                                       
-//#4004        short            tcon;                                                       
-//#4005        RCON*            pcon;                                                       
-//#4006        RCON*            tmap;                                                       
-//#4007        SMALPNTL*        tpnt;                                                           
-//#4008        unsigned*        tsrgns;                                                           
-//#4009        unsigned        sind;                                                           
-//#4010                                                                           
-//#4011    #if BUGSEQ                                                                       
-//#4012                                                                           
-//#4013        unsigned        bugcol;                                                           
-//#4014    #endif                                                                       
-//#4015                                                                           
-//#4016        if(spnt){                                                                   
-//#4017                                                                           
-//#4018            seq=new SMALPNTL*[spnt>>1];                                                               
-//#4019            lpnt=0;                                                               
-//#4020            for(ind=0;ind<spnt;ind+=2)                                                               
-//#4021                seq[lpnt++]=&lins[ind];                                                           
-//#4022            qsort((void*)seq,lpnt,4,sqcomp);                                                               
-//#4023            rgcnt=0;                                                               
-//#4024            trgns=(RGN*)oseq;                                                               
-//#4025            trgns[0].strt=0;                                                               
-//#4026            blin=seq[0]->lin;                                                               
-//#4027            for(ind=0;ind<lpnt;ind++){                                                               
+//#3999
+procedure lcon();
+//#4000    void lcon(){
+//#4001
+//#4002        unsigned        ind,ine,blin,cnt,sgrp;
+var
+  ind,ine,blin,cnt,sgrp,tcon : cardinal;
+  trgns : TArrayOfTRGN;
+//#4003        RGN*            trgns;
+//#4004        short            tcon;
+  pcon, tmap : TArrayOfTRCON;
+//#4005        RCON*            pcon;
+//#4006        RCON*            tmap;
+  tpnt : TArrayOfTSMALPNTL;
+//#4007        SMALPNTL*        tpnt;
+//#4008        unsigned*        tsrgns;
+//#4009        unsigned        sind;
+//#4010
+//#4011    #if BUGSEQ
+//#4012
+//#4013        unsigned        bugcol;
+//#4014    #endif
+//#4015
+begin
+//#4016        if(spnt){
+//#4017
+//#4018            seq=new SMALPNTL*[spnt>>1];
+//#4019            lpnt=0;
+//#4020            for(ind=0;ind<spnt;ind+=2)
+//#4021                seq[lpnt++]=&lins[ind];
+//#4022            qsort((void*)seq,lpnt,4,sqcomp);
+//#4023            rgcnt=0;
+//#4024            trgns=(RGN*)oseq;
+//#4025            trgns[0].strt=0;
+//#4026            blin=seq[0]->lin;
+//#4027            for(ind=0;ind<lpnt;ind++){
 //#4028                                                                           
 //#4029                if(blin!=seq[ind]->lin){                                                           
 //#4030                                                                           
@@ -4323,7 +4342,8 @@ end;
 //#4245            delete seqmap;                                                               
 //#4246            delete srgns;                                                               
 //#4247        }                                                                   
-//#4248    }                                                                       
+//#4248    }
+end;                                                                
 //#4249                                                                           
 //#4250    BOOL notin(unsigned ond){                                                                       
 //#4251                                                                           
@@ -4566,18 +4586,19 @@ begin
   else
     InsertionSort(LPtr, RPtr);
 end;}
-procedure QSort(var A: array of Integer);
+procedure PQSort(var A: TArrayOfPDUBPNTL);
 
-  procedure QuickSort(var A: array of Integer; iLo, iHi: Integer);
+  procedure QuickSortLin(var A: TArrayOfPDUBPNTL; iLo, iHi: Integer);
   var
-    Lo, Hi, Mid, T: Integer;
+    Lo, Hi, Mid: Integer;
+    T : PDUBPNTL;
   begin
     Lo := iLo;
     Hi := iHi;
-    Mid := A[(Lo + Hi) div 2];
+    Mid := A[(Lo + Hi) div 2].lin;
     repeat
-      while A[Lo] < Mid do Inc(Lo);
-      while A[Hi] > Mid do Dec(Hi);
+      while A[Lo].lin < Mid do Inc(Lo);
+      while A[Hi].lin > Mid do Dec(Hi);
       if Lo <= Hi then
       begin
 //        VisualSwap(A[Lo], A[Hi], Lo, Hi);
@@ -4588,23 +4609,107 @@ procedure QSort(var A: array of Integer);
         Dec(Hi);
       end;
     until Lo > Hi;
-    if Hi > iLo then QuickSort(A, iLo, Hi);
-    if Lo < iHi then QuickSort(A, Lo, iHi);
+    if Hi > iLo then QuickSortLin(A, iLo, Hi);
+    if Lo < iHi then QuickSortLin(A, Lo, iHi);
+//    if Terminated then Exit;
+  end;
+
+  procedure QuickSortX(var A: TArrayOfPDUBPNTL; iLo, iHi: Integer);
+  var
+    Lo, Hi: cardinal;
+    Mid : tfloat;
+    T : PDUBPNTL;
+  begin
+    Lo := iLo;
+    Hi := iHi;
+    Mid := A[(Lo + Hi) div 2].x;
+    repeat
+      while A[Lo].x < Mid do Inc(Lo);
+      while A[Hi].x > Mid do Dec(Hi);
+      if Lo <= Hi then
+      begin
+//        VisualSwap(A[Lo], A[Hi], Lo, Hi);
+        T := A[Lo];
+        A[Lo] := A[Hi];
+        A[Hi] := T;
+        Inc(Lo);
+        Dec(Hi);
+      end;
+    until Lo > Hi;
+    if Hi > iLo then QuickSortX(A, iLo, Hi);
+    if Lo < iHi then QuickSortX(A, Lo, iHi);
 //    if Terminated then Exit;
   end;
 
 begin
-  QuickSort(A, Low(A), High(A));
+  QuickSortLin(A, Low(A), High(A));
 end;
 
 
-procedure fnvrt(frmpnt : TFRMHED);
+procedure TQSort(var A: TArrayOfTDUBPNTL);
+
+  procedure QuickSortLin(var A: TArrayOfTDUBPNTL; iLo, iHi: Integer);
+  var
+    Lo, Hi, Mid: Integer;
+    T : TDUBPNTL;
+  begin
+    Lo := iLo;
+    Hi := iHi;
+    Mid := A[(Lo + Hi) div 2].lin;
+    repeat
+      while A[Lo].lin < Mid do Inc(Lo);
+      while A[Hi].lin > Mid do Dec(Hi);
+      if Lo <= Hi then
+      begin
+//        VisualSwap(A[Lo], A[Hi], Lo, Hi);
+        T := A[Lo];
+        A[Lo] := A[Hi];
+        A[Hi] := T;
+        Inc(Lo);
+        Dec(Hi);
+      end;
+    until Lo > Hi;
+    if Hi > iLo then QuickSortLin(A, iLo, Hi);
+    if Lo < iHi then QuickSortLin(A, Lo, iHi);
+//    if Terminated then Exit;
+  end;
+
+  procedure QuickSortX(var A: TArrayOfTDUBPNTL; iLo, iHi: Integer);
+  var
+    Lo, Hi: cardinal;
+    Mid : tfloat;
+    T : TDUBPNTL;
+  begin
+    Lo := iLo;
+    Hi := iHi;
+    Mid := A[(Lo + Hi) div 2].x;
+    repeat
+      while A[Lo].x < Mid do Inc(Lo);
+      while A[Hi].x > Mid do Dec(Hi);
+      if Lo <= Hi then
+      begin
+//        VisualSwap(A[Lo], A[Hi], Lo, Hi);
+        T := A[Lo];
+        A[Lo] := A[Hi];
+        A[Hi] := T;
+        Inc(Lo);
+        Dec(Hi);
+      end;
+    until Lo > Hi;
+    if Hi > iLo then QuickSortX(A, iLo, Hi);
+    if Lo < iHi then QuickSortX(A, Lo, iHi);
+//    if Terminated then Exit;
+  end;
+
+begin
+  QuickSortLin(A, Low(A), High(A));
+end;
+
+procedure fnvrt(var frmpnt : TFRMHED);  //Find Node Vertically?
 //#4454    void fnvrt(){
 //#4455
-  var ind,ine,inf,cnt,lincnt, tind : cardinal;
-    sids : cardinal;
+var ind,ine,inf,cnt,lincnt, tind : cardinal;
     tcnt : integer;
-    grindpnt,grpind,maxlins,spnt : integer;
 //#4456        unsigned    ind,ine,inf,cnt,lincnt=0,tind;
 //#4457        int            tcnt;
   jpts :  TArrayOfTDUBPNTL;
@@ -4612,26 +4717,37 @@ procedure fnvrt(frmpnt : TFRMHED);
 //#4458        DUBPNTL*    jpts;
 //#4459        DUBPNTL**    pjpts;
 //#4460        double        lox,hix,mx0,mstp;
-  lox,hix,mx0,mstp : Double;
+  lox,hix: single;
+  mx0,mstp : Double;
   tpnt : TDoublePoint;
-  lins : TArrayOfSMALPNTL;
 //#4461        DUBPNT        tpnt;
 //#4462        unsigned*    tgrinds;
 //#4463
   tgrinds : TArrayOfCardinal;
-  lin : TArrayOfFloatPoint;
 
+  orilen,addlen : integer;
+
+//================================== TAKEN FROM GLOBAL ========================
+//#328    FLPNT*            lin;                    //pointer to the line of the polygon being filled
+  lin : TArrayOfFloatPoint;
+  lins : TArrayOfTSMALPNTL;
+  grindpnt,grpind,maxlins,spnt : integer;
+  sids : cardinal;
 //#341    BSEQPNT            bseq[BSEQLEN];            //reverse sequence for polygon fills
-  bseq : array[0..BSEQLEN-1] of TBSEQPNT;
+  //bseq : array[0..BSEQLEN-1] of TBSEQPNT;
+//#408    unsigned*        grinds;                    //array of group indices for sequencing
+  grinds : TArrayOfCardinal;
+
 begin
-  lin := frmpnt.flt;
+  //PArrayOfFloatPoint(lin) := @frmpnt.flt;
+  lin := @frmpnt.flt[0];
   sids:= frmpnt.sids;
   lox := lin[0].X;
   hix := lin[0].X;
                                           //#4464        lin=frmpnt->flt;
                                           //#4465        sids=frmpnt->sids;
                                           //#4466        lox=hix=lin[0].x;
-  for ind := 1 to sids -1 do
+  for ind := 1 to frmpnt.sids -1 do
   begin
     hix := max(hix, lin[ind].X);
     lox := min(lox, lin[ind].X);
@@ -4688,11 +4804,13 @@ begin
 //#4497        maxlins=(maxlins>>1);
 //#4498        lins=new SMALPNTL[lincnt];
 //#4499        spnt=0;grpind=0;
-//#4500        tgrinds=(unsigned*)bseq;
+  //tgrinds := TArrayOfCardinal(@bseq);//#4500        tgrinds=(unsigned* )bseq;
+  setlength(tgrinds, BSEQLEN);
+
   grindpnt := 0; //#4501        grindpnt=0;
 
   setlength(jpts, sids+2);
-  setlength(pjpts, sids+2);//getmem(pjpts, sizeof(TDUBPNTL) * (sids +2));
+  setlength(pjpts, sids+2);
                                           //#4477        jpts=new DUBPNTL[sids+2];
                                           //#4478        pjpts=new DUBPNTL*[sids+2];
 
@@ -4703,15 +4821,17 @@ begin
     inf := 0;                                       //#4505            inf=0;
 
 
-    for ine := 0 to sids -2 do                      //#4506            for(ine=0;ine<(unsigned)sids-1;ine++){
+    //USING PJPTS:
+    (*for ine := 0 to sids -2 do                      //#4506            for(ine=0;ine<(unsigned)sids-1;ine++){
     begin
       if projv(mx0,lin[ine],lin[ine+1],tpnt) then   //#4508                if(projv(mx0,lin[ine],lin[ine+1],&tpnt)){
       begin
-         pjpts[inf]    := @jpts[inf];                   //#4509
-         jpts[inf].lin := ine;                       //#4510                    pjpts[inf]=&jpts[inf];
-         jpts[inf].x   := tpnt.x;                       //#4511                    jpts[inf].lin=ine;
+         pjpts[inf]    := @jpts[inf];               //#4509
+         jpts[inf].lin := ine;                      //#4510                    pjpts[inf]=&jpts[inf];
+         jpts[inf].x   := tpnt.x;                   //#4511                    jpts[inf].lin=ine;
          inc(inf);                                  //#4512                    jpts[inf].x=tpnt.x;
-         jpts[inf].y   := tpnt.y;                       //#4513                    jpts[inf++].y=tpnt.y;
+         pjpts[inf]    := @jpts[inf];
+         jpts[inf].y   := tpnt.y;                   //#4513                    jpts[inf++].y=tpnt.y;
       end;                                          //#4515                }
     end;                                            //#4516            }
     if projv(mx0,lin[ine],lin[0],tpnt)  then
@@ -4720,6 +4840,7 @@ begin
        jpts[inf].lin := ine;
        jpts[inf].x := tpnt.x;
        inc(inf);
+       pjpts[inf]    := @jpts[inf];
        jpts[inf].y := tpnt.y;
                                 //#4517            if(projv(mx0,lin[ine],lin[0],&tpnt)){
                                 //#4519                pjpts[inf]=&jpts[inf];
@@ -4731,7 +4852,7 @@ begin
 
 
 
-    
+
     if inf > 1 then
     begin
 //#4524            if(inf>1){
@@ -4740,13 +4861,36 @@ begin
 //#4527                tgrinds[grindpnt++]=spnt;
       inc(grindpnt);
       tgrinds[grindpnt] := spnt;
-      
+      setlength(pjpts, inf);
+      QSort(pjpts);
+      setlength(pjpts, sids+2);
 
-//#4528                qsort((void*)pjpts,inf,4,comp);
+//#4528                qsort((void* )pjpts,inf,4,comp);
 //#4529                ine=0;
 //#4530                tind=spnt;
+      ine := 0;
+      tind := spnt;
+      while ine < inf do
 //#4531                while(ine<inf){
-//#4532
+      begin
+				lins[spnt].lin  := pjpts[ine].lin;
+				lins[spnt].grp  :=grpind;
+				lins[spnt].x    :=pjpts[ine].x;
+        inc(spnt);
+        inc(ine);
+				lins[spnt].y  :=pjpts[ine].y;
+				lins[spnt].lin  :=pjpts[ine].lin;
+				lins[spnt].grp  :=grpind;
+				lins[spnt].x    :=pjpts[ine].x;
+        inc(spnt);
+        inc(ine);
+        //avoid access violoation:
+        if ine < inf then
+  				lins[spnt].y  :=pjpts[ine].y
+        //else
+  				//lins[spnt].y  :=pjpts[ine-1].y
+          ;
+
 //#4533                    lins[spnt].lin = pjpts[ine]->lin;
 //#4534                    lins[spnt].grp = grpind;
 //#4535                    lins[spnt].x   = pjpts[ine]->x;
@@ -4755,7 +4899,92 @@ begin
 //#4538                    lins[spnt].grp = grpind;
 //#4539                    lins[spnt].x   = pjpts[ine]->x;
 //#4540                    lins[spnt++].y = pjpts[ine++]->y;
-//#4541                }
+      end;      //#4541                }
+      if spnt <> tind then
+        inc(grpind);
+//#4542                if(spnt!=tind)
+//#4543                    grpind++;
+//#4544            }
+    end;*)
+
+    //USING JPTS
+    for ine := 0 to sids -2 do                      //#4506            for(ine=0;ine<(unsigned)sids-1;ine++){
+    begin
+      if projv(mx0,lin[ine],lin[ine+1],tpnt) then   //#4508                if(projv(mx0,lin[ine],lin[ine+1],&tpnt)){
+      begin
+         //pjpts[inf]    := @jpts[inf];               //#4509
+         jpts[inf].lin := ine;                      //#4510                    pjpts[inf]=&jpts[inf];
+         jpts[inf].x   := tpnt.x;                   //#4511                    jpts[inf].lin=ine;
+         //pjpts[inf]    := @jpts[inf];
+         jpts[inf].y   := tpnt.y;                   //#4513                    jpts[inf++].y=tpnt.y;
+         inc(inf);                                  //#4512                    jpts[inf].x=tpnt.x;
+      end;                                          //#4515                }
+    end;                                            //#4516            }
+    if projv(mx0,lin[ine],lin[0],tpnt)  then
+    begin
+       //pjpts[inf] := @jpts[inf];
+       jpts[inf].lin := ine;
+       jpts[inf].x := tpnt.x;
+       //pjpts[inf]    := @jpts[inf];
+       jpts[inf].y := tpnt.y;
+       inc(inf);
+                                //#4517            if(projv(mx0,lin[ine],lin[0],&tpnt)){
+                                //#4519                pjpts[inf]=&jpts[inf];
+                                //#4520                jpts[inf].lin=ine;
+                                //#4521                jpts[inf].x=tpnt.x;
+                                //#4522                jpts[inf++].y=tpnt.y;
+                                //#4523            }
+    end;
+
+
+
+
+    if inf > 1 then
+    begin
+//#4524            if(inf>1){
+      inf := inf and $fffffffe;
+//#4526                inf&=0xfffffffe;
+//#4527                tgrinds[grindpnt++]=spnt;
+      inc(grindpnt);
+      tgrinds[grindpnt] := spnt;
+      setlength(jpts, inf);
+      TQSort(jpts);
+      setlength(jpts, sids+2);
+
+//#4528                qsort((void* )pjpts,inf,4,comp);
+//#4529                ine=0;
+//#4530                tind=spnt;
+      ine := 0;
+      tind := spnt;
+      while ine < inf do
+//#4531                while(ine<inf){
+      begin
+				lins[spnt].lin  := jpts[ine].lin;
+				lins[spnt].grp  :=grpind;
+				lins[spnt].x    :=jpts[ine].x;
+				lins[spnt].y  :=jpts[ine].y;
+
+        inc(spnt);
+        inc(ine);
+
+				lins[spnt].lin  :=jpts[ine].lin;
+				lins[spnt].grp  :=grpind;
+				lins[spnt].x    :=jpts[ine].x;
+        lins[spnt].y    :=jpts[ine].y;
+        inc(spnt);
+        inc(ine);
+
+//#4533                    lins[spnt].lin = jpts[ine]->lin;
+//#4534                    lins[spnt].grp = grpind;
+//#4535                    lins[spnt].x   = jpts[ine]->x;
+//#4536                    lins[spnt++].y = jpts[ine++]->y;
+//#4537                    lins[spnt].lin = jpts[ine]->lin;
+//#4538                    lins[spnt].grp = grpind;
+//#4539                    lins[spnt].x   = jpts[ine]->x;
+//#4540                    lins[spnt++].y = jpts[ine++]->y;
+      end;      //#4541                }
+      if spnt <> tind then
+        inc(grpind);
 //#4542                if(spnt!=tind)
 //#4543                    grpind++;
 //#4544            }
@@ -4763,7 +4992,36 @@ begin
 //#4545        }
   end;
 
+  //X2NIE DEBUG
+  orilen := length(frmpnt.flt);
+  addlen := length(lins);
+  setlength(frmpnt.flt, orilen + addlen);
+
+  setlength(frmpnt.clp, orilen + addlen);
+  fillchar(frmpnt.clp[0], sizeof(TFloatPoint) * (orilen + addlen), 0 );
+  for ind := 0 to addlen-1 do
+  begin
+    with frmpnt.flt[orilen + ind] do
+    begin
+      x := lins[ind].x;
+      y := lins[ind].y;
+    end;
+    frmpnt.clp[orilen + ind].X := lins[ind].lin;
+  end;
+
+(*
 //#4546        tgrinds[grindpnt++]=spnt;
+  {is save spnt to point array at index grindpnt, and the index grown one
+  grow up by one
+  seems like that fnvrt() is just to calculate the points
+  and because tgrind is point to bseq,
+  so we need to track the bseq
+  Maybe Thred filling with bseq
+  Just a guess}
+  inc(grindpnt);
+  tgrinds[grindpnt] := spnt;
+
+
 //#4547        grinds=new unsigned[grindpnt];
 //#4548        for(ind=0;ind<grindpnt;ind++)
 //#4549            grinds[ind]=tgrinds[ind];
@@ -4771,6 +5029,7 @@ begin
 //#4551        delete jpts;
 //#4552        delete pjpts;
 //#4553    }
+*)
 end;
 //#4554
 //#4555    void fnhor(){
@@ -4792,38 +5051,83 @@ end;
 //#4571        fnvrt();                                                                   
 //#4572        frmpnt=&formlst[clofind];                                                                   
 //#4573    }                                                                       
-//#4574                                                                           
-//#4575    void fsvrt(){                                                                       
-//#4576                                                                           
-//#4577        delmclp(clofind);                                                                   
-//#4578        deltx();                                                                   
-//#4579        makpoli();                                                                   
-//#4580        frmpnt->ftyp=VRTF;                                                                   
-//#4581        frmpnt->typ=POLI;                                                                   
-//#4582        frmpnt->fcol=actcol;                                                                   
-//#4583        fsizpar();                                                                   
-//#4584        frmpnt->fspac=stspace;                                                                   
-//#4585        frmpnt->typ=POLI;                                                                   
-//#4586        dusqr();                                                                   
-//#4587        refilfn();                                                                   
-//#4588    }                                                                       
-//#4589                                                                           
-//#4590    void filvrt(){                                                                       
-//#4591                                                                           
-//#4592        unsigned ind;;                                                                   
-//#4593                                                                           
+//#4574
+procedure fsvrt(var frmpnt : TFRMHED);
+//#4575    void fsvrt(){
+begin
+//#4577        delmclp(clofind); //DEL CLIP
+                                    //#759    void delmclp(unsigned fpnt){
+                                    //#760
+                                    //#761        unsigned    src,dst;
+                                    //#762
+                                    //#763        if(clpad){
+                                    //#764
+                                    //#765            if(isclp(fpnt)){
+                                    //#766
+                                    //#767                dst=findclp(fpnt);
+                                    //#768                src=dst+formlst[fpnt].flencnt.nclp;
+                                    //#769                MoveMemory(&clps[dst],&clps[src],sizeof(FLPNT)*(clpad-src));
+                                    //#770                if(iseclp(fpnt))
+                                    //#771                    formlst[fpnt].clp-=formlst[fpnt].flencnt.nclp;
+                                    //#772                clpsub(fpnt,formlst[fpnt].flencnt.nclp);
+                                    //#773                if(clpad>formlst[fpnt].flencnt.nclp)
+                                    //#774                    clpad-=formlst[fpnt].flencnt.nclp;
+                                    //#775                else
+                                    //#776                    clpad=0;
+                                    //#777                formlst[fpnt].flencnt.nclp=0;
+                                    //#778            }
+                                    //#779        }
+                                    //#780    }
+
+//#4578        deltx();     //DEL TEXTURE
+//#4579        makpoli();   //set selected form as polygon
+//#4580        frmpnt->ftyp=VRTF;
+//#4581        frmpnt->typ=POLI;
+
+//#4582        frmpnt->fcol=actcol;
+//#4583        fsizpar();   //SET FORM CONSTRAINT_SIZE TO DEFAULT
+                                  //#1034    void fsizpar(){
+                                  //#1035
+                                  //#1036        frmpnt->fmax=ini.maxsiz;
+                                  //#1037        frmpnt->flencnt.flen=usesiz;
+                                  //#1038        frmpnt->fmin=minsiz;
+                                  //#1039    }
+
+//#4584        frmpnt->fspac=stspace; //SET SPACE BETWEEN STITCH TO DEFAULT
+//#4585        frmpnt->typ=POLI;
+//#4586        dusqr();
+                                  //#669    void dusqr(){
+                                  //#671        if(chku(SQRFIL))
+                                  //#672            frmpnt->xat|=AT_SQR;
+                                  //#673        else
+                                  //#674            frmpnt->xat&=(~AT_SQR);
+                                  //#675    }
+
+//#4587        refilfn(); //REFILL FORM N.   N= CURRENT WORKING FORM
+  refilfn( frmpnt)
+//#4588    }
+end;
+
+procedure filvrt(var frmpnt : TFRMHED); //called by menu: mnu_FILL_VERTClick()
+//#4590    void filvrt(){
+//#4592        unsigned ind;;
+begin
 //#4594        if(filmsgs(FMM_VRT))                                                                   
 //#4595            return;                                                               
-//#4596        if(fselpnt){                                                                   
+//#4596        if(fselpnt){    //number of selected forms;                                                               
 //#4597                                                                           
 //#4598            savdo();                                                               
-//#4599            for(ind=0;ind<fselpnt;ind++){                                                               
-//#4600                                                                           
-//#4601                clofind=selist[ind];                                                           
-//#4602                fvars(clofind);                                                           
-//#4603                if(frmpnt->typ!=LIN)                                                           
-//#4604                    fsvrt();                                                       
-//#4605            }                                                               
+//#4599            for(ind=0;ind<fselpnt;ind++){ //for selected forms                                                               
+//#4600
+  begin
+//#4601                clofind=selist[ind]; //closest form to the cursor
+//#4602                fvars(clofind);
+    //if frmpnt.
+      fsvrt(frmpnt);
+//#4603                if(frmpnt->typ!=LIN)
+//#4604                    fsvrt();
+//#4605            }
+  end;
 //#4606            setMap(INIT);                                                               
 //#4607            coltab();                                                               
 //#4608            setMap(RESTCH);                                                               
@@ -4839,7 +5143,8 @@ end;
 //#4618                setMap(RESTCH);                                                           
 //#4619            }                                                               
 //#4620        }                                                                   
-//#4621    }                                                                       
+//#4621    }
+end;                                                                       
 //#4622                                                                           
 //#4623    void fshor(){                                                                       
 //#4624                                                                           
@@ -4990,7 +5295,7 @@ end;
 //#4769        unsigned    ind;                                                               
 //#4770        double        len,mlen=1e99;                                                           
 //#4771                                                                           
-//#4772        fvars(clofind);                                                                   
+//#4772        fvars(clofind);
 //#4773        tpnt0.x=msg.pt.x-stOrg.x;                                                                   
 //#4774        tpnt0.y=msg.pt.y-stOrg.y;                                                                   
 //#4775        nuflen=frmpnt->sids+1;                                                                   
@@ -13543,7 +13848,7 @@ end;
 //#13322        xpnt++;                                                                   
 //#13323    }                                                                       
 //#13324                                                                           
-//#13325    void clpcon(){                                                                       
+//#13325    void clpcon(){
 //#13326                                                                           
 //#13327        RECT        nrct;                                                           
 //#13328        unsigned    ind,ine,inf,ing,nof,clpneg;                                                               
@@ -13947,32 +14252,35 @@ end;
 //#13726    #endif                                                                       
 //#13727        }                                                                   
 //#13728    }                                                                       
-//#13729                                                                           
-//#13730    void vrtsclp(){                                                                       
-//#13731                                                                           
-//#13732        unsigned ind;                                                                   
-//#13733                                                                           
-//#13734        fvars(clofind);                                                                   
-//#13735        delmclp(clofind);                                                                   
-//#13736        deltx();                                                                   
-//#13737        frmpnt->flencnt.nclp=clplen;                                                                   
-//#13738        frmpnt->angclp.clp=numclp();                                                                   
-//#13739        frmpnt->wpar=ini.faz;                                                                   
-//#13740        makpoli();                                                                   
-//#13741        frmpnt->fspac=ini.clpof;                                                                   
-//#13742        for(ind=0;ind<clplen;ind++){                                                                   
-//#13743                                                                           
-//#13744            frmpnt->angclp.clp[ind].x=clpnu[ind].x;                                                               
-//#13745            frmpnt->angclp.clp[ind].y=clpnu[ind].y;                                                               
-//#13746        }                                                                   
-//#13747        frmpnt->ftyp=VCLPF;                                                                   
-//#13748        frmpnt->fcol=actcol;                                                                   
-//#13749        frmpnt->typ=POLI;                                                                   
-//#13750        refilfn();                                                                   
-//#13751    }                                                                       
-//#13752                                                                           
-//#13753    void vrtclp(){                                                                       
-//#13754                                                                           
+//#13729
+procedure vrtsclp();
+//#13730    void vrtsclp(){
+begin
+//#13732        unsigned ind;
+//#13733
+//#13734        fvars(clofind);
+//#13735        delmclp(clofind);
+//#13736        deltx();
+//#13737        frmpnt->flencnt.nclp=clplen;
+//#13738        frmpnt->angclp.clp=numclp();
+//#13739        frmpnt->wpar=ini.faz;
+//#13740        makpoli();
+//#13741        frmpnt->fspac=ini.clpof;
+//#13742        for(ind=0;ind<clplen;ind++){
+//#13743
+//#13744            frmpnt->angclp.clp[ind].x=clpnu[ind].x;
+//#13745            frmpnt->angclp.clp[ind].y=clpnu[ind].y;
+//#13746        }
+//#13747        frmpnt->ftyp=VCLPF;
+//#13748        frmpnt->fcol=actcol;
+//#13749        frmpnt->typ=POLI;
+//#13750        refilfn();
+//#13751    }
+end;
+//#13752
+procedure vrtclp();
+//#13753    void vrtclp(){
+begin
 //#13755        unsigned ind;                                                                   
 //#13756                                                                           
 //#13757        if(filmsgs(FMM_CLP))                                                                   
@@ -14020,8 +14328,9 @@ end;
 //#13799            else                                                               
 //#13800                CloseClipboard();                                                           
 //#13801        }                                                                   
-//#13802    }                                                                       
-//#13803                                                                           
+//#13802    }
+end;                                                                       
+//#13803
 //#13804    void angout(){                                                                       
 //#13805                                                                           
 //#13806        FLRCT*        trct;                                                           

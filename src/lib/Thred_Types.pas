@@ -12,6 +12,7 @@ uses
 type
   TOldNameCharArray = array [0..OLDNUM - 1, 0..MAX_PATH - 1] of Char;
   TArrayOfTColor = array of TColor;
+  PArrayOfCardinal = ^TArrayOfCardinal;
   TArrayOfCardinal = array of Cardinal;
   T16Colors = array [0..15] of TColor;
   T16Byte   = array [0..15] of Byte;
@@ -26,7 +27,7 @@ type
     x, y : TFloat;
   end;//SMALPNTL;
 
-  TArrayOfSMALPNTL = array of TSMALPNTL;
+  TArrayOfTSMALPNTL = array of TSMALPNTL;
 
   PDUBPNTL = ^TDUBPNTL;
   TDUBPNTL = record
@@ -65,6 +66,22 @@ type
     lin : SmallInt;
   end; //TXPNT;
 
+  TPCSTCH = packed record
+    fx : byte;
+    x : smallint;
+    nx : byte;
+    fy : byte;
+    y : smallint;
+    ny : byte;
+    typ : byte;
+  end;//PCSTCH;
+
+  TCOLCHNG = record
+    stind,	//stich index
+    colind : word;	//color index
+  end;//COLCHNG;
+
+
   PSTRHED = ^TSTRHED; 
   TSTRHED = packed record 		//structure thred file header
     led : Cardinal;
@@ -94,7 +111,7 @@ type
   end; //STREX
 
   //pcs file header structure
-  THED = packed record  thred.h #681
+  THED = packed record  //thred.h #681
     ledIn,
     hup : Byte;
     fColCnt : Word;
@@ -115,12 +132,12 @@ type
     ledVer : array[0..1] of Char;
     off : array[0..2] of Byte;  //PEC offset [3byte]
     m1 : array[0..12] of Byte;
-    ce : array[0..5] of Byte;
+    ce : array[0..5] of Char;
     m2 : array[0..46] of Byte;
     xsiz,
     ysiz : Word;
     m3 : array[0..15] of Byte;
-    cs : array[0..5] of Byte;
+    cs : array[0..5] of Char;
     m4 : array[0..2] of Byte;
     scol : Byte;
     m5 : array[0..2] of Byte;
@@ -443,6 +460,36 @@ type
     lin : Integer;
 	  cnt : Integer;
   end; //RNGCNT;
+
+
+  TRGN = record//region for sequencing vertical fills
+    strt,		//start line of region
+    fin, //end;		//end line of region
+    brk,
+    cntbrk : Cardinal;
+  end;  //RGN;
+
+
+  TRCON = record		//pmap: path map for sequencing
+    vrt,
+    con,
+    grpn : Word;
+  end;//RCON;
+  TArrayOfTRCON = array of TRCON;
+
+  TArrayOfTRGN = array of TRGN;
+
+  TRGSEQ = packed record		//tmpath: temporary path connections
+    pcon : cardinal;		//pointer to pmap entry
+    cnt : integer;
+    skp : byte;		//path not found
+  end; //RGSEQ;
+
+  TFSEQ = packed record		//mpath: path of sequenced regions
+    vrt,
+    grpn : Word;
+    skp : Byte;	//path not found
+  end; //FSEQ;
 
 implementation
 

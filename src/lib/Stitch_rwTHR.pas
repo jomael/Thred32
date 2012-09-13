@@ -40,6 +40,8 @@ uses
   Classes, SysUtils, Graphics,
   gmFileFormatList, Stitch_items ;
 
+{$DEFINE LOADFORMS}
+
 type
   TStitchTHRConverter = class(TgmConverter)
   private
@@ -329,7 +331,7 @@ begin
     begin
 //#5744
 //#5745                            ReadFile(hFil,(STREX*)&hedx,sizeof(STREX),&red,NULL);
-    AStream.Read(hedx, SizeOf(TSTREX));
+      AStream.Read(hedx, SizeOf(TSTREX));
 //#5746                            if(red!=sizeof(STREX)){
 //#5747
 //#5748                                tabmsg(IDS_SHRTF);
@@ -465,6 +467,9 @@ begin
   formpnt := min(sthed.fpnt, MAXFORMS);
 
   //FORM
+  {$IFNDEF LOADFORMS}
+    formpnt := 0;
+  {$ENDIF}
 //#5816                        if(formpnt){
   if formpnt > 0 then
   begin

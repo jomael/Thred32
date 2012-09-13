@@ -105,9 +105,9 @@ var
 //#5621        TCHAR*            peschr;                                                       
 //#5622        unsigned        pecof;
   pcolcnt   : Byte;
-  usedColors: TArrayOfTColor;
-  pescols   : array Of TColor;
-  colorList : array{[0..255]} of byte;
+  useCol: TArrayOfTColor;
+  //pescols   : array Of TColor;
+  pescols : array{[0..255]} of byte;
 
 //#5623        unsigned char*    pcolcnt;
 
@@ -129,137 +129,214 @@ var
 
   deltaX,deltaY:integer;
                  translateStart :TPoint;
-                 LColorNum : integer;
-  colorIndex : byte;
-  Lstchs : TArrayOfTSHRTPNT;
-  LBytes : T16Byte;
-  chkhuprct : TfloatRect;
-
-  function getIndexFromOrder(order: integer): Integer;
-  begin
-    Result := colorList[order];
+                 pcolind : integer;
+  tcol : byte;
+  Lstchs : TArrayOfTSHRTPNT;
+  LBytes : T16Byte;
+  chkhuprct : TfloatRect;
+  xpnt : integer;
+  
+  function getIndexFromOrder(order: integer): Integer;
+  begin
+    Result := pescols[order];
   end;
 {$IFDEF COLORREMAP}
   //the rest methods below is for correction of colors mapping of pes to be used by thred.
   function RegisterNewIndex(pes66index: byte): byte;
     var target : TColor;
-    newsize : byte;
-  begin
-    newsize := length(usedColors) +1;
-    setlength(usedColors, newsize);
-    result := newsize -1;
-    usedColors[ result ] := ColorFromIndex(pes66index);
+    newsize : byte;
+  begin
+    newsize := length(useCol) +1;
+    setlength(useCol, newsize);
+    result := newsize -1;
+    useCol[ result ] := ColorFromIndex(pes66index);
+  end;
 
-  end;
 
-  function RegisteredIndex(pes66index : byte): integer ;
-    var target : TColor;
-    i : integer;
-  begin
-    result := -1;
-    target := ColorFromIndex(pes66index);
-    for i := 0 to length(usedColors) -1 do
-    begin
-      if usedColors[i] = Target then
-      begin
-        result := i;
-        break;
-      end;
-    end;
-  end;
+  function RegisteredIndex(pes66index : byte): integer ;
+    var target : TColor;
+    i : integer;
+  begin
+    result := -1;
+    target := ColorFromIndex(pes66index);
+    for i := 0 to length(useCol) -1 do
+    begin
+      if useCol[i] = Target then
+      begin
+        result := i;
+        break;
+      end;
+    end;
+  end;
 
-  procedure RegisterDistinct(var pes66index : byte);
-  var result : integer;
-  begin
-    result :=  RegisteredIndex(pes66index);
-    if result < 0 then
-      result :=  RegisterNewIndex(pes66index);
 
-    pes66index := result;
-  end;
+  procedure RegisterDistinct(var pes66index : byte);
+  var result : integer;
+  begin
+    //pes66index := pes66index and PESCMSK;
+    result :=  RegisteredIndex(pes66index);
+    if result < 0 then
+      result :=  RegisterNewIndex(pes66index);
+    pes66index := result;
+  end;
 
   procedure RegisterUntil16Used;
-  var pes66index,new : integer;
-  begin
-    pes66index := 0;
-    while length(usedColors) < 16 do
-    begin
-      new := RegisteredIndex(pes66index);
-      if new < 0 then  //not yet found.
-        RegisterNewIndex(pes66index);
-      inc(pes66index);
-      if pes66index > 66 then
-        break;
-    end;
-  end;
-{$ENDIF}  
+  var pes66index,new : integer;
+  begin
+    pes66index := 0;
+    while length(useCol) < 16 do
+    begin
+
+      new := RegisteredIndex(pes66index);
+      if new < 0 then  //not yet found.
+        RegisterNewIndex(pes66index);
+      inc(pes66index);
+      if pes66index > 66 then
+        break;
+    end;
+  end;
+
+{$ELSE}
+
+
+function pesmtch(rcol : TCOlor; pcol: byte): cardinal;
+var
+	rval,ind: cardinal;
+	tcol: cardinal;
+begin
+	//tcol:=pestrn[pcol];
+  tcol := ColorFromIndex(pcol);
+	rval:=0;
+	for ind :=0 to 2 do
+  begin
+		inc(rval, abs((rcol and $ff)-(tcol and $ff)));
+		tcol := tcol shr 8;
+		rcol := rcol shr 8;
+	end;
+	result := rval;
+end;
+
+
+function dupcol: cardinal;
+//unsigned dupcol(){
+var
+	ind : cardinal;
+	col : TColor;
+	mat,matm,pmatm : Cardinal;
+begin
+	//col=pestrn[pescols[pcolind++]];
+  col := ColorFromIndex(pescols[pcolind]);
+  inc(pcolind);
+	for ind :=0 to xpnt -1  do
+  begin
+
+		if(useCol[ind]=col)then
+    begin
+			//return ind;
+      result := ind;
+      exit;
+    end;
+	end;
+	matm := $ffffff;
+	for ind:=1 to xpnt-1  do
+  begin
+
+		mat := pesmtch(col,pescols[ind]);
+		if(mat<matm) then
+    begin
+			matm :=mat;
+			pmatm :=ind;
+		end;
+	end;
+	result := pmatm;
+end;
+
+{$ENDIF}
 
 begin
-  FStream := AStream;
+
+  FStream := AStream;
   LDesign := TStitchCollection(ACollection);
   LDesign.Clear;
   SetLength(Lstchs,0);
-  SetLength(usedColors,0);
+  SetLength(useCol,0);
   prevX := 0;// 00665;
   prevY := 0;// 00376;
   maxX := 0;
   minX := 0;
   maxY := 0;
   minY := 0;
-  LColorNum := 0;
   chkhuprct := floatRect(0,0,0,0);
 
-//#5967    #if PESACT                                                                       
-//#5968                        else{                                                   
+//#5967    #if PESACT
+//#5968                        else{
 //#5969
   AStream.Read(peshed, SizeOf(TPESHED));
   if peshed.led <> '#PES00' then
     raise Exception.Create('Not a PES file');
 
-//#5970                            ReadFile(hFil,(BSEQPNT*)&bseq,sizeof(bseq),&red,0);                                               
-//#5971                            peshed=(PESHED*)&bseq;                                               
-//#5972                            peschr=(TCHAR*)&bseq;                                               
-//#5973                            if(strncmp(peshed->led,"#PES00",6)){                                               
+//#5970                            ReadFile(hFil,(BSEQPNT*)&bseq,sizeof(bseq),&red,0);
+//#5971                            peshed=(PESHED*)&bseq;
+//#5972                            peschr=(TCHAR*)&bseq;
+//#5973                            if(strncmp(peshed->led,"#PES00",6)){
 //#5974
 //#5975                                sprintf(msgbuf,"Not a PES file: %s\n",filnam);
-//#5976                                shoMsg(msgbuf);                                           
-//#5977                                return;                                           
+//#5976                                shoMsg(msgbuf);
+//#5977                                return;
 //#5978                            }
 
-  pecof := peshed.off[0] + (peshed.off[1] shl 8) + (peshed.off[2] shl 16);                                                   
-//#5979                            pecof=tripl(peshed->off);                                               
-//#5980                            pestch=(unsigned char*)&peschr[pecof+532];                                               
+  pecof := peshed.off[0] + (peshed.off[1] shl 8) + (peshed.off[2] shl 16);
+//#5979                            pecof=tripl(peshed->off);
+//#5980                            pestch=(unsigned char*)&peschr[pecof+532];
 //#5981                            xpnt=0;
 
   //COLORS===
+//#5982                            pcolcnt=(unsigned char*)&peschr[pecof+48];
   AStream.Position :=pecof + 48;
   pcolcnt := ReadByte; // should +1 !
   //for i := 0 to FnumColors do
       //colorList[i] := ReadByte;
-  SetLength(colorList,pcolcnt + 1);
-  AStream.Read(colorList[0], pcolcnt + 1);
-//#5982                            pcolcnt=(unsigned char*)&peschr[pecof+48];
+  SetLength(pescols,pcolcnt + 1);
+  AStream.Read(pescols[0], pcolcnt + 1);
+
+
 
   FStream.Position := pecof + 532;
 //#5983                            pescols=&pcolcnt[1];
 
-//#5984                            rmap[0]=rmap[1]=0;                                               
-//#5985                            xpnt=0;                                               
-//#5986                            for(ind=0;ind<(unsigned)(*pcolcnt+1);ind++){                                               
-//#5987                                                                           
-//#5988                                if(setRmp(pescols[ind])){                                           
-//#5989                                                                           
-//#5990                                    useCol[xpnt++]=pestrn[pescols[ind]&PESCMSK];                                       
-//#5991                                    if(xpnt>=16)                                       
-//#5992                                        break;                                   
-//#5993                                }                                           
-//#5994                            }                                               
-//#5995                            tcol=0;                                               
-//#5996                            pcolind=1;                                               
-//#5997                            loc.x=loc.y=0;                                               
-//#5998                            pabind=ind=ine=0;                                               
-//#5999                            rstMap(FILDIR);                                               
-//#6000                            ind=0;                                               
+//#5984                            rmap[0]=rmap[1]=0;
+//#5985                            xpnt=0;
+  xpnt := 0;
+
+  for i := 0 to pcolcnt do
+  begin
+
+    tcol := getIndexFromOrder(i);
+    
+    RegisterDistinct(tcol);
+    //useCol[xpnt]=pestrn[pescols[ind]&PESCMSK];
+    if length(useCol) >=16 then
+        break;
+
+  end;
+//#5986                            for(ind=0;ind<(unsigned)(*pcolcnt+1);ind++){
+//#5987
+//#5988                                if(setRmp(pescols[ind])){
+//#5989
+//#5990                                    useCol[xpnt++]=pestrn[pescols[ind]&PESCMSK];
+//#5991                                    if(xpnt>=16)
+//#5992                                        break;
+//#5993                                }
+//#5994                            }
+//#5995                            tcol=0;
+//#5996                            pcolind=1;
+  tcol := 0;
+  pcolind := 1;
+
+//#5997                            loc.x=loc.y=0;
+//#5998                            pabind=ind=ine=0;
+//#5999                            rstMap(FILDIR);
+//#6000                            ind=0;
 //#6001                            pabstch=(PESTCH*)&peschr[sizeof(PESHED)+4];                                               
 //#6002                            ind=0;                                               
 //#6003                            ine=1;                                               
@@ -311,10 +388,10 @@ begin
 
           tempStitches = new List<Point>();
           }
-          Inc(LColorNum);
-          colorIndex := getIndexFromOrder(LColorNum);
           {$IFDEF COLORREMAP}
-          RegisterDistinct(colorIndex);
+          tcol := getIndexFromOrder(pcolind);
+          Inc(pcolind);
+          RegisterDistinct(tcol);
           {$ENDIF}
           //curBlock.colorIndex = colorIndex;
           //pb.Buffer.PenColor := Color32(getColorFromIndex(colorIndex));
@@ -361,17 +438,6 @@ begin
                   deltaX := deltaX - 128;
               end;
           end;
-//#6028                                    locof*=0.6;
-//#6029                                    if(toglMap(FILDIR)){
-//#6030
-//#6031                                        loc.y-=locof;
-//#6032                                        stchs[ine].x=loc.x;
-//#6033                                        stchs[ine].y=loc.y;
-//#6034                                        stchs[ine].at=tcol;
-//#6035                                        ine++;
-//#6036                                    }
-//#6037                                    else
-//#6038                                        loc.x+=locof;
 
           if ((val2 and 128) = 128) then//$80
           begin
@@ -391,29 +457,44 @@ begin
               begin
                   deltaY := deltaY - 128;
               end;
-          end;                                                                   
+          end;
           //tempStitches.Add(new Point(prevX + deltaX, prevY + deltaY));
 
           //deltaX := deltaX * 0.6;
           //deltaY := deltaY * 0.6;
-          
+
           SetLength(Lstchs,Length(Lstchs)+1);
           with Lstchs[High(lstchs)] do
           begin
             x := (prevX + deltaX);// * 0.6;
             y :=  (prevY + deltaY);// * 0.6;
 
+            {$IFDEF COLORREMAP}
             //BUGFIX: HAPPEN WHEN IS THE FIRST TIME AND NO COLOR YET DETECTED.
-            if (colorIndex = 0) and (length(usedColors)=0) then
+            if (tcol = 0) and (length(useCol)=0) then
             begin
-              {$IFDEF COLORREMAP}
-              RegisterDistinct(colorIndex);
-              {$ENDIF}
+              //tcol := getIndexFromOrder(pcolind);
+              //Inc(pcolind);
+
+              RegisterDistinct(tcol);
             end;
-            at := colorIndex;
+            {$ENDIF}
+
+            at := tcol;
+//#6028                                    locof*=0.6;
+//#6029                                    if(toglMap(FILDIR)){
+//#6030
+//#6031                                        loc.y-=locof;
+//#6032                                        stchs[ine].x=loc.x;
+//#6033                                        stchs[ine].y=loc.y;
+//#6034                                        stchs[ine].at=tcol;
+//#6035                                        ine++;
+//#6036                                    }
+//#6037                                    else
+//#6038                                        loc.x+=locof;
           end;
           //pb.Buffer.LineToXS(Fixed((prevX + deltaX)/3),Fixed(( prevY + deltaY)/3));
-          
+
           prevX := prevX + deltaX;
           prevY := prevY + deltaY;
 
@@ -470,7 +551,7 @@ begin
 
   {$IFDEF COLORREMAP}
   RegisterUntil16Used; //correction.
-  LDesign.Colors := usedColors;//getPesDefaultColors;
+  LDesign.Colors := useCol;//getPesDefaultColors;
   {$ELSE}
   LDesign.Colors := getPesDefaultColors;
   {$ENDIF}
@@ -627,23 +708,240 @@ begin
   FStream.Read(Result,4)
 end;
 
+
+
+function TStitchPESConverter.ColorFromIndex(index : Integer): TColor;
+    const pestrn : array[0..63] of TColor=(
+	$f0f0f0, //00 
+	$940a1a, //01 
+	$ff750f, //02 
+	$4c9300, //03 
+	$febdba, //04 
+	$0000ec, //05 
+	$5a99e4, //06 
+	$ab48cc, //07 
+	$fac4fd, //08 
+	$cd84dd, //09 
+	$8ad36b, //10 
+	$45a9e4, //11 
+	$42bdff, //12 
+	$00e6ff, //13 
+	$00d96c, //14 
+	$41a9c1, //15 
+	$97adb5, //16 
+	$5f9cba, //17 
+	$9ef5fa, //18 
+	$808080, //19 
+	$000000, //20
+	$df1c00, //21 
+	$b800df, //22 
+	$626262, //23 
+	$0d2669, //24 
+	$6000ff, //25 
+	$0082bf, //26 
+	$7891f3, //27 
+	$0568ff, //28 
+	$f0f0f0, //29 
+	$cd32c8, //30 
+	$9bbfb0, //31 
+	$ebbf65, //32 
+	$04baff, //33 
+	$6cf0ff, //34 
+	$15cafe, //35 
+	$0181f3, //36 
+	$23a937, //37 
+	$5f4623, //38 
+	$95a6a6, //39 
+	$a6bfce, //40 
+	$02aa96, //41 
+	$c6e3ff, //42 
+	$d799ff, //43 
+	$047000, //44 
+	$fbcced, //45 
+	$d889c0, //46 
+	$b4d9e7, //47 
+	$860ee9, //48 
+	$2968cf, //49 
+	$158640, //50 
+	$9717db, //51 
+	$04a7ff, //52 
+	$ffffb9, //53 
+	$278922, //54 
+	$cd12b6, //55 
+	$00aa00, //56 
+	$dca9fe, //57 
+	$10d5fe, //58 
+	$df9700, //59 
+	$84ffff, //60 
+	$74e7cf, //61 
+	$42bdff, //62 
+	$b4d9e7  //63
+  );
+begin
+
+    case index of
+      1: result := RGB(14, 31, 124);
+      2: result := RGB(10, 85, 163);
+      3: result := RGB(48, 135, 119);
+      4: result := RGB(75, 107, 175);
+      5: result := RGB(237, 23, 31);
+      6: result := RGB(209, 92, 0);
+      7: result := RGB(145, 54, 151);
+      8: result := RGB(228, 154, 203);
+      9: result := RGB(145, 95, 172);
+      10: result := RGB(157, 214, 125);
+      11: result := RGB(232, 169, 0);
+      12: result := RGB(254, 186, 53);
+      13: result := RGB(255, 255, 0);
+      14: result := RGB(112, 188, 31);
+      15: result := RGB(186, 152, 0);
+      16: result := RGB(168, 168, 168);
+      17: result := RGB(123, 111, 0);
+      18: result := RGB(255, 255, 179);
+      19: result := RGB(79, 85, 86);
+      20: result := RGB(0, 0, 0);
+      21: result := RGB(11, 61, 145);
+      22: result := RGB(119, 1, 118);
+      23: result := RGB(41, 49, 51);
+      24: result := RGB(42, 19, 1);
+      25: result := RGB(246, 74, 138);
+      26: result := RGB(178, 118, 36);
+      27: result := RGB(252, 187, 196);
+      28: result := RGB(254, 55, 15);
+      29: result := RGB(240, 240, 240);
+      30: result := RGB(106, 28, 138);
+      31: result := RGB(168, 221, 196);
+      32: result := RGB(37, 132, 187);
+      33: result := RGB(254, 179, 67);
+      34: result := RGB(255, 240, 141);
+      35: result := RGB(208, 166, 96);
+      36: result := RGB(209, 84, 0);
+      37: result := RGB(102, 186, 73);
+      38: result := RGB(19, 74, 70);
+      39: result := RGB(135, 135, 135);
+      40: result := RGB(216, 202, 198);
+      41: result := RGB(67, 86, 7);
+      42: result := RGB(254, 227, 197);
+      43: result := RGB(249, 147, 188);
+      44: result := RGB(0, 56, 34);
+      45: result := RGB(178, 175, 212);
+      46: result := RGB(104, 106, 176);
+      47: result := RGB(239, 227, 185);
+      48: result := RGB(247, 56, 102);
+      49: result := RGB(181, 76, 100);
+      50: result := RGB(19, 43, 26);
+      51: result := RGB(199, 1, 85);
+      52: result := RGB(254, 158, 50);
+      53: result := RGB(168, 222, 235);
+      54: result := RGB(0, 103, 26);
+      55: result := RGB(78, 41, 144);
+      56: result := RGB(47, 126, 32);
+      57: result := RGB(253, 217, 222);
+      58: result := RGB(255, 217, 17);
+      59: result := RGB(9, 91, 166);
+      60: result := RGB(240, 249, 112);
+      61: result := RGB(227, 243, 91);
+      62: result := RGB(255, 200, 100);
+      63: result := RGB(255, 200, 150);
+      64: result := RGB(255, 200, 200);
+      else
+        result := clWhite;
+      end;
+      //if result > 63 then  result := pestrn[index];
+end;
+
+
+function TStitchPESConverter.getPesDefaultColors(): TArrayOfTColor;
+var i : Integer;
+begin
+  SetLength(Result, 65);
+  for i := 0 to 65 do
+  begin
+    Result[i] := ColorFromIndex(i);
+  end;
+
+
+end;
+
+
+class function TStitchPESConverter.WantThis(AStream: TStream): Boolean;
+var
+  peshed : TPESHED;
+  red : Integer;
+begin
+  aStream.Read(peshed, SizeOf(TPESHED));
+  Result := peshed.led = '#PES00' ;
+
+end;
+
 procedure TStitchPESConverter.SaveToStream(AStream: TStream;
   ACollection: TCollection);
+    function pesmtch(rcol : TCOlor; pcol: byte): cardinal;
+    var
+      rval,ind: cardinal;
+      tcol: cardinal;
+    begin
+      //tcol:=pestrn[pcol];
+      tcol := ColorFromIndex(pcol);
+      rval:=0;
+      for ind :=0 to 2 do
+      begin
+        inc(rval, abs((rcol and $ff)-(tcol and $ff)));
+        tcol := tcol shr 8;
+        rcol := rcol shr 8;
+      end;
+      result := rval;
+    end;
+
+var
+  LDesign : TStitchCollection;
+  peshed : TPESHED;
+  ind,ine : cardinal;
+  useCol : T16Colors;
+  mtchind,mtchmin,match : cardinal;
+  pescolrs : array[0..15] of byte;
 begin
-//#6629    #if PESACT                                                                       
-//#6630                                                                           
-//#6631            case AUXPES:                                                               
-//#6632                                                                           
-//#6633                pchr=(TCHAR*)&peshed;                                                           
-//#6634                for(ind=0;ind<sizeof(PESHED);ind++)                                                           
-//#6635                    pchr[ind]=0;                                                       
-//#6636                strcpy(peshed.led,"#PES0001");                                                           
-//#6637                strcpy(peshed.ce,"CEmbOne");                                                           
-//#6638                strcpy(peshed.cs,"CSewSeg");                                                           
-//#6639                pestch=(PESTCH*)&bseq;                                                           
-//#6640                for(ind=0;ind<16;ind++){                                                           
-//#6641                                                                           
-//#6642                    mtchmin=0xffffffff;                                                       
+//#6629    #if PESACT
+//#6630
+//#6631            case AUXPES:
+//#6632
+  LDesign := TStitchCollection(ACollection);
+  for ind := 0 to 15 do
+     UseCol[ind] := LDesign.Colors[ind];
+
+//#6633                pchr=(TCHAR*)&peshed;
+//#6634                for(ind=0;ind<sizeof(PESHED);ind++)
+//#6635                    pchr[ind]=0;
+  fillchar(peshed, sizeof(TPESHED),0);
+
+  peshed.led := '#PES00';
+  peshed.ledVer := '01';
+//  peshed.ce := 'CEmbOne';
+  //peshed.cs := 'CSewSeg';
+//#6636                strcpy(peshed.led,"#PES0001");
+//#6637                strcpy(peshed.ce,"CEmbOne");
+//#6638                strcpy(peshed.cs,"CSewSeg");
+
+
+
+//#6639                pestch=(PESTCH*)&bseq;
+  for ind := 0 to 15 do
+  begin
+    mtchmin := $ffffffff;
+    for ine := 0 to 64 do
+    begin
+      match := pesmtch(useCol[ind], ine);
+      if match < mtchmin then
+      begin
+        mtchind := ine;
+        mtchmin := match;
+      end;
+    end;
+    pescolrs[ind] := mtchind;
+  end;
+//#6640                for(ind=0;ind<16;ind++){
+//#6641
+//#6642                    mtchmin=0xffffffff;
 //#6643                    for(ine=0;ine<sizeof(pestrn)>>2;ine++){                                                       
 //#6644                                                                           
 //#6645                        match=pesmtch(useCol[ind],ine);                                                   
@@ -654,7 +952,9 @@ begin
 //#6650                        }                                                   
 //#6651                    }                                                       
 //#6652                    pescolrs[ind]=(unsigned char)mtchind;                                                       
-//#6653                }                                                           
+//#6653                }
+
+                                                      
 //#6654                tcol=stchs[0].at&COLMSK;                                                           
 //#6655                pescol=peshed.scol=pescolrs[stchs[0].at&COLMSK];                                                           
 //#6656                sizstch(&srct);                                                           
@@ -720,243 +1020,22 @@ begin
 //#6716                psiz++;                                                           
 //#6717                *psiz=480;                                                           
 //#6718                pesof=(unsigned*)psiz;                                                           
-//#6719                *pesof=11534816;                                                           
+//#6719                *pesof=11534816;
 //#6720    //            pchr[527]=(TCHAR)0x0;                                                           
 //#6721    //            pchr[528]=(TCHAR)0x90;                                                           
 //#6722    //            pchr[529]=(TCHAR)0x0;                                                           
 //#6723    //            pchr[530]=(TCHAR)0x8f;                                                           
 //#6724                pchr[527]=(TCHAR)0x00;                                                           
-//#6725                pchr[528]=(TCHAR)0x80;    //hor    msb                                                   
-//#6726                pchr[529]=(TCHAR)0x80; //hor lsb                                                           
-//#6727                pchr[530]=(TCHAR)0x82; //vert msb                                                           
-//#6728                pchr[531]=(TCHAR)0xff; //vert lsb                                                           
-//#6729                WriteFile(hPcs,(TCHAR*)&bseq,opnt,&wrot,0);                                                           
-//#6730                break;                                                           
+//#6725                pchr[528]=(TCHAR)0x80;    //hor    msb
+//#6726                pchr[529]=(TCHAR)0x80; //hor lsb
+//#6727                pchr[530]=(TCHAR)0x82; //vert msb
+//#6728                pchr[531]=(TCHAR)0xff; //vert lsb
+//#6729                WriteFile(hPcs,(TCHAR*)&bseq,opnt,&wrot,0);
+//#6730                break;
 //#6731    #endif
-end;
-
-    function TStitchPESConverter.ColorFromIndex(index : Integer): TColor;
-    begin
-    case index of
-      1:
-                    result := RGB(14, 31, 124);
-                    
-                 2:
-                    result := RGB(10, 85, 163);
-                    
-                 3:
-                    result := RGB(48, 135, 119);
-                    
-                 4:
-                    result := RGB(75, 107, 175);
-                    
-                 5:
-                    result := RGB(237, 23, 31);
-                    
-                 6:
-                    result := RGB(209, 92, 0);
-                    
-                 7:
-                    result := RGB(145, 54, 151);
-                    
-                 8:
-                    result := RGB(228, 154, 203);
-                    
-                 9:
-                    result := RGB(145, 95, 172);
-                    
-                 10:
-                    result := RGB(157, 214, 125);
-                    
-                 11:
-                    result := RGB(232, 169, 0);
-                    
-                 12:
-                    result := RGB(254, 186, 53);
-                    
-                 13:
-                    result := RGB(255, 255, 0);
-                    
-                 14:
-                    result := RGB(112, 188, 31);
-                    
-                 15:
-                    result := RGB(186, 152, 0);
-                    
-                 16:
-                    result := RGB(168, 168, 168);
-                    
-                 17:
-                    result := RGB(123, 111, 0);
-                    
-                 18:
-                    result := RGB(255, 255, 179);
-                    
-                 19:
-                    result := RGB(79, 85, 86);
-                    
-                 20:
-                    result := RGB(0, 0, 0);
-                    
-                 21:
-                    result := RGB(11, 61, 145);
-                    
-                 22:
-                    result := RGB(119, 1, 118);
-                    
-                 23:
-                    result := RGB(41, 49, 51);
-                    
-                 24:
-                    result := RGB(42, 19, 1);
-                    
-                 25:
-                    result := RGB(246, 74, 138);
-                    
-                 26:
-                    result := RGB(178, 118, 36);
-                    
-                 27:
-                    result := RGB(252, 187, 196);
-                    
-                 28:
-                    result := RGB(254, 55, 15);
-                    
-                 29:
-                    result := RGB(240, 240, 240);
-                    
-                 30:
-                    result := RGB(106, 28, 138);
-                    
-                 31:
-                    result := RGB(168, 221, 196);
-                    
-                 32:
-                    result := RGB(37, 132, 187);
-                    
-                 33:
-                    result := RGB(254, 179, 67);
-                    
-                 34:
-                    result := RGB(255, 240, 141);
-                    
-                 35:
-                    result := RGB(208, 166, 96);
-                    
-                 36:
-                    result := RGB(209, 84, 0);
-                    
-                 37:
-                    result := RGB(102, 186, 73);
-                    
-                 38:
-                    result := RGB(19, 74, 70);
-                    
-                 39:
-                    result := RGB(135, 135, 135);
-                    
-                 40:
-                    result := RGB(216, 202, 198);
-                    
-                 41:
-                    result := RGB(67, 86, 7);
-                    
-                 42:
-                    result := RGB(254, 227, 197);
-                    
-                 43:
-                    result := RGB(249, 147, 188);
-                    
-                 44:
-                    result := RGB(0, 56, 34);
-                    
-                 45:
-                    result := RGB(178, 175, 212);
-                    
-                 46:
-                    result := RGB(104, 106, 176);
-                    
-                 47:
-                    result := RGB(239, 227, 185);
-                    
-                 48:
-                    result := RGB(247, 56, 102);
-                    
-                 49:
-                    result := RGB(181, 76, 100);
-                    
-                 50:
-                    result := RGB(19, 43, 26);
-                    
-                 51:
-                    result := RGB(199, 1, 85);
-                    
-                 52:
-                    result := RGB(254, 158, 50);
-                    
-                 53:
-                    result := RGB(168, 222, 235);
-                    
-                 54:
-                    result := RGB(0, 103, 26);
-                    
-                 55:
-                    result := RGB(78, 41, 144);
-                    
-                 56:
-                    result := RGB(47, 126, 32);
-                    
-                 57:
-                    result := RGB(253, 217, 222);
-                    
-                 58:
-                    result := RGB(255, 217, 17);
-                    
-                 59:
-                    result := RGB(9, 91, 166);
-                    
-                 60:
-                    result := RGB(240, 249, 112);
-                    
-                 61:
-                    result := RGB(227, 243, 91);
-                    
-                 62:
-                    result := RGB(255, 200, 100);
-                    
-                 63:
-                    result := RGB(255, 200, 150);
-                    
-                 64:
-                    result := RGB(255, 200, 200);
-                   else
-                      result := clWhite;
-      end;
-    end;
-function TStitchPESConverter.getPesDefaultColors(): TArrayOfTColor;
-var i : Integer;
-begin
-  SetLength(Result, 65);
-  for i := 0 to 65 do
-  begin
-    Result[i] := ColorFromIndex(i);
-
-  end;
-
-
-end;
-
-
-class function TStitchPESConverter.WantThis(AStream: TStream): Boolean;
-var
-  peshed : TPESHED;
-  red : Integer;
-begin
-  aStream.Read(peshed, SizeOf(TPESHED));
-  Result := peshed.led = '#PES00' ;
-
 end;
 
 initialization
   TStitchCollection.RegisterConverterReader('PES','Brother',0, TStitchPESConverter);
 end.
+
