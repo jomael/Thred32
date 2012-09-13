@@ -28,6 +28,8 @@ type
     OutdoorPhoto1: TMenuItem;
     Mountain1: TMenuItem;
     XRay1: TMenuItem;
+    actHotPressure: TAction;
+    HotPressure1: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure pbPaintBuffer(Sender: TObject);
@@ -141,7 +143,9 @@ begin
         else
           pb.Buffer.LineToFS(x * zRat.X, y * zRat.Y);}
       end;
-    end; 
+    end;
+    R := FloatRect(0,0, FStitchs.HeaderEx.xhup * zRat.X, FStitchs.HeaderEx.yhup * zRat.Y);
+    
     FDrawLine(pb.Buffer, R, Color32(FStitchs.BgColor), sdlFinish);
 
     //FORMS
@@ -194,6 +198,7 @@ begin
     4 : FDrawLine := DrawLineStippled;//DrawLineFS;
     5 : FDrawLine := DrawLineFS;
     6 : FDrawLine := DrawXRay;
+    7 : FDrawLine := DrawHotPressure;
   end;
   pb.Repaint;
 end;

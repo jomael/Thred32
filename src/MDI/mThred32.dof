@@ -100,7 +100,7 @@ Conditionals=
 DebugSourceDirs=
 UsePackages=0
 [Parameters]
-RunParams=
+RunParams=E:\VCLs\appls\embroidery\thred\work\lilo\stfr1ts.PES E:\VCLs\appls\embroidery\thred\work\lilo\stfr1ts.PES
 HostApplication=
 Launcher=
 UseLauncher=0

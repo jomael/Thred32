@@ -33,8 +33,10 @@ type
     swaDefault: TgmSwatchListView;
     swa2: TgmSwatchListView;
     procedure FormCreate(Sender: TObject);
+    procedure FormActivate(Sender: TObject);
   private
     { Private declarations }
+    FParamsLoaded : boolean;
     FIni : TThredIniFile;
   public
     { Public declarations }
@@ -78,6 +80,21 @@ begin
   //FStitchs.Colors := LColors;// ini.StitchColors;
     swa2.Changed;
     swaDefault.Changed;
+    
+
+end;
+
+procedure TMainForm.FormActivate(Sender: TObject);
+var i : integer;
+begin
+  if not FParamsLoaded then
+  begin
+    FParamsLoaded := true;
+    if paramcount > 0 then
+      for i := 1 to Paramcount do
+        CreateMDIChild(paramstr(i));
+
+  end;
 end;
 
 end.

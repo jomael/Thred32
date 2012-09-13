@@ -49,14 +49,46 @@ procedure DrawLineFS    (B: TBitmap32; R : TFloatRect; C : TColor32; AState: TSD
 procedure DrawLineStippled(B: TBitmap32; R : TFloatRect; C : TColor32; AState: TSDLState);
 procedure Draw3DLine    (B: TBitmap32; R : TFloatRect; C : TColor32; AState: TSDLState);
 procedure DrawXRay(B: TBitmap32; R : TFloatRect; C : TColor32; AState: TSDLState);
-
+procedure DrawHotPressure(B: TBitmap32; R : TFloatRect; C : TColor32; AState: TSDLState);
 
 implementation
 
 uses
-  Math,
+  Math, Dialogs, SysUtils{for debug},
   GR32_Blend;
 
+var
+  UHotPressureColors : TArrayOfColor32;
+  
+procedure BuildHotPressureColors;
+var B: TBitmap32;
+  i : integer;
+begin
+  B := TBitmap32.Create;
+  B.SetSize(256,1); //1 horizontal line
+  B.StippleStep := 4/255;
+  setlength(UHotPressureColors,5);
+  UHotPressureColors[0] := Color32($350c0a); //dark violet
+  UHotPressureColors[1] := Color32($981992); //fuchsia
+  UHotPressureColors[2] := Color32($4d56d6); //orange
+  UHotPressureColors[3] := clYellow32; //Color32($17b0f3); //
+  UHotPressureColors[4] := clWhite32; //
+
+  B.SetStipple(UHotPressureColors);
+  B.StippleCounter := 0;
+  B.LineFSP(0,0,255,0);
+
+  setlength(UHotPressureColors,256);
+  for i := 0 to 255 do
+  begin
+    UHotPressureColors[i] := b.PixelS[i,0];
+  end;
+  B.Free;
+end;
+
+
+
+//-----------------------------------------------
 
 procedure DrawLineFS(B: TBitmap32; R : TFloatRect; C : TColor32; AState: TSDLState);
 begin
@@ -159,5 +191,79 @@ begin
     B.LineFS(left, top, right, bottom, $40FFFFFF);
 end;
 
+procedure DrawHotPressure(B: TBitmap32; R : TFloatRect; C : TColor32; AState: TSDLState);
+//BEST FOR LOOKING THE MOST VISITED POINT
+var h, dx, dy : TFloat;
+  L,i,X,Y : integer;
+  V : byte;
+  Cs : TArrayOfColor32;
+  P : PColor32Array;
+begin
+  if AState = sdlStart then
+    B.FillRectTS(MakeRect(R), ClBlack32);
 
+  if AState = sdlFinish then
+  begin
+    if not assigned(UHotPressureColors) then
+      BuildHotPressureColors;
+    with MakeRect(R) do
+    for y := max(Top,0) to min(Bottom, B.Height) -1 do
+    begin
+      P := B.ScanLine[y];
+      for x := max(left,0) to min(right, B.Width) -1 do
+      begin
+        V := P[x] and $FF;
+        P^[x] := UHotPressureColors[V];
+      end;
+    end;
+
+    //debug
+    {B.StippleStep := 255/(B.Width-1);
+    B.SetStipple(UHotPressureColors);
+    B.StippleCounter := 0;
+    for y := 0 to B.Height div 8 do
+    begin
+      B.StippleCounter := 0;
+      B.LineFSP(0, y, B.Width-1, y);
+    end;}
+
+  end;
+
+  if AState = sdlLine then
+  begin
+    //DrawXRay(B, R, C, sdlLine);
+    //exit;//
+    with R do
+    begin
+      dx := right - left;
+      dy := bottom - top;
+      h := hypot(dx,dy);
+
+      if h = 0 then exit;
+
+      L := floor(h) div 2; //pixel hot
+      L := max(L, 3);
+      B.StippleStep := {4}(L-1)/h;
+      setlength(Cs,{5}L);
+      Cs[0] := $77FFFFFF; // calling EMMS each time after call to Lighten() to avoid "invalid floating operation" error
+      Cs[L-1] := Cs[0];
+      for i := 1 to L-2 do
+      begin
+        Cs[i] := 0;
+      end;
+
+
+      B.SetStipple(Cs);
+
+
+      B.StippleCounter := 0;
+      B.LineFSP(left, top, right, bottom);
+      //B.StippleCounter := 0;
+      //B.LineFSP(left, top, right, bottom);
+    end;
+  end;
+end;
+
+initialization
+  UHotPressureColors := nil;
 end.

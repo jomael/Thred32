@@ -13,6 +13,7 @@ object MainForm: TMainForm
   FormStyle = fsMDIForm
   OldCreateOrder = False
   Position = poDefault
+  OnActivate = FormActivate
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13

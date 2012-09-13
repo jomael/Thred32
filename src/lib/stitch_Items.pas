@@ -209,6 +209,7 @@ procedure TStitchCollection.LoadFromFile(const FileName: string);
 var
   Stream: TStream;
 begin
+  self.FileName := FileName;
   Stream := TFileStream.Create( ExpandFileName(FileName), fmOpenRead or fmShareDenyWrite);
   //Stream.Seek(0,soFromBeginning);
   try

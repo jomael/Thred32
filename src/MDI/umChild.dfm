@@ -73,6 +73,11 @@ object MDIChild: TMDIChild
         GroupIndex = 109
         RadioItem = True
       end
+      object HotPressure1: TMenuItem
+        Action = actHotPressure
+        AutoCheck = True
+        GroupIndex = 109
+      end
     end
   end
   object actlst1: TActionList
@@ -124,6 +129,14 @@ object MDIChild: TMDIChild
       Category = 'View'
       AutoCheck = True
       Caption = 'X-Ray'
+      GroupIndex = 12
+      OnExecute = QualityChanged
+    end
+    object actHotPressure: TAction
+      Tag = 7
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Hot Pressure'
       GroupIndex = 12
       OnExecute = QualityChanged
     end

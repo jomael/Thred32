@@ -122,7 +122,7 @@ end;
 
 procedure TDM.actFileSave1Update(Sender: TObject);
 begin
-  actFileSave1.Enabled := Mainform.ActiveMDIChild is TMDIChild;
+  TAction(sender).Enabled := Mainform.ActiveMDIChild is TMDIChild;
 end;
 
 procedure TDM.actFileSaveAs1Execute(Sender: TObject);
