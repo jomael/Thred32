@@ -3,10 +3,23 @@ unit umDm;
 interface
 
 uses
-  SysUtils, Classes, StdActns, ActnList, ImgList, Controls, Dialogs, Menus,
+  SysUtils, Classes, Graphics, StdActns, ActnList, ImgList, Controls, Dialogs, Menus,
   AppEvnts;
 
+  
+{$DEFINE DISABLED_IL}
+
 type
+
+  //subclassing fro draw Saturated image while draw disabled menu item.
+  {$IFDEF DISABLED_IL}
+  TImageList = class(Controls.TImageList)
+  protected
+    procedure DoDraw(Index: Integer; Canvas: TCanvas; X, Y: Integer;
+      Style: Cardinal; Enabled: Boolean = True); override;
+  end;
+  {$ENDIF}
+
   TDM = class(TDataModule)
     il1: TImageList;
     actlst1: TActionList;
@@ -50,14 +63,17 @@ type
     WindowArrangeItem: TMenuItem;
     Help1: TMenuItem;
     HelpAboutItem: TMenuItem;
-    appevents1: TApplicationEvents;
+    ilDisabled: TImageList;
+    il2: TImageList;
+    il3: TImageList;
     procedure actOpenStitchExecute(Sender: TObject);
     procedure actFileNew1Execute(Sender: TObject);
     procedure actHelpAbout1Execute(Sender: TObject);
     procedure actFileExit1Execute(Sender: TObject);
     procedure actFileSave1Execute(Sender: TObject);
-    procedure actFileSave1Update(Sender: TObject);
     procedure actFileSaveAs1Execute(Sender: TObject);
+    procedure actFileSaveAs1Update(Sender: TObject);
+    procedure actFileSave1Update(Sender: TObject);
   private
     { Private declarations }
   public
@@ -120,11 +136,6 @@ begin
 //    mnu_FILE_SAVE3Click(Sender); //SaveAs
 end;
 
-procedure TDM.actFileSave1Update(Sender: TObject);
-begin
-  TAction(sender).Enabled := Mainform.ActiveMDIChild is TMDIChild;
-end;
-
 procedure TDM.actFileSaveAs1Execute(Sender: TObject);
 var LStitchs : TStitchCollection;
 begin
@@ -140,5 +151,32 @@ begin
     Free;
   end;
 end;
+
+procedure TDM.actFileSaveAs1Update(Sender: TObject);
+begin
+  TAction(sender).Enabled := Mainform.ActiveMDIChild is TMDIChild;
+end;
+
+procedure TDM.actFileSave1Update(Sender: TObject);
+begin
+  TAction(sender).Enabled := (Mainform.ActiveMDIChild is TMDIChild) and
+    TMDIChild(Mainform.ActiveMDIChild).Modified ;
+end;
+
+{ TImageList }
+{$IFDEF DISABLED_IL}
+procedure TImageList.DoDraw(Index: Integer; Canvas: TCanvas; X, Y: Integer;
+  Style: Cardinal; Enabled: Boolean);
+begin
+  if Enabled {or (ColorDepth <> cd32Bit)} then
+    inherited
+  else
+    if self <> DM.il1 then
+      inherited
+    else
+      dm.il3.DoDraw(index, Canvas, X, Y, Style, True);
+
+end;
+{$ENDIF}
 
 end.

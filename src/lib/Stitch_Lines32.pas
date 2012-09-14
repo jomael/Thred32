@@ -188,7 +188,7 @@ begin
 
   if AState = sdlLine then
   with R do
-    B.LineFS(left, top, right, bottom, $40FFFFFF);
+    B.LineFS(left, top, right, bottom, $10FFFFFF);
 end;
 
 procedure DrawHotPressure(B: TBitmap32; R : TFloatRect; C : TColor32; AState: TSDLState);
@@ -200,10 +200,11 @@ var h, dx, dy : TFloat;
   P : PColor32Array;
 begin
   if AState = sdlStart then
-    B.FillRectTS(MakeRect(R), ClBlack32);
+    B.FillRectS(MakeRect(R), ClBlack32);
 
   if AState = sdlFinish then
   begin
+    exit;//debug
     if not assigned(UHotPressureColors) then
       BuildHotPressureColors;
     with MakeRect(R) do

@@ -1,6 +1,6 @@
 object MDIChild: TMDIChild
-  Left = 190
-  Top = 335
+  Left = 639
+  Top = 182
   Width = 594
   Height = 377
   Caption = 'MDI Child'
@@ -11,17 +11,24 @@ object MDIChild: TMDIChild
   OldCreateOrder = False
   Position = poDefault
   Visible = True
+  OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object pb: TPaintBox32
-    Left = 248
-    Top = 160
-    Width = 206
-    Height = 125
+  object imgStitchs: TImgView32
+    Left = 104
+    Top = 40
+    Width = 249
+    Height = 257
+    Bitmap.ResamplerClassName = 'TNearestResampler'
+    BitmapAlign = baTopLeft
+    Scale = 1.000000000000000000
+    ScaleMode = smScale
+    ScrollBars.ShowHandleGrip = True
+    ScrollBars.Style = rbsDefault
+    OverSize = 0
     TabOrder = 0
-    OnPaintBuffer = pbPaintBuffer
   end
   object mm1: TMainMenu
     AutoMerge = True
@@ -74,7 +81,16 @@ object MDIChild: TMDIChild
         RadioItem = True
       end
       object HotPressure1: TMenuItem
-        Action = actHotPressure
+        Action = actHotPerforated
+        AutoCheck = True
+        GroupIndex = 109
+      end
+      object N1: TMenuItem
+        Caption = '-'
+        GroupIndex = 109
+      end
+      object UseOrdinalColor1: TMenuItem
+        Action = actUseOrdinalColor
         AutoCheck = True
         GroupIndex = 109
       end
@@ -132,13 +148,23 @@ object MDIChild: TMDIChild
       GroupIndex = 12
       OnExecute = QualityChanged
     end
-    object actHotPressure: TAction
+    object actHotPerforated: TAction
       Tag = 7
       Category = 'View'
       AutoCheck = True
-      Caption = 'Hot Pressure'
+      Caption = 'Hot Perforated'
       GroupIndex = 12
       OnExecute = QualityChanged
     end
+    object actUseOrdinalColor: TAction
+      Category = 'View'
+      AutoCheck = True
+      Caption = 'Use Ordinal Color'
+      OnExecute = actUseOrdinalColorExecute
+    end
+  end
+  object swlCustom: TgmSwatchList
+    Left = 80
+    Top = 56
   end
 end

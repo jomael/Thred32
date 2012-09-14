@@ -5,7 +5,8 @@ uses
   umMain in 'umMain.pas' {MainForm},
   umChild in 'umChild.pas' {MDIChild},
   about in 'about.pas' {AboutBox},
-  umDm in 'umDm.pas' {DM: TDataModule};
+  umDm in 'umDm.pas' {DM: TDataModule},
+  gmIntegrator in '..\..\..\..\..\..\..\UI\GR32\GraphicsMagicPro\graphicsmagic\branches\GraphicsMagic_2_0_0\Source\Internal\Core\gmIntegrator.pas';
 
 {$R *.RES}
 
