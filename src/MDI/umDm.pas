@@ -3,7 +3,7 @@ unit umDm;
 interface
 
 uses
-  SysUtils, Classes, Graphics, StdActns, ActnList, ImgList, Controls, Dialogs, Menus,
+  SysUtils, Classes, Graphics, Forms, StdActns, ActnList, ImgList, Controls, Dialogs, Menus,
   AppEvnts;
 
   
@@ -22,7 +22,7 @@ type
 
   TDM = class(TDataModule)
     il1: TImageList;
-    actlst1: TActionList;
+    actlstStandard: TActionList;
     actFileNew1: TAction;
     actFileOpen1: TAction;
     FileClose1: TWindowClose;
@@ -54,7 +54,6 @@ type
     CopyItem: TMenuItem;
     PasteItem: TMenuItem;
     View1: TMenuItem;
-    oolbsr1: TMenuItem;
     Window1: TMenuItem;
     WindowCascadeItem: TMenuItem;
     WindowTileItem: TMenuItem;
@@ -66,6 +65,28 @@ type
     ilDisabled: TImageList;
     il2: TImageList;
     il3: TImageList;
+    actToolHand: TAction;
+    actToolZoom: TAction;
+    ool1: TMenuItem;
+    Hand1: TMenuItem;
+    Zoom1: TMenuItem;
+    ilQuality: TImageList;
+    actlstQuality: TActionList;
+    actDqSolid: TAction;
+    actDqPhoto: TAction;
+    actDqOutdoorPhoto: TAction;
+    actDqMountain: TAction;
+    actDqHotPerforated: TAction;
+    actDqXRay: TAction;
+    actDqWireframe: TAction;
+    actUseOrdinalColor: TAction;
+    actDqTogglePhoto: TAction;
+    Solid1: TMenuItem;
+    Photo1: TMenuItem;
+    HotPerforated1: TMenuItem;
+    Mountain1: TMenuItem;
+    XRay1: TMenuItem;
+    HotPerforated2: TMenuItem;
     procedure actOpenStitchExecute(Sender: TObject);
     procedure actFileNew1Execute(Sender: TObject);
     procedure actHelpAbout1Execute(Sender: TObject);
@@ -74,6 +95,12 @@ type
     procedure actFileSaveAs1Execute(Sender: TObject);
     procedure actFileSaveAs1Update(Sender: TObject);
     procedure actFileSave1Update(Sender: TObject);
+    procedure actToolHandExecute(Sender: TObject);
+    procedure actToolZoomExecute(Sender: TObject);
+    procedure actQualityChanged(Sender: TObject);
+    procedure actQualityUpdate(Sender: TObject);
+    procedure actUseOrdinalColorUpdate(Sender: TObject);
+    procedure DataModuleCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -86,8 +113,10 @@ var
 implementation
 
 uses
+  gmIntegrator, gmTool_Zoom,  gmTool_Hand, 
   gmSwatch_rwTHR, gmSwatch_rwACO, gmSwatch_rwSWA,
   Stitch_FileDlg, stitch_Items,
+  Thred_Constants,
   umChild, umMain, about;
 {$R *.dfm}
 
@@ -178,5 +207,60 @@ begin
 
 end;
 {$ENDIF}
+
+procedure TDM.actToolHandExecute(Sender: TObject);
+begin
+  TAction(sender).Checked := gmSelectTool(TgmtoolHand);
+end;
+
+procedure TDM.actToolZoomExecute(Sender: TObject);
+begin
+  TAction(sender).Checked := gmSelectTool(TgmtoolZoom);
+
+end;
+
+procedure TDM.actQualityChanged(Sender: TObject);
+var
+  LAction : TAction;
+begin
+  LAction := TAction(Sender);
+  with Application.MainForm do
+  begin
+    if Assigned(ActiveMDIChild) and (ActiveMDIChild is TMDIChild) then
+      TMDIChild(ActiveMDIChild).DrawQuality :=  LAction.Tag;
+
+    if (LAction <> actDqTogglePhoto) and (LAction.Tag in [DQINDOORPHOTO, DQOUTDOORPHOTO]) then
+    begin
+      actDqTogglePhoto.Assign(LAction);
+      actDqTogglePhoto.Tag := LAction.Tag;
+    end;
+  end;
+//  actQualityUpdate(LAction);
+end;
+
+procedure TDM.actQualityUpdate(Sender: TObject);
+begin
+  with Application.MainForm do
+  begin
+    TAction(Sender).Enabled := Assigned(ActiveMDIChild) and (ActiveMDIChild is TMDIChild);
+    TAction(Sender).Checked := TAction(Sender).Enabled and (TMDIChild(ActiveMDIChild).DrawQuality = TAction(Sender).Tag);
+  end;
+end;
+
+procedure TDM.actUseOrdinalColorUpdate(Sender: TObject);
+begin
+  with Application.MainForm do
+  begin
+    TAction(Sender).Enabled := Assigned(ActiveMDIChild) and (ActiveMDIChild is TMDIChild);
+    if actUseOrdinalColor.Enabled then
+      actUseOrdinalColor.Checked := TMDIChild(ActiveMDIChild).UseOrdinalColor;
+  end;
+end;
+
+procedure TDM.DataModuleCreate(Sender: TObject);
+begin
+  actDqTogglePhoto.Assign(actDqPhoto);
+  actDqTogglePhoto.Tag := actDqPhoto.Tag;
+end;
 
 end.

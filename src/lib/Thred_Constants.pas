@@ -4,6 +4,23 @@ interface
 
 
 const
+  DQWIREFRAME = 1;
+  DQBASICSOLID = 2;
+  DQINDOORPHOTO = 3;
+  DQOUTDOORPHOTO = 4;
+  DQMOUNTAIN = 5;
+  DQXRAY = 6;
+  DQVISITEDEMISSION = 7;
+
+  { 1 : FDrawLine := DrawWireFrame;
+    2 : FDrawLine := DrawLineFS;  //Solid
+    3 : FDrawLine := Draw3DLine;  //Photo
+    4 : FDrawLine := DrawLineStippled;//Outdoor Photo
+    5 : FDrawLine := DrawMountain;
+    6 : FDrawLine := DrawXRay;        //
+    7 : FDrawLine := DrawHotPressure;
+    }
+
 // compile switches (thred.h #1)
   //PESACT     = 0;		// compile pes code. we use PES in different approach.
 

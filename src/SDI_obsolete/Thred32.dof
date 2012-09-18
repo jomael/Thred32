@@ -138,14 +138,3 @@ Comments=
 c:\program files (x86)\borland\delphi7\Projects\Bpl\MWKToolPalette32_pkg.bpl=MWKToolPalette GR32 style by x2nie
 C:\Program Files (x86)\Borland\Delphi7\Bin\dclOffice2k70.bpl=Microsoft Office 2000 Sample Automation Server Wrapper Components
 c:\program files (x86)\borland\delphi7\Projects\Bpl\ip4000word2000vcl7.bpl=Woll2Woll InfoPower 4000 RichEdit for MSWord
-[HistoryLists\hlUnitAliases]
-Count=1
-Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
-[HistoryLists\hlSearchPath]
-Count=3
-Item0=..\shared;..\...\source\internal\DrawingTool;..\..\source\internal\DrawingTool
-Item1=..\shared;..\...\source\internal\DrawingTool
-Item2=..\shared
-[HistoryLists\hlOutputDirectorry]
-Count=1
-Item0=..\..\GraphicsMagic\bin
