@@ -4,7 +4,7 @@ interface
 
 uses
 { Standard }
-  Windows, Graphics,
+  Classes, Windows, Graphics,
   GR32,
 { Thred32 }
   Thred_Constants;
@@ -98,6 +98,7 @@ type
   end; //STRHED
 
   //thred v1.0 file header extension
+  PSTREX = ^TSTREX;
   TSTREX = packed record
     xhup,		//hoop size x dimension
     yhup,		//hoop size y dimension
@@ -356,7 +357,29 @@ type
     cres : Byte	//reserved
   end; //FRMHED;
 
-  TArrayOfTFRMHED = array of TFRMHED;
+  TArrayOfTFRMHED = array of TFRMHED; //used by stitchList
+  TArrayOfPFRMHED = array of PFRMHED; //used for multi-select drag
+
+  {TFRMHEDList = class(TList)
+  private
+    function GetItems(Index: Integer): TFRMHED;
+    procedure SetItems(Index: Integer; const Value: TFRMHED);
+  protected
+    //function GetItems(Index: Integer): TClass;
+    //procedure SetItems(Index: Integer; AClass: TClass);
+  public
+    function Add(AFRM: TFRMHED): Integer;
+    //function Extract(Item: TClass): TClass;
+    //function Remove(AClass: TClass): Integer;
+    //function IndexOf(AClass: TClass): Integer;
+    //function First: TClass;
+    //function Last: TClass;
+    //function Find(AClassName: string): TClass;
+    //procedure GetClassNames(Strings: TStrings);
+    //procedure Insert(Index: Integer; AClass: TClass);
+    property Items[Index: Integer]: TFRMHED read GetItems write SetItems; default;
+  end;}
+
 
   TRNGC = packed record  // thred.h #786
     strt : Cardinal;

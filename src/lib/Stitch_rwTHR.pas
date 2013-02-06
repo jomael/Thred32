@@ -38,7 +38,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics,
-  gmFileFormatList, Stitch_items ;
+  gmCore_rw, Stitch_items ;
 
 {$DEFINE LOADFORMS}
 
@@ -87,7 +87,7 @@ var
   sthed : TSTRHED;
   item  : TSHRTPNT;
   hedx : TSTREX;
-  LDesign : TStitchCollection;
+  LDesign : TStitchList;
   c : TColor;
   c16 : T16Colors;
   LColors : TArrayOfTColor;
@@ -259,7 +259,7 @@ var
   end;
 
 begin
-  LDesign := TStitchCollection(ACollection);
+  LDesign := TStitchList(ACollection.Owner);
   LDesign.Clear;
   
   //here we go!
@@ -678,7 +678,7 @@ var
   sthed : TSTRHED;
   item  : TSHRTPNT;
   hedx : TSTREX;
-  LDesign : TStitchCollection;
+  LDesign : TStitchList;
   c : TColor;
   c16 : T16Colors;
   LColors : TArrayOfTColor;
@@ -698,7 +698,7 @@ var
 
 begin
   
-  LDesign := TStitchCollection(ACollection);
+  LDesign := TStitchList(ACollection.Owner);
   //header 0
   FillChar(sthed, SizeOf(TSTRHED),0);
   with sthed do
@@ -848,6 +848,6 @@ begin
 end;
 
 initialization
-  TStitchCollection.RegisterConverterReader('THR','Thredwork',0, TStitchTHRConverter);
-  TStitchCollection.RegisterConverterWriter('THR','Thredwork',0, TStitchTHRConverter);
+  TStitchList.RegisterConverterReader('THR','Thredwork',0, TStitchTHRConverter);
+  TStitchList.RegisterConverterWriter('THR','Thredwork',0, TStitchTHRConverter);
 end.

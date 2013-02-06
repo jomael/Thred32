@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 478
-  Top = 164
+  Left = 333
+  Top = 175
   Width = 765
   Height = 530
   Caption = 'Thred32'
@@ -19,9 +19,17 @@ object MainForm: TMainForm
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
+  object spl1: TSplitter
+    Left = 0
+    Top = 383
+    Width = 757
+    Height = 3
+    Cursor = crVSplit
+    Align = alBottom
+  end
   object pnlStatusBar: TPanel
     Left = 0
-    Top = 478
+    Top = 475
     Width = 757
     Height = 25
     Align = alBottom
@@ -70,9 +78,9 @@ object MainForm: TMainForm
   end
   object pnlSidebar: TPanel
     Left = 0
-    Top = 50
+    Top = 76
     Width = 64
-    Height = 428
+    Height = 307
     Align = alLeft
     BevelOuter = bvNone
     TabOrder = 1
@@ -85,33 +93,12 @@ object MainForm: TMainForm
       BevelOuter = bvNone
       BorderWidth = 5
       TabOrder = 0
-      object tb2: TToolBar
-        Left = 5
-        Top = 5
-        Width = 54
-        Height = 24
-        AutoSize = True
-        Caption = 'tb2'
-        EdgeBorders = []
-        Images = DM.il1
-        TabOrder = 0
-        object btnToolHand: TToolButton
-          Left = 0
-          Top = 2
-          Action = DM.actToolHand
-        end
-        object btnToolZoom: TToolButton
-          Left = 23
-          Top = 2
-          Action = DM.actToolZoom
-        end
-      end
     end
     object pgscrlr1: TPageScroller
       Left = 0
       Top = 169
       Width = 64
-      Height = 259
+      Height = 138
       Align = alClient
       Control = pnl2
       Orientation = soVertical
@@ -120,7 +107,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 64
-        Height = 259
+        Height = 138
         Align = alLeft
         Alignment = taLeftJustify
         BevelOuter = bvNone
@@ -130,18 +117,25 @@ object MainForm: TMainForm
           Left = 30
           Top = 0
           Width = 32
-          Height = 259
+          Height = 138
           Align = alLeft
+          Bitmap.ResamplerClassName = 'TNearestResampler'
+          BitmapAlign = baCustom
           Color = clBtnFace
           ParentColor = False
-          SwatchList = swlCustom
-          ThumbWidth = 30
-          ThumbHeight = 20
           ParentShowHint = False
           Scale = 1.000000000000000000
           ScaleMode = smNormal
+          ScrollBars.ShowHandleGrip = True
+          ScrollBars.Style = rbsDefault
+          ScrollBars.Size = 16
+          ScrollBars.Visibility = svHidden
           ShowHint = True
+          OverSize = 0
           TabOrder = 0
+          SwatchList = swlCustom
+          ThumbWidth = 30
+          ThumbHeight = 20
           CellBorderStyle = borContrasGrid
           FrameColor = clSilver
         end
@@ -149,18 +143,25 @@ object MainForm: TMainForm
           Left = 0
           Top = 0
           Width = 30
-          Height = 259
+          Height = 138
           Align = alLeft
+          Bitmap.ResamplerClassName = 'TNearestResampler'
+          BitmapAlign = baCustom
           Color = clBtnFace
           ParentColor = False
-          SwatchList = swlDefault
-          ThumbWidth = 30
-          ThumbHeight = 20
           ParentShowHint = False
           Scale = 1.000000000000000000
           ScaleMode = smNormal
+          ScrollBars.ShowHandleGrip = True
+          ScrollBars.Style = rbsDefault
+          ScrollBars.Size = 16
+          ScrollBars.Visibility = svHidden
           ShowHint = True
+          OverSize = 0
           TabOrder = 1
+          SwatchList = swlDefault
+          ThumbWidth = 30
+          ThumbHeight = 20
           CellBorderStyle = borContrasGrid
           FrameColor = clSilver
         end
@@ -169,7 +170,7 @@ object MainForm: TMainForm
   end
   object rullerH: TgmRuller
     Left = 0
-    Top = 26
+    Top = 52
     Width = 757
     Height = 24
     Font.Charset = DEFAULT_CHARSET
@@ -191,9 +192,9 @@ object MainForm: TMainForm
   end
   object rullerV: TgmRuller
     Left = 64
-    Top = 50
+    Top = 76
     Width = 24
-    Height = 428
+    Height = 307
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -9
@@ -215,7 +216,7 @@ object MainForm: TMainForm
     Left = 0
     Top = 0
     Width = 757
-    Height = 26
+    Height = 52
     Align = alTop
     AutoSize = True
     BevelEdges = []
@@ -358,7 +359,7 @@ object MainForm: TMainForm
       end
     end
     object pnl1: TPanel
-      Left = 567
+      Left = 562
       Top = 2
       Width = 185
       Height = 22
@@ -367,6 +368,98 @@ object MainForm: TMainForm
       Caption = 'pnl1'
       TabOrder = 2
     end
+    object tb3: TToolBar
+      Left = 171
+      Top = 28
+      Width = 246
+      Height = 22
+      Caption = 'tb3'
+      EdgeBorders = []
+      Flat = True
+      Images = dmTool.il1
+      TabOrder = 3
+      object btnToolLineNew: TToolButton
+        Left = 0
+        Top = 0
+        Action = dmTool.actToolLineNew
+      end
+      object btnToolLineInsert: TToolButton
+        Left = 23
+        Top = 0
+        Action = dmTool.actToolLineInsert
+      end
+      object btnDqOutdoorPhoto: TToolButton
+        Left = 46
+        Top = 0
+        Action = dmTool.actToolLineEdit
+      end
+      object edVertex: TEdit
+        Left = 69
+        Top = 0
+        Width = 43
+        Height = 22
+        BorderStyle = bsNone
+        Ctl3D = True
+        ParentCtl3D = False
+        TabOrder = 0
+        Text = '5'
+      end
+    end
+    object tb2: TToolBar
+      Left = 11
+      Top = 28
+      Width = 147
+      Height = 22
+      Caption = 'tb2'
+      Color = clBtnFace
+      EdgeBorders = []
+      Flat = True
+      Images = dmTool.il1
+      ParentColor = False
+      TabOrder = 4
+      object btnToolSelect: TToolButton
+        Left = 0
+        Top = 0
+        Action = dmTool.actToolSelect
+      end
+      object btnToolHand: TToolButton
+        Left = 23
+        Top = 0
+        Action = dmTool.actToolLine
+      end
+      object btnToolStitch: TToolButton
+        Left = 46
+        Top = 0
+        Action = dmTool.actToolStitch
+      end
+      object btnToolZoom: TToolButton
+        Left = 69
+        Top = 0
+        Action = dmTool.actToolHand
+      end
+      object btnToolZoom1: TToolButton
+        Left = 92
+        Top = 0
+        Action = dmTool.actToolZoom
+      end
+    end
+  end
+  object mmo1: TMemo
+    Left = 0
+    Top = 386
+    Width = 757
+    Height = 89
+    Align = alBottom
+    Color = clBlack
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clLime
+    Font.Height = -11
+    Font.Name = 'Courier New'
+    Font.Style = []
+    Lines.Strings = (
+      'Debug Log:')
+    ParentFont = False
+    TabOrder = 5
   end
   object swlDefault: TgmSwatchList
     Left = 80
@@ -399,7 +492,7 @@ object MainForm: TMainForm
   object pmDqPhoto: TPopupMenu
     Images = DM.ilQuality
     Left = 328
-    Top = 72
+    Top = 112
     object Photo1: TMenuItem
       Action = DM.actDqPhoto
     end

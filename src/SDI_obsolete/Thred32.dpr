@@ -11,7 +11,7 @@ uses
   Stitch_rwTHR in '..\lib\Stitch_rwTHR.pas',
   Stitch_rwPES in '..\lib\Stitch_rwPES.pas',
   Stitch_Lines32 in '..\lib\Stitch_Lines32.pas',
-  Form_cpp in 'Form_cpp.pas',
+  Form_cpp in '..\lib\Form_cpp.pas',
   Stitch_rwDST in '..\lib\Stitch_rwDST.pas';
 
 {$R *.res}

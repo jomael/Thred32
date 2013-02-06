@@ -1,6 +1,6 @@
-object MDIChild: TMDIChild
-  Left = 337
-  Top = 343
+object fcDesign: TfcDesign
+  Left = 695
+  Top = 217
   Width = 594
   Height = 377
   Caption = 'MDI Child'
@@ -30,14 +30,15 @@ object MDIChild: TMDIChild
     Width = 209
     Height = 193
     Bitmap.ResamplerClassName = 'TKernelResampler'
-    Bitmap.Resampler.KernelClassName = 'TMitchellKernel'
-    Bitmap.Resampler.KernelMode = kmDynamic
+    Bitmap.Resampler.KernelClassName = 'TBoxKernel'
+    Bitmap.Resampler.KernelMode = kmTableLinear
     Bitmap.Resampler.TableSize = 32
     BitmapAlign = baCustom
     Scale = 1.000000000000000000
     ScaleMode = smScale
     ScrollBars.ShowHandleGrip = True
     ScrollBars.Style = rbsDefault
+    ScrollBars.Size = 16
     OverSize = 0
     TabOrder = 0
     TabStop = True

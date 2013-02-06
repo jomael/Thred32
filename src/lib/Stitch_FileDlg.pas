@@ -61,7 +61,7 @@ type
     function IsFilterStored: Boolean;
   protected
     //FScrollBox         : TScrollbox;
-    FStitchsList     : TStitchCollection;
+    FStitchsList     : TStitchList;
     //FStitchsListView : TStitchsListView;
 
     // polymorphism
@@ -109,7 +109,7 @@ constructor TOpenStitchsDialog.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
 
-  FStitchsList := TStitchCollection.Create(Self);
+  FStitchsList := TStitchList.Create(Self);
   Filter         := GetFilter();
 
   {FGridPanel := TPanel.Create(Self);

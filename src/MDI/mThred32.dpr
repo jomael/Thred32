@@ -3,12 +3,11 @@ program mThred32;
 uses
   Forms,
   umMain in 'umMain.pas' {MainForm},
-  umChild in 'umChild.pas' {MDIChild},
+  umChild in 'umChild.pas' {fcDesign},
   about in 'about.pas' {AboutBox},
   umDm in 'umDm.pas' {DM: TDataModule},
-  gmIntegrator in '..\..\..\..\..\..\..\UI\GR32\GraphicsMagicPro\graphicsmagic\branches\GraphicsMagic_2_0_0\Source\Internal\Core\gmIntegrator.pas',
-  gmCoreItems in '..\..\..\..\..\..\..\UI\GR32\GraphicsMagicPro\graphicsmagic\branches\GraphicsMagic_2_0_0\Source\Internal\Core\gmCoreItems.pas',
-  gmIntercept_GR32_Image in '..\lib\gmIntercept_GR32_Image.pas';
+  gmIntercept_GR32_Image in '..\lib\gmIntercept_GR32_Image.pas',
+  umDmTool in 'umDmTool.pas' {dmTool: TDataModule};
 
 {$R *.RES}
 
@@ -18,5 +17,6 @@ begin
   Application.CreateForm(TDM, DM);
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TAboutBox, AboutBox);
+  Application.CreateForm(TdmTool, dmTool);
   Application.Run;
 end.

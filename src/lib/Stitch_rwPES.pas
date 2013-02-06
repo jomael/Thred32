@@ -19,11 +19,6 @@ unit Stitch_rwPES;
  *
  * Contributor(s):
  *
- * Lab to RGB color conversion is using RGBCIEUtils.pas under mbColorLib library
- * developed by Marko Binic' marko_binic [at] yahoo [dot] com
- * or mbinic [at] gmail [dot] com.
- * forums : http://mxs.bergsoft.net/forums
- *
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -44,7 +39,7 @@ interface
 uses
   Classes, SysUtils, Graphics,
   GR32,
-  gmFileFormatList,
+  gmCore_rw,
   Stitch_items, Thred_Constants, Thred_Types ;
 
 type
@@ -56,7 +51,7 @@ type
     function ReadByte:Byte;
     function getPesDefaultColors: TArrayOfTColor;
     function ColorFromIndex(index: Integer): TColor;
-    procedure hupfn(ADesign: TStitchCollection; chkhuprct: TFloatRect);
+    procedure hupfn(ADesign: TStitchList; chkhuprct: TFloatRect);
   public
     constructor Create; override;
     procedure LoadFromStream(AStream: TStream; ACollection: TCollection); override;
@@ -92,7 +87,7 @@ var
   sthed : THED;
 //  item  : SHRTPNT;
   hedx : TSTREX;
-  LDesign : TStitchCollection;
+  LDesign : TStitchList;
   c : TColor;
   c16 : T16Colors;
   buf : array[0..17] of Char;
@@ -256,7 +251,7 @@ end;
 begin
 
   FStream := AStream;
-  LDesign := TStitchCollection(ACollection);
+  LDesign := TStitchList(ACollection.Owner);
   LDesign.Clear;
   SetLength(Lstchs,0);
   SetLength(useCol,0);
@@ -564,7 +559,7 @@ begin
 //#6046    #endif //endif IFDEF PESACT
 end;
 
-procedure TStitchPESConverter.hupfn(ADesign : TStitchCollection; chkhuprct: TFloatRect);
+procedure TStitchPESConverter.hupfn(ADesign : TStitchList; chkhuprct: TFloatRect);
 //#11687    void hupfn(){
 var
 //#11688
@@ -894,7 +889,7 @@ procedure TStitchPESConverter.SaveToStream(AStream: TStream;
     end;
 
 var
-  LDesign : TStitchCollection;
+  LDesign : TStitchList;
   peshed : TPESHED;
   ind,ine : cardinal;
   useCol : T16Colors;
@@ -905,7 +900,7 @@ begin
 //#6630
 //#6631            case AUXPES:
 //#6632
-  LDesign := TStitchCollection(ACollection);
+  LDesign := TStitchList(ACollection);
   for ind := 0 to 15 do
      UseCol[ind] := LDesign.Colors[ind];
 
@@ -1036,6 +1031,6 @@ begin
 end;
 
 initialization
-  TStitchCollection.RegisterConverterReader('PES','Brother',0, TStitchPESConverter);
+  TStitchList.RegisterConverterReader('PES','Brother',0, TStitchPESConverter);
 end.
 

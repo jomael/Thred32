@@ -2,20 +2,23 @@ unit umChild;
 
 interface
 
-uses Windows, Classes, Graphics, Forms, Controls, Messages, StdCtrls, SysUtils,
-  {GR32}
+uses
+  Windows, Classes, Graphics, Forms, Controls, Messages, StdCtrls, SysUtils,
+{GR32}
   GR32, GR32_Image, GR32_Layers,
-  {GraphicsMagic}
-  gmIntegrator, gmGridBased_List, gmSwatch_List,
+{GraphicsMagic}
+  gmIntegrator, //gmGridBased_List,
+  //gmSwatch_List,
   gmIntercept_GR32_Image,
-  {Thred32}
+{Thred32}
   Stitch_items, Stitch_rwTHR, Stitch_rwPCS, Stitch_rwPES,
   Stitch_Lines32,
 
-  Form_cpp, Menus, ActnList, ComCtrls, ToolWin, ExtCtrls ;
+  Form_cpp, Menus, ActnList, ComCtrls, ToolWin, ExtCtrls, gmCore_Items,
+  gmGridBased, gmSwatch ;
 
 type
-  TMDIChild = class(TForm)
+  TfcDesign = class(TForm)
     swlCustom: TgmSwatchList;
     imgStitchs: TImgView32;
     timerLazyLoad: TTimer;
@@ -34,14 +37,13 @@ type
       Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
   private
     { Private declarations }
-    FStitchs : TStitchCollection;
+    FStitchs : TStitchList;
     FDrawLine : TStitch_LineProc;
     FDrawQuality : Integer;
     FModified: boolean;
     FStitchLoaded : boolean;
     gmSource : TgmIntegratorSource;
     FUseOrdinalColor: boolean;
-    procedure DrawStitchs;
     procedure SetDrawQuality(const Value: Integer);
     procedure SetUseOrdinalColor(const Value: boolean);
   protected
@@ -53,8 +55,9 @@ type
 
   public
     { Public declarations }
+    procedure DrawStitchs;
     procedure LoadFromFile(const AFileName: string);
-    property Stitchs : TStitchCollection read FStitchs;
+    property Stitchs : TStitchList read FStitchs;
     property Modified : boolean read FModified;
     property DrawQuality : Integer read FDrawQuality write SetDrawQuality;// render func index
     property UseOrdinalColor : boolean read FUseOrdinalColor write SetUseOrdinalColor;    
@@ -67,7 +70,7 @@ procedure CreateMDIChild(const AFileName: string); //called by MainForm.
 
 implementation
 
-uses umMain, umDm, Thred_Constants, Thred_Defaults, Math;
+uses umMain, umDm, Thred_Constants, Thred_Defaults, Thred_Types, Math;
 
 {$R *.dfm}
 {$R VirtualTrees.res}
@@ -78,20 +81,27 @@ type
   
 procedure CreateMDIChild(const AFileName: string);
 var
-  Child: TMDIChild;
+  Child: TfcDesign;
 begin
   { create a new MDI child window }
-  Child := TMDIChild.Create(Application);
+  Child := TfcDesign.Create(Application);
   Child.Caption := AFileName;
   //if FileExists(AFileName) then Child.LoadFromFile(AFileName);
   if FileExists(AFileName) then
     Child.FStitchs.FileName := AFileName; // Lazy Loading. for avoid flicker / hang while first time visibled.
 end;
 
-procedure TMDIChild.FormCreate(Sender: TObject);
+procedure TfcDesign.FormCreate(Sender: TObject);
+var LSTREX : PSTREX;
 begin
-  FStitchs := TStitchCollection.Create(self);
+  FStitchs := TStitchList.Create(self);
   self.imgStitchs.Align := alClient;
+  LSTREX := @FStitchs.HeaderEx;
+  LSTREX.xhup := 400;
+  LSTREX.yhup := 400;
+  imgStitchs.Bitmap.SetSize(400,400);// hup size
+  imgStitchs.Bitmap.Clear(clWhite32);
+  
   FDrawLine := Draw3DLine;//DrawLineStippled;//DrawLineFS;
   FDrawQuality := DQINDOORPHOTO;
   gmSource := TgmIntegratorSource.Create(self);
@@ -99,13 +109,13 @@ begin
 
 end;
 
-procedure TMDIChild.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TfcDesign.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Action := caFree;
-  MainForm.ActiveChild := nil; //send signal to MDI form for ready reflect changes. such color swatch
+  TMainForm(Application.MainForm).ActiveChild := nil; //send signal to MDI form for ready reflect changes. such color swatch
 end;
 
-procedure TMDIChild.LoadFromFile(const AFileName: string);
+procedure TfcDesign.LoadFromFile(const AFileName: string);
 var
   i : integer;
 begin
@@ -117,15 +127,16 @@ begin
     swlCustom[i].Color := FStitchs.Colors[i];
   end;
   DrawStitchs();
-  imgStitchs.Show;
+  {imgStitchs.Show;
   lblLoading.Hide;
 
   if Application.MainForm.ActiveMDIChild = Self then
-    FormActivate(self); // send signal to MDI MainForm 
+    FormActivate(self); // send signal to MDI MainForm
+  }
 end;
 
 
-procedure TMDIChild.FormActivate(Sender: TObject);
+procedure TfcDesign.FormActivate(Sender: TObject);
 begin
   //send signal to MDI MainForm to reflect my (childform) properties; such colors swatch
   self.gmSource.Activate; //set ready to TgmTool
@@ -133,16 +144,16 @@ begin
     imgStitchs.SetFocus; //allow mouse wheel
 
   if Length(FStitchs.Stitchs) > 0 then
-    MainForm.ActiveChild := self;
+    TMainForm(Application.MainForm).ActiveChild := self;
 
 end;
 
-procedure TMDIChild.actUseOrdinalColorExecute(Sender: TObject);
+procedure TfcDesign.actUseOrdinalColorExecute(Sender: TObject);
 begin
   self.DrawStitchs;
 end;
 
-procedure TMDIChild.DrawStitchs;
+procedure TfcDesign.DrawStitchs;
 var i,j : Integer;
   zRat : TFloatPoint;
   ColorAt :Cardinal;
@@ -154,17 +165,18 @@ var i,j : Integer;
 begin
 
   //We will do painting while there is something to draw.
-  if Length(FStitchs.Stitchs) = 0 then exit;
+  //if Length(FStitchs.Stitchs) = 0 then exit;   But, we might have a new form.
 
   LastColor := clNone;
 
-  zRat.X := (imgStitchs.Width / FStitchs.HeaderEx.xhup );
+  {zRat.X := (imgStitchs.Width / FStitchs.HeaderEx.xhup );
   zRat.Y := (imgStitchs.Height / FStitchs.HeaderEx.yhup );
 
   if zRat.X < zRat.Y then
     zRat.Y := zRat.X
   else
     zRat.X := zRat.Y;
+  }
   zRat.x := 1; //debug
   zRat.Y := 1; //debug
 
@@ -222,7 +234,8 @@ begin
       //FORMS
       Bitmap.PenColor:= clTrRed32;
       if length(FStitchs.Forms) > 0 then
-      for i := 0 to FStitchs.Header.fpnt -1 do
+      //for i := 0 to FStitchs.Header.fpnt -1 do
+      for i := 0 to Length(FStitchs.Forms) -1 do
       begin
         if length(FStitchs.Forms[i].flt) = 0 then continue;
 
@@ -261,46 +274,57 @@ begin
 
 end;
 
-procedure TMDIChild.WMEnterSizeMove(var Msg: TMessage);
+procedure TfcDesign.WMEnterSizeMove(var Msg: TMessage);
 begin
   //code here
   inherited;
 end;
 
-procedure TMDIChild.WMExitSizeMove(var Msg: TMessage);
+procedure TfcDesign.WMExitSizeMove(var Msg: TMessage);
 begin
   //code here
-  MainForm.RullersRedraw;
+  TMainForm(Application.MainForm).RullersRedraw;
   inherited
 end;
 
-procedure TMDIChild.WMPosChanging(var Msg: TMessage);
+procedure TfcDesign.WMPosChanging(var Msg: TMessage);
 begin
   //code here
-  MainForm.RullersRedraw;
+  TMainForm(Application.MainForm).RullersRedraw;
   inherited;
 end;
 
   
-procedure TMDIChild.imgStitchsScroll(Sender: TObject);
+procedure TfcDesign.imgStitchsScroll(Sender: TObject);
 begin
-  MainForm.RullersRedraw;
+  TMainForm(Application.MainForm).RullersRedraw;
   //caption := format('%d, %d',[TImgView32Access(imgStitchs).HScroll.Range, TImgView32Access(imgStitchs).VScroll.Range]);
 end;
 
-procedure TMDIChild.timerLazyLoadTimer(Sender: TObject);
+procedure TfcDesign.timerLazyLoadTimer(Sender: TObject);
 begin
   if not (csLoading in self.ComponentState) and self.Visible and not FStitchLoaded then
   begin
     timerLazyLoad.Enabled := False;
     FStitchLoaded := True;
     if FStitchs.FileName <> '' then
-    self.LoadFromFile(FStitchs.FileName);
+    begin
+      self.LoadFromFile(FStitchs.FileName);
+    end
+    else
+    begin
+      
+    end;
+    imgStitchs.Show;
+    lblLoading.Hide;
+
+    if Application.MainForm.ActiveMDIChild = Self then
+      FormActivate(self); // send signal to MDI MainForm
   end;
 
 end;
 
-procedure TMDIChild.SetDrawQuality(const Value: Integer);
+procedure TfcDesign.SetDrawQuality(const Value: Integer);
 begin
   if FDrawQuality <> Value then
   begin
@@ -321,7 +345,7 @@ begin
 
 end;
 
-procedure TMDIChild.SetUseOrdinalColor(const Value: boolean);
+procedure TfcDesign.SetUseOrdinalColor(const Value: boolean);
 begin
   if FUseOrdinalColor <> Value then
   begin
@@ -330,7 +354,7 @@ begin
   end;
 end;
 
-procedure TMDIChild.FormMouseWheelDown(Sender: TObject; Shift: TShiftState;
+procedure TfcDesign.FormMouseWheelDown(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 begin
   if [ssShift, ssAlt] * Shift <> [] then //modifiered?
@@ -339,7 +363,7 @@ begin
     imgStitchs.Scroll(0, 16) //end;
 end;
 
-procedure TMDIChild.FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
+procedure TfcDesign.FormMouseWheelUp(Sender: TObject; Shift: TShiftState;
   MousePos: TPoint; var Handled: Boolean);
 begin
   if [ssShift, ssAlt] * Shift <> [] then //modifiered?
@@ -348,7 +372,7 @@ begin
     imgStitchs.Scroll(0, -16) //end;
 end;
 
-procedure TMDIChild.imgStitchsMouseDown(Sender: TObject;
+procedure TfcDesign.imgStitchsMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer;
   Layer: TCustomLayer);
 begin

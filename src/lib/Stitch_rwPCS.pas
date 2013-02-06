@@ -42,7 +42,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics,
-  gmFileFormatList, Stitch_items;
+  gmCore_rw, Stitch_items;
 
 type
   TStitchPCSConverter = class(TgmConverter)
@@ -85,7 +85,7 @@ var
   hedx : TSTREX;
   stchs  : TArrayOfTSHRTPNT;
   LColors : tarrayoftcolor;
-  LDesign : TStitchCollection;
+  LDesign : TStitchList;
   c : TColor;
   c16 : T16Colors;
   buf : array[0..17] of Char;
@@ -94,7 +94,7 @@ var
   colch : array of TCOLCHNG;
   strct : TFloatRect;
 begin
-  LDesign := TStitchCollection(ACollection);
+  LDesign := TStitchList(ACollection.Owner);
   LDesign.Clear;
   strct := FloatRect(makerect(0,0,0,0));
 
@@ -299,5 +299,5 @@ begin
 end;
 
 initialization
-  TStitchCollection.RegisterConverterReader('PCS','Thredwork',0, TStitchPCSConverter);
+  TStitchList.RegisterConverterReader('PCS','Thredwork',0, TStitchPCSConverter);
 end.

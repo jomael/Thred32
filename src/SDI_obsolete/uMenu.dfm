@@ -17,7 +17,7 @@ object Form2: TForm2
   object pnl1: TPanel
     Left = 0
     Top = 0
-    Width = 918
+    Width = 922
     Height = 41
     Align = alTop
     Caption = 'pnl1'
@@ -35,9 +35,9 @@ object Form2: TForm2
   object pc1: TPageControl
     Left = 0
     Top = 41
-    Width = 918
-    Height = 384
-    ActivePage = tab3
+    Width = 922
+    Height = 392
+    ActivePage = tab1
     Align = alClient
     TabOrder = 1
     object tab1: TTabSheet
@@ -45,13 +45,13 @@ object Form2: TForm2
       object spl1: TSplitter
         Left = 497
         Top = 0
-        Height = 356
+        Height = 364
       end
       object lst1: TListBox
         Left = 0
         Top = 0
         Width = 497
-        Height = 356
+        Height = 364
         Align = alLeft
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -550,8 +550,8 @@ object Form2: TForm2
       object lst2: TListBox
         Left = 500
         Top = 0
-        Width = 410
-        Height = 356
+        Width = 414
+        Height = 364
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -569,8 +569,8 @@ object Form2: TForm2
       object mmoDfm: TMemo
         Left = 0
         Top = 0
-        Width = 910
-        Height = 356
+        Width = 914
+        Height = 364
         Align = alClient
         Lines.Strings = (
           'mmoDfm')
@@ -584,8 +584,8 @@ object Form2: TForm2
       object mmoInterface: TMemo
         Left = 0
         Top = 0
-        Width = 910
-        Height = 356
+        Width = 914
+        Height = 364
         Align = alClient
         Lines.Strings = (
           'mmoDfm')

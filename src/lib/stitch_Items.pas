@@ -1,5 +1,4 @@
 unit Stitch_items;
-{unit gmGridBased}
 
 (* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/LGPL 2.1/GPL 2.0
@@ -39,21 +38,42 @@ uses
 { Standard }
   Types, Classes, SysUtils, Graphics,
 { Graphics32 }
-  GR32, GR32_LowLevel,
+  GR32, GR32_LowLevel, GR32_Polygons, GR32_PolygonsEx,
 { Graphics Magic }  
-  gmFileFormatList, gmCoreItems,
+  gmCore_rw, gmCore_Items, gmShape,
   Thred_Constants, Thred_Types;
 
-type
+type    //TStitchItem
+  {//form types enum
+	LIN   =1;
+	POLI  =2;
+	RPOLI =3;
+	STAR  =4;
+	SPIR  =5;
+	SAT   =6;
+	HART  =7;
+	LENS  =8;
+	EGG   =9;
+	TEAR  =10;
+	ZIG   =11;
+	WAV   =12;
+	DASY  =13;}
+  TStitchFormType = (ftNone, ftLine, ftPolygon, ftRegularPolygon, ftStar,
+    ftSpiral, ftSatin, ftHearth, ftLens, ftEgg, ftTear, ftZigzag, ftWave,
+    ftDaisy);
+
   TStitchItem = class(TgmCoreItem)
   private
+//    FFormType: TStitchFormType;
   protected
   public
+//    property FormType : TStitchFormType read FFormType write FFormType;
+    //property PolyPolygon : PArrayOfgmShapeInfo read GetPolyPolygon;
   published
   end;
 
 
-  TStitchCollection = class(TgmCoreCollection)
+  TStitchList = class(TgmCoreList)
   private
     FHeader: TSTRHED;
     FBName: string;
@@ -65,10 +85,16 @@ type
     FStitchs: TArrayOfTSHRTPNT;
     FHeaderEx: TSTREX;
   protected
+    class function GetItemClass : TCollectionItemClass; override;
+  
   public
     constructor Create(AOwner: TComponent); override;
     class function GetFileReaders : TgmFileFormatsList; override;
     class function GetFileWriters : TgmFileFormatsList; override;
+
+
+    function AddForm : PFRMHED;
+    function GetNearestForm(P : TFloatPoint) : PFRMHED;
 
     property Header : TSTRHED read FHeader write FHeader;
     property HeaderEx : TSTREX read FHeaderEx write FHeaderEx;
@@ -84,7 +110,8 @@ type
 
 implementation
 
-//uses
+uses
+  Math;
   //gmMiscFuncs;
 
 var
@@ -92,12 +119,23 @@ var
 
 { TStitchCollection }
 
-constructor TStitchCollection.Create(AOwner: TComponent);
+
+function TStitchList.AddForm: PFRMHED;
+var
+  L : Integer;
 begin
-  Create(AOwner,TStitchItem);
+  L := Length(FForms);
+  SetLength(FForms, L + 1);
+  Result := @fforms[L];
 end;
 
-class function TStitchCollection.GetFileReaders: TgmFileFormatsList;
+constructor TStitchList.Create(AOwner: TComponent);
+begin
+  inherited;
+  FBgColor := clWhite32;
+end;
+
+class function TStitchList.GetFileReaders: TgmFileFormatsList;
 begin
  if not Assigned(UStitchsReaders) then
   begin
@@ -107,7 +145,7 @@ begin
   Result := UStitchsReaders;
 end;
 
-class function TStitchCollection.GetFileWriters: TgmFileFormatsList;
+class function TStitchList.GetFileWriters: TgmFileFormatsList;
 begin
   if not Assigned(UStitchsWriters) then
   begin
@@ -117,6 +155,39 @@ begin
   Result := UStitchsWriters;
 end;
 
+
+class function TStitchList.GetItemClass: TCollectionItemClass;
+begin
+  Result := TStitchItem;
+end;
+
+function TStitchList.GetNearestForm(P: TFloatPoint): PFRMHED;
+const
+  T = 4;
+var i,j : Integer;
+  LForm : TFRMHED;
+  z : Double;
+begin
+  Result := nil;
+  for i := High(FForms) downto Low(FForms) do
+  begin
+    LForm := FForms[i];
+    for j := 0 to Length(LForm.flt)-1  do
+    begin
+      with P do
+        z := Hypot(x - LForm.flt[j].X, Y - LForm.flt[j].y );
+      if z < T then
+      begin
+        Result := @FForms[i];
+        Break;
+      end;
+    end;
+
+    if Result <> nil then
+      Break;
+  end;
+
+end;
 
 end.
 

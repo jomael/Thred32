@@ -6,16 +6,18 @@ uses Windows, SysUtils, Classes, Graphics, Forms, Controls, Menus,
   StdCtrls, Dialogs, Buttons, Messages, ExtCtrls, ComCtrls, StdActns,
   ActnList, ToolWin, ImgList, //XPMan,
   
-  {Graphics32}
+{Graphics32}
   GR32_Image, GR32_RangeBars,
 
-  {Graphics Magic}
-  gmRuller, gmGridBased_ListView,  gmSwatch_ListView, gmGridBased_List, gmSwatch_List,
+{Graphics Magic}
+  gmRuller, //gmGridBased_ListView,
+  gmSwatch_ListView, //gmGridBased_List, gmSwatch_List,
   Thred_Types, Thred_Constants, Thred_Defaults, AppEvnts,
 
-  {This project units}
+{This project units}
   umDM{should be put after Controls in USES.INTEFACE. need to subclassing the disabled menuitem},
-  umChild;
+  umChild, gmCore_Items, gmGridBased, gmSwatch, gmCore_Viewer,
+  gmGridBased_ListView;
 
 type
   TMainForm = class(TForm)
@@ -54,9 +56,6 @@ type
     tbChildren: TToolBar;
     btnSolid: TToolButton;
     pnl1: TPanel;
-    tb2: TToolBar;
-    btnToolHand: TToolButton;
-    btnToolZoom: TToolButton;
     btnPhoto: TToolButton;
     btnMountain: TToolButton;
     btnXRay: TToolButton;
@@ -67,6 +66,19 @@ type
     pmDqPhoto: TPopupMenu;
     Photo1: TMenuItem;
     OutdoorPhoto1: TMenuItem;
+    tb3: TToolBar;
+    btnToolLineNew: TToolButton;
+    btnToolLineInsert: TToolButton;
+    edVertex: TEdit;
+    mmo1: TMemo;
+    tb2: TToolBar;
+    btnToolStitch: TToolButton;
+    btnToolZoom: TToolButton;
+    btnToolHand: TToolButton;
+    btnToolZoom1: TToolButton;
+    btnDqOutdoorPhoto: TToolButton;
+    spl1: TSplitter;
+    btnToolSelect: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure appevents1Hint(Sender: TObject);
@@ -76,14 +88,16 @@ type
   private
     { Private declarations }
     FParamsLoaded : boolean;
-    function GetActiveChild: TMDIChild;
-    procedure SetActiveChild(const Value: TMDIChild);
+    FIdentLog : Integer;
+    function GetActiveChild: TfcDesign;
+    procedure SetActiveChild(const Value: TfcDesign);
+    procedure DebugLog(Sender : TObject; const Msg : string; Ident : Integer);
     //FIni : TThredIniFile;
   public
     { Public declarations }
     //procedure ChildMoved(AChild : TMDIChild); rullerRedraw!
     procedure RullersRedraw;
-    property ActiveChild : TMDIChild read GetActiveChild write SetActiveChild; //special purpose. it able to set as nil value!
+    property ActiveChild : TfcDesign read GetActiveChild write SetActiveChild; //special purpose. it able to set as nil value!
   end;
 
 var
@@ -93,11 +107,15 @@ implementation
 
 {$R *.dfm}
 
-uses about,
+uses
+  //StrUtils,
+  about,
   GR32_Polygons,
   gmIntegrator, 
-  gmSwatch_rwTHR, gmSwatch_rwACO, gmSwatch_rwSWA,
-  Stitch_FileDlg;
+  gmSwatch_rwTHR, //gmSwatch_rwACO,
+  gmSwatch_rwSWA,
+  Stitch_FileDlg,
+  umDmTool;
 
 
 
@@ -112,7 +130,7 @@ begin
 
   // add TMainMenu to this form.
   self.Menu := dm.mm1;
-  self.WindowMenu := dm.Window1;
+  self.WindowMenu := dm.mnhdWindow;
 
   //correct the most left drawn ruller.
   rullerH.ZeroPixel := pnlTools.Width + rullerV.Width;
@@ -136,8 +154,10 @@ begin
 
   swaCustom.Changed;
   swaDefault.Changed;
-    
 
+  //INTEGRATOR
+  ActiveIntegrator.OnDebugLog := self.DebugLog;  
+  Caption := 'Aloha!';
 end;
 
 procedure TMainForm.FormActivate(Sender: TObject);
@@ -165,17 +185,17 @@ end;
 
 
 
-function TMainForm.GetActiveChild: TMDIChild;
+function TMainForm.GetActiveChild: TfcDesign;
 begin
-  result := TMDIChild(self.ActiveMDIChild); //property create by borland. perhap nil.
-  if assigned(result) and not (result is TMDIChild) then //make sure correct type.
+  result := TfcDesign(self.ActiveMDIChild); //property create by borland. perhap nil.
+  if assigned(result) and not (result is TfcDesign) then //make sure correct type.
     result := nil;
 end;
 
 type
   TToolBarAccess = class(TToolBar) end;
   
-procedure TMainForm.SetActiveChild(const Value: TMDIChild);
+procedure TMainForm.SetActiveChild(const Value: TfcDesign);
 var i : integer;
 begin
   if Value = nil then
@@ -265,6 +285,22 @@ begin
     end;
   end;
 {$ENDIF}
+end;
+
+procedure TMainForm.DebugLog(Sender: TObject; const Msg: string; Ident : integer);
+var space : string;
+begin
+  if Ident < 0 then
+    Inc(FIdentLog, Ident);
+
+  space := '';
+  while Length(space) < FIdentLog do
+    space := space + '   ';
+
+  mmo1.Lines.Add(Format('@%s %s : %s',[ FormatDateTime('HH:mm:ss.zzz',now), space + Sender.ClassName, msg]) );
+  
+  if Ident > 0 then
+    Inc(FIdentLog, Ident);
 end;
 
 end.

@@ -4,7 +4,7 @@ interface
 
 uses
   SysUtils, Classes, Graphics, Forms, StdActns, ActnList, ImgList, Controls, Dialogs, Menus,
-  AppEvnts;
+  AppEvnts, TBXGraphics;
 
   
 {$DEFINE DISABLED_IL}
@@ -54,7 +54,7 @@ type
     CopyItem: TMenuItem;
     PasteItem: TMenuItem;
     View1: TMenuItem;
-    Window1: TMenuItem;
+    mnhdWindow: TMenuItem;
     WindowCascadeItem: TMenuItem;
     WindowTileItem: TMenuItem;
     WindowTileItem2: TMenuItem;
@@ -65,8 +65,6 @@ type
     ilDisabled: TImageList;
     il2: TImageList;
     il3: TImageList;
-    actToolHand: TAction;
-    actToolZoom: TAction;
     ool1: TMenuItem;
     Hand1: TMenuItem;
     Zoom1: TMenuItem;
@@ -87,6 +85,9 @@ type
     Mountain1: TMenuItem;
     XRay1: TMenuItem;
     HotPerforated2: TMenuItem;
+    tbxilImageList1: TTBXImageList;
+    il1TBX: TImageList;
+    il4: TImageList;
     procedure actOpenStitchExecute(Sender: TObject);
     procedure actFileNew1Execute(Sender: TObject);
     procedure actHelpAbout1Execute(Sender: TObject);
@@ -95,8 +96,6 @@ type
     procedure actFileSaveAs1Execute(Sender: TObject);
     procedure actFileSaveAs1Update(Sender: TObject);
     procedure actFileSave1Update(Sender: TObject);
-    procedure actToolHandExecute(Sender: TObject);
-    procedure actToolZoomExecute(Sender: TObject);
     procedure actQualityChanged(Sender: TObject);
     procedure actQualityUpdate(Sender: TObject);
     procedure actUseOrdinalColorUpdate(Sender: TObject);
@@ -114,10 +113,11 @@ implementation
 
 uses
   gmIntegrator, gmTool_Zoom,  gmTool_Hand, 
-  gmSwatch_rwTHR, gmSwatch_rwACO, gmSwatch_rwSWA,
+  //gmSwatch_rwTHR, gmSwatch_rwACO, gmSwatch_rwSWA,
   Stitch_FileDlg, stitch_Items,
   Thred_Constants,
-  umChild, umMain, about;
+  umChild, umMain,
+  about;
 {$R *.dfm}
 
 procedure TDM.actOpenStitchExecute(Sender: TObject);
@@ -139,7 +139,7 @@ end;
 
 procedure TDM.actFileNew1Execute(Sender: TObject);
 begin
-  CreateMDIChild('NONAME' + IntToStr(MainForm.MDIChildCount + 1));
+  CreateMDIChild('NONAME' + IntToStr(Application.MainForm.MDIChildCount + 1));
 end;
 
 procedure TDM.actHelpAbout1Execute(Sender: TObject);
@@ -149,14 +149,14 @@ end;
 
 procedure TDM.actFileExit1Execute(Sender: TObject);
 begin
-  MainForm.Close;
+  Application.MainForm.Close;
 end;
 
 procedure TDM.actFileSave1Execute(Sender: TObject);
-var LStitchs : TStitchCollection;
+var LStitchs : TStitchList;
 begin
-  assert(assigned(Mainform.ActiveMDIChild));// error should happen in programming level.
-  LStitchs := TMDIChild(Mainform.ActiveMDIChild).Stitchs;
+  assert(assigned(Application.Mainform.ActiveMDIChild));// error should happen in programming level.
+  LStitchs := TfcDesign(Application.MainForm.ActiveMDIChild).Stitchs;
   if LStitchs.FileName <> '' then
   begin
     LStitchs.SaveToFile(LStitchs.FileName);
@@ -166,11 +166,11 @@ begin
 end;
 
 procedure TDM.actFileSaveAs1Execute(Sender: TObject);
-var LStitchs : TStitchCollection;
+var LStitchs : TStitchList;
 begin
-  assert(assigned(Mainform.ActiveMDIChild));// error should happen in programming level.
+  assert(assigned(Application.Mainform.ActiveMDIChild));// error should happen in programming level.
   
-  LStitchs := TMDIChild(Mainform.ActiveMDIChild).Stitchs;
+  LStitchs := TfcDesign(Application.MainForm.ActiveMDIChild).Stitchs;
   with TSaveStitchsDialog.Create(Self) do
   begin
     if Execute then
@@ -183,13 +183,13 @@ end;
 
 procedure TDM.actFileSaveAs1Update(Sender: TObject);
 begin
-  TAction(sender).Enabled := Mainform.ActiveMDIChild is TMDIChild;
+  TAction(sender).Enabled := Application.Mainform.ActiveMDIChild is TfcDesign;
 end;
 
 procedure TDM.actFileSave1Update(Sender: TObject);
 begin
-  TAction(sender).Enabled := (Mainform.ActiveMDIChild is TMDIChild) and
-    TMDIChild(Mainform.ActiveMDIChild).Modified ;
+  TAction(sender).Enabled := (Application.Mainform.ActiveMDIChild is TfcDesign) and
+    TfcDesign(Application.Mainform.ActiveMDIChild).Modified ;
 end;
 
 { TImageList }
@@ -203,21 +203,13 @@ begin
     if self <> DM.il1 then
       inherited
     else
-      dm.il3.DoDraw(index, Canvas, X, Y, Style, True);
+      if Application.MainForm.ClassType = TMainForm then //dont custom draw in TBX
+        dm.il3.DoDraw(index, Canvas, X, Y, Style, True)
+      else
+        inherited;
 
 end;
 {$ENDIF}
-
-procedure TDM.actToolHandExecute(Sender: TObject);
-begin
-  TAction(sender).Checked := gmSelectTool(TgmtoolHand);
-end;
-
-procedure TDM.actToolZoomExecute(Sender: TObject);
-begin
-  TAction(sender).Checked := gmSelectTool(TgmtoolZoom);
-
-end;
 
 procedure TDM.actQualityChanged(Sender: TObject);
 var
@@ -226,8 +218,8 @@ begin
   LAction := TAction(Sender);
   with Application.MainForm do
   begin
-    if Assigned(ActiveMDIChild) and (ActiveMDIChild is TMDIChild) then
-      TMDIChild(ActiveMDIChild).DrawQuality :=  LAction.Tag;
+    if Assigned(ActiveMDIChild) and (ActiveMDIChild is TfcDesign) then
+      TfcDesign(ActiveMDIChild).DrawQuality :=  LAction.Tag;
 
     if (LAction <> actDqTogglePhoto) and (LAction.Tag in [DQINDOORPHOTO, DQOUTDOORPHOTO]) then
     begin
@@ -242,8 +234,8 @@ procedure TDM.actQualityUpdate(Sender: TObject);
 begin
   with Application.MainForm do
   begin
-    TAction(Sender).Enabled := Assigned(ActiveMDIChild) and (ActiveMDIChild is TMDIChild);
-    TAction(Sender).Checked := TAction(Sender).Enabled and (TMDIChild(ActiveMDIChild).DrawQuality = TAction(Sender).Tag);
+    TAction(Sender).Enabled := Assigned(ActiveMDIChild) and (ActiveMDIChild is TfcDesign);
+    TAction(Sender).Checked := TAction(Sender).Enabled and (TfcDesign(ActiveMDIChild).DrawQuality = TAction(Sender).Tag);
   end;
 end;
 
@@ -251,9 +243,9 @@ procedure TDM.actUseOrdinalColorUpdate(Sender: TObject);
 begin
   with Application.MainForm do
   begin
-    TAction(Sender).Enabled := Assigned(ActiveMDIChild) and (ActiveMDIChild is TMDIChild);
+    TAction(Sender).Enabled := Assigned(ActiveMDIChild) and (ActiveMDIChild is TfcDesign);
     if actUseOrdinalColor.Enabled then
-      actUseOrdinalColor.Checked := TMDIChild(ActiveMDIChild).UseOrdinalColor;
+      actUseOrdinalColor.Checked := TfcDesign(ActiveMDIChild).UseOrdinalColor;
   end;
 end;
 

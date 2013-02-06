@@ -37,7 +37,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics,
-  gmFileFormatList, gmSwatch;
+  gmCore_rw, gmSwatch;
 
 type
 
@@ -77,11 +77,11 @@ var
   c16 : T16Colors;
   buf : array[0..17] of Char;
 
-  LCollection : TgmSwatchCollection;
+//  LCollection : TgmSwatchCollection;
 begin
-  LCollection := TgmSwatchCollection(ACollection);
+  //LCollection := TgmSwatchCollection(ACollection);
 
-  LCollection.Clear;
+  ACollection.Clear;
   
   //here we go!
   //validation of stream is already done.
@@ -211,7 +211,7 @@ begin
   AStream.Read(c16[0], 64);
   //LCollection.Colors := c16;
   for i := 0 to 15 do
-    LCollection.Add.Color := c16[i];
+    TgmSwatchItem( ACollection.Add).Color := c16[i];
 
 
 //#5796                        ReadFile(hFil,(COLORREF*)custCol,64,&red,0);
@@ -224,7 +224,7 @@ begin
   AStream.Read(c16, 64);
   //LCollection.CustomColors := c16;
   for i := 0 to 15 do
-    LCollection.Add.Color := c16[i];
+    TgmSwatchItem(ACollection.Add).Color := c16[i];
 
 end;
 
@@ -254,7 +254,7 @@ end;
 
 initialization
   //TStitchCollection.RegisterConverterReader('THR','Thredwork',0, TStitchTHRConverter);
-  TgmSwatchCollection.RegisterConverterReader('THR','Thredwork',0, TStitchTHRConverter);
+  TgmSwatchList.RegisterConverterReader('THR','Thredwork',0, TStitchTHRConverter);
 //  TgmSwatchCollection.RegisterConverterWriter('SWA','GraphicsMagic Color Swatch',0, TgmSwaConverter);
 
 end.

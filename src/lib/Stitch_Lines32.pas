@@ -152,7 +152,7 @@ begin
     Cs[1] := C;//Lighten(C, 11);
     Cs[2] := Lighten(C, 151);
     Cs[3] := C;//Lighten(C, 11);
-    Cs[4] := Lighten(C, - 64);
+    Cs[4] := Lighten(C, - 64); EMMS;
     B.SetStipple(Cs);
 
 
@@ -182,7 +182,7 @@ begin
     //B.StippleCounter := 0;
     B.StippleStep := 4/h;
     setlength(Cs,5);
-    Cs[0] := clBlack32;//$0fffffff and Lighten(C, - 64); EMMS; // calling EMMS each time after call to Lighten() to avoid "invalid floating operation" error
+    Cs[0] := $0fffffff and Lighten(C, - 64); EMMS; // calling EMMS each time after call to Lighten() to avoid "invalid floating operation" error
     Cs[1] := C;//Lighten(C, 11);
     Cs[2] := Lighten(C, 90); EMMS;
     Cs[3] := C;//Lighten(C, 11);
