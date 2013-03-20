@@ -39,7 +39,8 @@ uses
   GR32, GR32_LowLevel, GR32_Polygons, GR32_PolygonsEx,
 { Graphics Magic }  
   gmCore_rw, gmCore_Items, gmShape,
-  Thred_Constants, Thred_Types;
+  Thred_Constants,
+  Thred_Types;
 
 type
 
@@ -100,9 +101,9 @@ type
 
 //    FFormType: TStitchFormType;
   protected
-    procedure ResetFill; override;
     //procedure SetCollection(const Value: TEmbroideryList); reintroduce;
   public
+    procedure ResetFill; override;
     procedure Move(dx,dy:TFloat); override;
 
 //    property FormType : TStitchFormType read FFormType write FFormType;
@@ -116,18 +117,35 @@ type
 
 
   TEmbroideryList = class(TgmShapeList)
+  // each instance of this manage a single file, therefore manage a Single MDIChild editor. 
   private
+    FHupSize : TFloatPoint;
     FCustomColors: TArrayOfTColor;
     FColors: TArrayOfTColor;
     FStitchs: TArrayOfTSHRTPNT2;
     FBgColor: TColor;
     FIni: PThredIniFile;
+    FDesignerName: string;
+    FThreadSize: T16Byte;
     function GetItem(Index: TgmCoreIndex): TEmbroideryItem;
     procedure SetItem(Index: TgmCoreIndex; const Value: TEmbroideryItem);
+    function GetHup(const Index: Integer): TFloat;
+    procedure SetHup(const Index: Integer; const Value: TFloat);
   protected
     class function GetItemClass : TCollectionItemClass; override;
 
   public
+    constructor Create(AOwner: TComponent); override;
+  
+    class function GetFileReaders : TgmFileFormatsList; override;
+    class function GetFileWriters : TgmFileFormatsList; override;
+
+    property HupWidth : TFloat index 0 read GetHup write SetHup;
+    property HupHeight : TFloat index 1 read GetHup write SetHup;
+    property HupSize : TFloatPoint read FHupSize write FHupSize;
+
+    property DesignerName : string read FDesignerName write FDesignerName;
+    property ThreadSize : T16Byte read FThreadSize write FThreadSize;
     property BgColor : TColor read FBgColor write FBgColor;
     property Colors : TArrayOfTColor read FColors write FColors;
     property CustomColors : TArrayOfTColor read FCustomColors write FCustomColors;
@@ -140,9 +158,54 @@ type
   
 implementation
 
+uses
+  Embroidery_Defaults;
+
+
+{ unit }
+var
+  UEmbroideryReaders, UEmbroideryWriters : TgmFileFormatsList;
+
+
 { TEmbroideryList }
 
 
+constructor TEmbroideryList.Create(AOwner: TComponent);
+begin
+  inherited;
+  FHupSize := FloatPoint(LHUPX, LHUPY);
+  SetLength(FColors,16);
+  Move(defCol[0], FColors[0], 4 * 16);
+end;
+
+class function TEmbroideryList.GetFileReaders: TgmFileFormatsList;
+begin
+ if not Assigned(UEmbroideryReaders) then
+  begin
+    UEmbroideryReaders := TgmFileFormatsList.Create;
+  end;
+
+  Result := UEmbroideryReaders;
+end;
+
+class function TEmbroideryList.GetFileWriters: TgmFileFormatsList;
+begin
+  if not Assigned(UEmbroideryWriters) then
+  begin
+    UEmbroideryWriters := TgmFileFormatsList.Create;
+  end;
+
+  Result := UEmbroideryWriters;
+end;
+
+function TEmbroideryList.GetHup(const Index: Integer): TFloat;
+begin
+  Result := 0;
+  case Index of
+    0 : Result := FHupSize.X;
+    1 : Result := FHupSize.Y;
+  end;
+end;
 
 function TEmbroideryList.GetItem(Index: TgmCoreIndex): TEmbroideryItem;
 begin
@@ -154,6 +217,15 @@ begin
   Result := TEmbroideryItem;
 end;
 
+
+procedure TEmbroideryList.SetHup(const Index: Integer;
+  const Value: TFloat);
+begin
+  case Index of
+    0 : FHupSize.X := Value;
+    1 : FHupSize.Y := Value;
+  end;
+end;
 
 procedure TEmbroideryList.SetItem(Index: TgmCoreIndex;
   const Value: TEmbroideryItem);

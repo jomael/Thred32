@@ -357,7 +357,7 @@ type
     emin: Single;	//minimum border stitch length
     dhx : TTFHED;	//feather/texture info
     strt,	//fill strt point
-    endp : Word;	//fill end point {end}
+    {end} endp : Word;	//fill end point 
     uspac,//underlay spacing
     ulen,	//underlay stitch length
     uang,	//underlay stitch angle

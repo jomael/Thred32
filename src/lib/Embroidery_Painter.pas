@@ -64,6 +64,43 @@ type
     class procedure PaintLine(B: TBitmap32; ALine : TStitchLine; AColor: TColor32); override;
   end;
 
+
+  TEmbroideryOutDoorPhotoPainter = class(TEmbroideryPainter)
+  protected
+    class procedure PaintLine(B: TBitmap32; ALine : TStitchLine; AColor: TColor32); override;
+  end;
+
+
+  TEmbroideryHotPressurePainter = class(TEmbroideryPainter)
+  protected
+    class procedure PaintLine(B: TBitmap32; ALine : TStitchLine; AColor: TColor32); override;
+  public
+    class procedure BeginPaint(B: TBitmap32); override;
+    class procedure EndPaint(B: TBitmap32); override;
+  end;
+
+
+  TEmbroideryMountainPainter = class(TEmbroideryPainter)
+  protected
+    class procedure PaintLine(B: TBitmap32; ALine : TStitchLine; AColor: TColor32); override;
+  public
+    class procedure BeginPaint(B: TBitmap32); override;
+    class procedure EndPaint(B: TBitmap32); override;
+  end;
+
+
+  TEmbroideryXRayPainter = class(TEmbroideryPainter)
+  protected
+    class procedure PaintLine(B: TBitmap32; ALine : TStitchLine; AColor: TColor32); override;
+  public
+    class procedure BeginPaint(B: TBitmap32); override;
+  end;
+
+
+
+  //----------------- BELOW ARE DEBUG PAINTERS:
+  // ----------------not attended for production ----------------
+
   TEmbroideryByLinPainter = class(TEmbroideryPainter)
   private
     class procedure PaintShapeBy(B: TBitmap32; AnItem: TEmbroideryItem; Tag : Integer); 
@@ -99,7 +136,76 @@ uses
   GR32_Blend,
   Embroidery_Defaults;
 
+const
+  VERTICES = 10;
+  LEdgeColors : array[0..VERTICES-1] of TColor32 = (clYellow32, clLime32, clAqua32, clBlueViolet32, clFuchsia32, clred32,
+      clGray32, clLightGray32, clblack32,  clDarkOrange32);
+  TRA = clTrWhite32;
 
+var
+  UHotPressureColors,
+  UMountainColors : TArrayOfColor32;
+
+{ Unit procs }
+function Line2FloatRect(ALine: TStitchLine): TFloatRect;
+begin
+  Result.TopLeft := ALine.Start.Point;
+  Result.BottomRight := ALine.Finish.Point;
+end;
+
+procedure BuildHotPressureColors;
+var B: TBitmap32;
+  i : integer;
+begin
+  B := TBitmap32.Create;
+  B.SetSize(256,1); //1 horizontal line
+  B.StippleStep := 4/255;
+  setlength(UHotPressureColors,5);
+  UHotPressureColors[0] := Color32($350c0a); //dark violet
+  UHotPressureColors[1] := Color32($981992); 
+  UHotPressureColors[2] := Color32($4d56d6); //orange
+  UHotPressureColors[3] := clYellow32; 
+  UHotPressureColors[4] := clWhite32; //
+
+  B.SetStipple(UHotPressureColors);
+  B.StippleCounter := 0;
+  B.LineFSP(0,0,255,0);
+
+  setlength(UHotPressureColors,256);
+  for i := 0 to 255 do
+  begin
+    UHotPressureColors[i] := b.PixelS[i,0];
+  end;
+  B.Free;
+end;
+
+procedure BuildMountainColors;
+var B: TBitmap32;
+  i : integer;
+begin
+  B := TBitmap32.Create;
+  B.SetSize(256,1); //1 horizontal line
+  B.StippleStep := 3/255;
+  setlength(UMountainColors,4);
+  UMountainColors[0] := clGreen32;// clNavy32;//Color32(clGreen); //dark violet
+  UMountainColors[1] := BlendReg(clLime32, clGreen32); EMMS;// Color32(clLime); //fuchsia
+  UMountainColors[2] := clYellow32; //Color32($17b0f3); //
+  UMountainColors[3] := Color32($4d56d6); //orange
+
+
+  B.SetStipple(UMountainColors);
+  B.StippleCounter := 0;
+  B.LineFSP(0,0,255,0);
+
+  setlength(UMountainColors,256);
+  for i := 0 to 255 do
+  begin
+    UMountainColors[i] := b.PixelS[i,0];
+  end;
+  UMountainColors[0] := clNavy32;
+  B.Free;
+end;
+  
 { TEmbroideryPainter }
 
 class procedure TEmbroideryPainter.BeginPaint(B: TBitmap32);
@@ -138,6 +244,7 @@ var
   CurrentColor,
   LastColor :TColor32;
   R : TStitchLine;
+  zoomRatio : TFloatPoint;
 begin
   //STITCH
   //PArrayOfStitchPoint(LStitchs) := LShapeItem.Stitchs;
@@ -145,6 +252,14 @@ begin
   LStitchs := AnItem.Stitchs^;
   LastColor := $01000000;
 
+  zoomRatio.X := ( B.Width / LShapeList.HupWidth );
+  zoomRatio.Y := ( B.Height / LShapeList.HupHeight );
+
+  if zoomRatio.X < zoomRatio.Y then
+    zoomRatio.Y := zoomRatio.X
+  else
+    zoomRatio.X := zoomRatio.Y;
+      
   for i := 0 to High(LStitchs) do
   begin
     // Bitmap.PenColor:= clBlack32;
@@ -155,9 +270,9 @@ begin
         LColorI := at and $0F;
 
       //if UseOrdinalColor then
-        CurrentColor := Color32( defCol[ LColorI ] );
+        //CurrentColor := Color32( defCol[ LColorI ] );
       //else}
-        //CurrentColor := Color32( LShapeList.Colors[ LColorI ] );
+        CurrentColor := Color32( LShapeList.Colors[ LColorI ] );
 
       if i = 0 then
       begin
@@ -227,16 +342,45 @@ begin
   
 end;
 
+
+{ TEmbroideryOutDoorPhotoPainter }
+
+class procedure TEmbroideryOutDoorPhotoPainter.PaintLine(B: TBitmap32;
+  ALine: TStitchLine; AColor: TColor32);
+var h, x, y : TFloat;
+  Cs : TArrayOfColor32;  
+begin
+  with Line2FloatRect(ALine) do
+  begin
+    x := right - left;
+    y := bottom - top;
+    h := hypot(x,y);
+
+    if h = 0 then exit;
+
+    //B.StippleCounter := 0;
+    B.StippleStep := 4/h;
+    setlength(Cs,5);
+    Cs[0] := Lighten(AColor, - 64);
+    Cs[1] := AColor;//Lighten(C, 11);
+    Cs[2] := Lighten(AColor, 151);
+    Cs[3] := AColor;//Lighten(C, 11);
+    Cs[4] := Lighten(AColor, - 64); EMMS;
+    B.SetStipple(Cs);
+
+
+    B.StippleCounter := 0;
+    B.LineFSP(left, top, right, bottom);
+    B.StippleCounter := 0;
+    B.LineFSP(left, top, right, bottom);
+  end;
+
+end;
+
 { TEmbroideryByLinPainter }
 
 class procedure TEmbroideryByLinPainter.PaintShapeBy(B: TBitmap32;
   AnItem: TEmbroideryItem; Tag: Integer);
-const
-  VERTICES = 10;
-  LEdgeColors : array[0..VERTICES-1] of TColor32 = (clYellow32, clLime32, clAqua32, clBlueViolet32, clFuchsia32, clred32,
-      clGray32, clLightGray32, clblack32,  clDarkOrange32);
-  TRA = clTrWhite32;
-
 var
   LBarCount, 
   w,x,y,i,j : Integer;
@@ -464,4 +608,204 @@ begin
   PaintShapeBy(B, AnItem, 5);
 end;
 
+{ TEmbroideryHotPressurePainter }
+
+class procedure TEmbroideryHotPressurePainter.BeginPaint(B: TBitmap32);
+begin
+  //B.FillRectS(MakeRect(R), ClBlack32);
+  B.Clear(clBlack32);
+end;
+
+class procedure TEmbroideryHotPressurePainter.EndPaint(B: TBitmap32);
+var
+  R : TRect;
+//BEST FOR LOOKING THE MOST VISITED POINT
+var h, dx, dy : TFloat;
+  L,i,X,Y : integer;
+  V : byte;
+  Cs : TArrayOfColor32;
+  P : PColor32Array;
+begin
+  R := B.BoundsRect;
+//exit;//debug
+    if not assigned(UHotPressureColors) then
+      BuildHotPressureColors;
+    with R do
+    for y := max(Top,0) to min(Bottom, B.Height) -1 do
+    begin
+      P := B.ScanLine[y];
+      for x := max(left,0) to min(right, B.Width) -1 do
+      begin
+        V := P[x] and $FF;
+        P^[x] := UHotPressureColors[V];
+      end;
+    end;
+
+    //debug
+    {B.StippleStep := 255/(B.Width-1);
+    B.SetStipple(UHotPressureColors);
+    B.StippleCounter := 0;
+    for y := 0 to B.Height div 8 do
+    begin
+      B.StippleCounter := 0;
+      B.LineFSP(0, y, B.Width-1, y);
+    end;}
+end;
+
+class procedure TEmbroideryHotPressurePainter.PaintLine(B: TBitmap32;
+  ALine: TStitchLine; AColor: TColor32);
+//BEST FOR LOOKING THE MOST VISITED POINT
+var h, dx, dy : TFloat;
+  L,i,X,Y : integer;
+  V : byte;
+  Cs : TArrayOfColor32;
+  P : PColor32Array;
+  R : TFloatRect;
+begin
+
+  R := Line2FloatRect(ALine);
+
+
+
+
+
+    //DrawXRay(B, R, C, sdlLine);
+    //exit;//
+    with R do
+    begin
+      dx := right - left;
+      dy := bottom - top;
+      h := hypot(dx,dy);
+
+      if h = 0 then exit;
+
+      L := floor(h) div 2; //pixel hot
+      L := max(L, 3);
+      B.StippleStep := {4}(L-1)/h;
+      setlength(Cs,{5}L);
+      Cs[0] := $77FFFFFF; // calling EMMS each time after call to Lighten() to avoid "invalid floating operation" error
+      Cs[L-1] := Cs[0];
+      for i := 1 to L-2 do
+      begin
+        Cs[i] := 0;
+      end;
+
+
+      B.SetStipple(Cs);
+
+
+      B.StippleCounter := 0;
+      B.LineFSP(left, top, right, bottom);
+      //B.StippleCounter := 0;
+      //B.LineFSP(left, top, right, bottom);
+    end;
+
+end;
+
+{ TEmbroideryMountainPainter }
+
+class procedure TEmbroideryMountainPainter.BeginPaint(B: TBitmap32);
+begin
+  B.Clear(ClBlack32);
+
+end;
+
+class procedure TEmbroideryMountainPainter.EndPaint(B: TBitmap32);
+var h, dx, dy : TFloat;
+  L,i,X,Y : integer;
+  P : PColor32Array;
+  V : byte;
+begin
+  if not assigned(UMountainColors) then
+      BuildMountainColors;
+    with B.BoundsRect do
+    for y := max(Top,0) to min(Bottom, B.Height) -1 do
+    begin
+      P := B.ScanLine[y];
+      for x := max(left,0) to min(right, B.Width) -1 do
+      begin
+        V := P[x] and $FF;
+        P^[x] := UMountainColors[V];
+      end;
+    end;
+
+    //debug
+    {B.StippleStep := 255/(B.Width-1);
+    B.SetStipple(UHotPressureColors);
+    B.StippleCounter := 0;
+    for y := 0 to B.Height div 8 do
+    begin
+      B.StippleCounter := 0;
+      B.LineFSP(0, y, B.Width-1, y);
+    end;}
+
+end;
+
+class procedure TEmbroideryMountainPainter.PaintLine(B: TBitmap32;
+  ALine: TStitchLine; AColor: TColor32);
+//BEST FOR LOOKING THE MOST OVERLAPED ZONE
+var h, dx, dy : TFloat;
+  L,i,X,Y : integer;
+  V : byte;
+  Cs : TArrayOfColor32;
+  P : PColor32Array;
+begin  
+//DrawXRay(B, R, C, sdlLine);
+    //exit;//
+    
+    with Line2FloatRect(ALine) do
+    begin
+      dx := right - left;
+      dy := bottom - top;
+      h := hypot(dx,dy);
+
+      if h = 0 then exit;
+
+      L := floor(h) div 3; //pixel hot
+      L := max(L, 3); //atleast pixels
+      B.StippleStep := {4}(L-1)/h;
+      setlength(Cs,{5}L);
+      Cs[0] := clBlack32; // calling EMMS each time after call to Lighten() to avoid "invalid floating operation" error
+      Cs[L-1] := Cs[0];
+      for i := 1 to L-2 do
+      begin
+        Cs[i] := $22FFFFFF;
+      end;
+
+
+      B.SetStipple(Cs);
+
+
+      B.StippleCounter := 0;
+      B.LineFSP(left, top, right, bottom);
+      //B.StippleCounter := 0;
+      //B.LineFSP(left, top, right, bottom);
+    end;
+
+end;
+
+{ TEmbroideryXRayPainter }
+
+class procedure TEmbroideryXRayPainter.BeginPaint(B: TBitmap32);
+begin
+  B.Clear(clBlack32);
+
+end;
+
+class procedure TEmbroideryXRayPainter.PaintLine(B: TBitmap32;
+  ALine: TStitchLine; AColor: TColor32);
+begin
+  with Line2FloatRect(ALine) do
+    B.LineFS(left, top, right, bottom, $10FFFFFF, True);
+
+end;
+
+
+
+initialization
+  UHotPressureColors := nil;
+  UMountainColors := nil;
+finalization
+  UHotPressureColors := nil;
+  UMountainColors := nil;
 end.

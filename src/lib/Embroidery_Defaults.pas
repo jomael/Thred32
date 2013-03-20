@@ -3,7 +3,7 @@ unit Embroidery_Defaults; {to avoid error: "curcilar refence" between Constants.
 interface
 
 uses
-  Thred_Types, Thred_Constants;
+  GR32, Thred_Types, Thred_Constants;
 
 const
 
@@ -157,5 +157,11 @@ const
     2054	//49
   );
 implementation
+
+function Colors32Of16(): Integer ;
+begin
+
+end;
+
 
 end.

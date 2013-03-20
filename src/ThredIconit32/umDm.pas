@@ -124,7 +124,7 @@ uses
   umDmTool, gmTool_Shape,
   gmIntegrator, gmTool_Zoom,  gmTool_Hand, 
   gmSwatch_rwTHR, //gmSwatch_rwACO, gmSwatch_rwSWA,
-  Stitch_FileDlg, stitch_Items,
+  Stitch_FileDlg, gmCore_FileDlg {universal FileDlg}, Embroidery_Viewer, stitch_Items,
   Thred_Constants,
   
   umChild, umMain,
@@ -134,9 +134,12 @@ uses
 procedure TDM.actOpenStitchExecute(Sender: TObject);
 var i : Integer;
 begin
-  with TOpenStitchsDialog.Create(Self) do
+
+  //with TOpenStitchsDialog.Create(Self) do
   //with TOpenDialog.Create(self) do
+  with TgmOpenDialog.Create(Self) do
   begin
+    ViewerClassName := TgmEmbroideryViewer.ClassName;
     Options := Options + [ofAllowMultiSelect];
     if Execute then
       for i := 0 to Files.Count -1  do

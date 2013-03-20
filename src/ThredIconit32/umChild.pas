@@ -11,8 +11,9 @@ uses
   //gmSwatch_List,
   gmIntercept_GR32_Image,
 {Thred32}
-  Embroidery_Items, Embroidery_Painter, Embroidery_Lines32,
-  Stitch_items, Stitch_rwTHR, Stitch_rwPCS, Stitch_rwPES,
+  Embroidery_Items, Embroidery_Painter,
+  Stitch_items, //Stitch_rwTHR, Stitch_rwPCS, Stitch_rwPES,
+  Embroidery_rwTHR,
 
   Menus, ActnList, ComCtrls, ToolWin, ExtCtrls, gmCore_Items,
   gmGridBased, gmSwatch, gmShape ;
@@ -47,7 +48,7 @@ type
     FStitchLoaded : boolean;
     gmSource : TgmIntegratorSource;
     FUseOrdinalColor: boolean;
-    FDrawLine : TEmbroidery_LineProc;
+    //FDrawLine : TEmbroidery_LineProc;
     FPainter  : TEmbroideryPainterClass;
     
     //FSelections : TArrayOfArrayOfInteger;// TArrayOfPArrayOfgmShapeInfo;
@@ -111,7 +112,8 @@ uses
   GR32_VectorUtils, //VPR
   {$ENDIF}
 
-  Thred_Defaults, Thred_Constants,
+  Thred_Constants,
+  Embroidery_Lines32, Embroidery_Defaults {Thred_Defaults} ,
   umMain, umDm, umDmFill, Math;
 
 {$R *.dfm}
@@ -183,8 +185,9 @@ var
   i : integer;
 begin
 ///
-{  FStitchs.LoadFromFile(AFileName);
-  for i := 0 to High(FStitchs.Colors) do
+//  FStitchs.LoadFromFile(AFileName);
+  FShapeList.LoadFromFile(AFileName);
+{  for i := 0 to High(FStitchs.Colors) do
   begin
     if swlCustom.Count < i +1 then
       swlCustom.Add;
@@ -360,14 +363,16 @@ begin
 
   LastColor := clNone;
 
-  {zRat.X := (imgStitchs.Width / FStitchs.HeaderEx.xhup );
-  zRat.Y := (imgStitchs.Height / FStitchs.HeaderEx.yhup );
+  imgStitchs.Bitmap.SetSize(Ceil(ShapeList.HupWidth), Ceil(ShapeList.HupHeight));
+
+  zRat.X := ( imgStitchs.Width / ShapeList.HupWidth );
+  zRat.Y := ( imgStitchs.Height / ShapeList.HupHeight );
 
   if zRat.X < zRat.Y then
     zRat.Y := zRat.X
   else
     zRat.X := zRat.Y;
-  }
+
   zRat.x := 1; //debug
   zRat.Y := 1; //debug
 
@@ -461,6 +466,8 @@ begin
         }
       end;//for
 
+      FPainter.EndPaint(Bitmap);
+
       //if FSelectedIndex >= 0 then
         LDrawSelection();
 
@@ -515,15 +522,15 @@ begin
     timerLazyLoad.Enabled := False;
     FStitchLoaded := True;
 ////
-{    if FStitchs.FileName <> '' then
+    if FShapeList.FileName <> '' then
     begin
-      self.LoadFromFile(FStitchs.FileName);
+      self.LoadFromFile(FShapeList.FileName);
     end
     else
     begin
 
     end;
-}    
+
     imgStitchs.Show;
     lblLoading.Hide;
 
@@ -540,13 +547,13 @@ begin
     FDrawQuality := Value;
     //it is modified by my own (childform) render quality menu.
     case Value of
-      1 : FDrawLine := DrawWireFrame;
-      2 : FPainter := TEmbroideryPainter;  //Solid
-      3 : FPainter := TEmbroideryPhotoPainter;  //Photo
-      4 : FDrawLine := DrawLineStippled;//Outdoor Photo
-      5 : FDrawLine := DrawMountain;
-      6 : FDrawLine := DrawXRay;        //
-      7 : FDrawLine := DrawHotPressure;
+      //1 : FDrawLine := DrawWireFrame;
+      2 : FPainter  := TEmbroideryPainter;  //Solid
+      3 : FPainter  := TEmbroideryPhotoPainter;  //Photo
+      4 : FPainter  := TEmbroideryOutDoorPhotoPainter;//Outdoor Photo
+      5 : FPainter  := TEmbroideryMountainPainter;
+      6 : FPainter  := TEmbroideryXRayPainter;        //
+      7 : FPainter  := TEmbroideryHotPressurePainter;
       8 : FPainter  := TEmbroideryByLinPainter;
       9 : FPainter  := TEmbroideryByGrpPainter;
       10 : FPainter  := TEmbroideryByRegionPainter ;

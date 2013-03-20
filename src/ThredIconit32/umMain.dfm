@@ -1,9 +1,9 @@
 object MainForm: TMainForm
-  Left = 334
-  Top = 178
+  Left = 356
+  Top = 372
   Width = 860
   Height = 530
-  Caption = 'Iconit32'
+  Caption = 'Thred-32'
   Color = clAppWorkSpace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clBlack

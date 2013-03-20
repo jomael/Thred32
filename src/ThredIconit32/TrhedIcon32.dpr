@@ -10,7 +10,9 @@ uses
   Embroidery_Items in '..\lib\Embroidery_Items.pas',
   umDmFill in 'umDmFill.pas' {dmFill: TDataModule},
   Embroidery_Lines32 in '..\lib\Embroidery_Lines32.pas',
-  Embroidery_Painter in '..\lib\Embroidery_Painter.pas';
+  Embroidery_Painter in '..\lib\Embroidery_Painter.pas',
+  Embroidery_rwTHR in '..\lib\Embroidery_rwTHR.pas',
+  Embroidery_Viewer in '..\lib\Embroidery_Viewer.pas';
 
 {$R *.RES}
 

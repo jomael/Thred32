@@ -176,7 +176,6 @@ procedure TdmTool.actToolLineAfterMouseUp(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer;
   Layer: TCustomLayer);
 var
-  LForm : PgmShapeInfo;
   //LPoints : TArrayOfFloatPoint;
   LToolLine : TgmtoolShape;
 begin
