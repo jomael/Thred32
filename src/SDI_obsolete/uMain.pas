@@ -11,7 +11,7 @@ uses
   ComCtrls, {JvExComCtrls, JvPageScroller,} ExtCtrls,
   gmGridBased_FileDlg,
   gmSwatch_FileDlgs, gmGridBased_List, gmSwatch_List, gmGridBased_ListView,
-  gmSwatch_ListView;
+  gmSwatch_ListView, gmCore_Items, gmGridBased, gmSwatch, gmCore_Viewer;
 
 type
   TfrmMain = class(TForm)
@@ -297,6 +297,8 @@ type
     procedure mnu_FORMClick(Sender: TObject);
     procedure mnu_FILL_VERTClick(Sender: TObject);
     procedure mnu_VRTCLPClick(Sender: TObject);
+    procedure mnu_FILL_HORClick(Sender: TObject);
+    procedure mnu_HORCLPClick(Sender: TObject);
   private
     filnam : TFileName;
     FIni: TThredIniFile;
@@ -20379,7 +20381,7 @@ begin
 //#19887                            unpsel();                                               
 //#19888                            pselrng.strt=clofine;                                               
 //#19889                            pselrng.cnt=1;                                               
-//#19890                            rstMap(PSELDIR);                                               
+//#19890                            rstMap(PSELDIR);
 //#19891                            setpsel();                                               
 //#19892                        }
 //#19893                        else{                                                   
@@ -20408,7 +20410,7 @@ begin
 //#19916                    if(GetKeyState(VK_CONTROL)&0X8000)                                                       
 //#19917                        nudgfn(-ini.nudg,0);                                                   
 //#19918                    else{                                                       
-//#19919                                                                           
+//#19919
 //#19920                        if(chkMap(LENSRCH)){
 //#19921                                                                           
 //#19922                            shorter();                                               
@@ -20553,7 +20555,7 @@ end;
 //#20059            case ID_SETSIZ:                                                               
 //#20060                                                                           
 //#20061                nudsiz();                                                           
-//#20062                break;                                                           
+//#20062                break;
 //#20063                                                                           
 //#20064            case ID_TXFIL:                                                               
 //#20065                                                                           
@@ -20582,7 +20584,7 @@ end;
 //#20088                                                                           
 //#20089            case ID_MAXBLEN:                                                               
 //#20090                                                                           
-//#20091                setbmax();                                                           
+//#20091                setbmax();
 //#20092                break;                                                           
 //#20093                                                                           
 //#20094            case ID_MINBLEN:                                                               
@@ -20611,7 +20613,7 @@ end;
 //#20117                break;                                                           
 //#20118
 //#20119            case ID_SETUCOL:                                                               
-//#20120                                                                           
+//#20120
 //#20121                setucol();                                                           
 //#20122                break;                                                           
 //#20123                                                                           
@@ -20640,7 +20642,7 @@ end;
 //#20146                uspac();                                                           
 //#20147                break;                                                           
 //#20148                                                                           
-//#20149            case ID_UNDLEN:                                                               
+//#20149            case ID_UNDLEN:
 //#20150                                                                           
 //#20151                undlen();                                                           
 //#20152                break;                                                           
@@ -20698,7 +20700,7 @@ end;
 //#20204            case ID_UANG:                                                               
 //#20205                                                                           
 //#20206                setuang();                                                           
-//#20207                break;                                                           
+//#20207                break;
 //#20208                                                                           
 //#20209            case ID_USTCH:                                                               
 //#20210                                                                           
@@ -20727,7 +20729,7 @@ end;
 //#20233                                                                           
 //#20234            case ID_2FTHR:                                                               
 //#20235                                                                           
-//#20236                setMap(CNV2FTH);                                                           
+//#20236                setMap(CNV2FTH);
 //#20237                ribon();                                                           
 //#20238                break;
 //#20239                                                                           
@@ -20756,7 +20758,7 @@ end;
 //#20262                frmcursel(1);                                                           
 //#20263                break;                                                           
 //#20264                                                                           
-//#20265            case ID_FRMBOX:                                                               
+//#20265            case ID_FRMBOX:
 //#20266                                                                           
 //#20267                frmcursel(0);                                                           
 //#20268                break;                                                           
@@ -20814,7 +20816,7 @@ end;
 //#20320                chain();                                                           
 //#20321                break;                                                           
 //#20322                                                                           
-//#20323            case ID_OPNCHN:                                                               
+//#20323            case ID_OPNCHN:
 //#20324                                                                           
 //#20325                rstMap(LINCHN);                                                           
 //#20326                chain();                                                           
@@ -20843,110 +20845,118 @@ end;
 //#20349            case ID_TRDIF:                                                               
 //#20350                                                                           
 //#20351                trdif();                                                           
-//#20352                break;                                                           
-//#20353                                                                           
+//#20352                break;
+//#20353
 //#20354            case ID_TRACEDG:
-//#20355                                                                           
-//#20356                tracedg();                                                           
-//#20357                break;                                                           
-//#20358                                                                           
-//#20359            case ID_TRCSEL:                                                               
-//#20360                                                                           
-//#20361                trcsel();                                                           
-//#20362                break;                                                           
-//#20363                                                                           
-//#20364            case ID_TRACE:                                                               
-//#20365                                                                           
-//#20366                trinit();                                                           
-//#20367                break;                                                           
-//#20368                                                                           
-//#20369            case ID_FLOK:                                                               
-//#20370                                                                           
-//#20371                lock();                                                           
-//#20372                break;                                                           
-//#20373                                                                           
+//#20355
+//#20356                tracedg();
+//#20357                break;
+//#20358
+//#20359            case ID_TRCSEL:
+//#20360
+//#20361                trcsel();
+//#20362                break;
+//#20363
+//#20364            case ID_TRACE:
+//#20365
+//#20366                trinit();
+//#20367                break;
+//#20368
+//#20369            case ID_FLOK:
+//#20370
+//#20371                lock();
+//#20372                break;
+//#20373
 //#20374            case ID_ROTAUXON:
-//#20375                                                                           
-//#20376                rotauxsel(1);                                                           
-//#20377                break;                                                           
-//#20378                                                                           
-//#20379            case ID_ROTAUXOFF:                                                               
-//#20380                                                                           
-//#20381                rotauxsel(0);                                                           
-//#20382                break;                                                           
-//#20383                                                                           
-//#20384            case ID_FRM2COL:                                                               
-//#20385                                                                           
-//#20386                col2frm();                                                           
-//#20387                break;                                                           
-//#20388                                                                           
-//#20389            case ID_SNAP2GRD:                                                               
-//#20390                                                                           
-//#20391                gsnap();                                                           
-//#20392                break;                                                           
-//#20393                                                                           
+//#20375
+//#20376                rotauxsel(1);
+//#20377                break;
+//#20378
+//#20379            case ID_ROTAUXOFF:
+//#20380
+//#20381                rotauxsel(0);
+//#20382                break;
+//#20383
+//#20384            case ID_FRM2COL:
+//#20385
+//#20386                col2frm();
+//#20387                break;
+//#20388
+//#20389            case ID_SNAP2GRD:
+//#20390
+//#20391                gsnap();
+//#20392                break;
+//#20393
 //#20394            case ID_FIL2SEL_ON:
-//#20395                                                                           
-//#20396                fil2sel(1);                                                           
-//#20397                break;                                                           
-//#20398                                                                           
-//#20399            case ID_FIL2SEL_OFF:                                                               
-//#20400                                                                           
-//#20401                fil2sel(0);                                                           
-//#20402                break;                                                           
-//#20403                                                                           
-//#20404            case ID_OVRLAY:                                                               
-//#20405                                                                           
-//#20406                ovrlay();                                                           
-//#20407                break;                                                           
-//#20408                                                                           
-//#20409            case ID_GRDHI:                                                               
-//#20410                                                                           
-//#20411                setgrd(HIGRD);                                                           
-//#20412                break;                                                           
-//#20413                                                                           
+//#20395
+//#20396                fil2sel(1);
+//#20397                break;
+//#20398
+//#20399            case ID_FIL2SEL_OFF:
+//#20400
+//#20401                fil2sel(0);
+//#20402                break;
+//#20403
+//#20404            case ID_OVRLAY:
+//#20405
+//#20406                ovrlay();
+//#20407                break;
+//#20408
+//#20409            case ID_GRDHI:
+//#20410
+//#20411                setgrd(HIGRD);
+//#20412                break;
+//#20413
 //#20414            case ID_GRDMED:
-//#20415                                                                           
-//#20416                setgrd(MEDGRD);                                                           
-//#20417                break;                                                           
-//#20418                                                                           
-//#20419            case ID_GRDEF:                                                               
-//#20420                                                                           
-//#20421                setgrd(DEFGRD);                                                           
-//#20422                break;                                                           
-//#20423                                                                           
-//#20424            case ID_GRDRED:                                                               
-//#20425                                                                           
-//#20426                setgrd(REDGRD);                                                           
-//#20427                break;                                                           
-//#20428                                                                           
-//#20429            case ID_GRDBLU:                                                               
-//#20430                                                                           
-//#20431                setgrd(BLUGRD);                                                           
-//#20432                break;                                                           
-//#20433                                                                           
+//#20415
+//#20416                setgrd(MEDGRD);
+//#20417                break;
+//#20418
+//#20419            case ID_GRDEF:
+//#20420
+//#20421                setgrd(DEFGRD);
+//#20422                break;
+//#20423
+//#20424            case ID_GRDRED:
+//#20425
+//#20426                setgrd(REDGRD);
+//#20427                break;
+//#20428
+//#20429            case ID_GRDBLU:
+//#20430
+//#20431                setgrd(BLUGRD);
+//#20432                break;
+//#20433
 //#20434            case ID_GRDGRN:
-//#20435                                                                           
-//#20436                setgrd(GRNGRD);                                                           
-//#20437                break;                                                           
-//#20438                                                                           
-//#20439            case ID_RETRACE:                                                               
-//#20440                                                                           
-//#20441                retrac();                                                           
-//#20442                break;                                                           
-//#20443                                                                           
-//#20444            case ID_DUBFIL:                                                               
-//#20445                                                                           
-//#20446                dubfil();                                                           
-//#20447                break;                                                           
-//#20448                                                                           
-//#20449            case ID_HORCLP:                                                               
-//#20450                                                                           
-//#20451                if(chkMap(FORMSEL)||fselpnt)                                                           
-//#20452                    savdo();                                                       
-//#20453                horclp();                                                           
+//#20435
+//#20436                setgrd(GRNGRD);
+//#20437                break;
+//#20438
+//#20439            case ID_RETRACE:
+//#20440
+//#20441                retrac();
+//#20442                break;
+//#20443
+//#20444            case ID_DUBFIL:
+//#20445
+//#20446                dubfil();
+//#20447                break;
+//#20448
+
+
+procedure TfrmMain.mnu_HORCLPClick(Sender: TObject);
+begin
+
+
+//#20449            case ID_HORCLP:
+//#20450
+//#20451                if(chkMap(FORMSEL)||fselpnt)
+//#20452                    savdo();
+//#20453                horclp();
 //#20454                break;
-//#20455                                                                           
+//#20455
+end;
+
 //#20456            case ID_ANGCLP:                                                               
 //#20457                                                                           
 //#20458                if(chkMap(FORMSEL)||fselpnt)                                                           
@@ -21575,6 +21585,11 @@ begin
 //#21068
 end;
 
+
+procedure TfrmMain.mnu_FILL_HORClick(Sender: TObject);
+begin
+
+
 //#21069            case ID_FILL_HOR:
 //#21070
 //#21071                if(chkMap(FORMSEL))
@@ -21582,6 +21597,7 @@ end;
 //#21073                filhor();
 //#21074                break;
 //#21075
+end;
 //#21076            case ID_RUNPAT:
 //#21077
 //#21078                movi();
@@ -24470,6 +24486,7 @@ begin
     FPainting := false;
 
 end;
+
 
 
 

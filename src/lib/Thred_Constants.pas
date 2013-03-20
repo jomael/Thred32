@@ -11,6 +11,7 @@ const
   DQMOUNTAIN = 5;
   DQXRAY = 6;
   DQVISITEDEMISSION = 7;
+  DQDEBUG = 8;
 
   { 1 : FDrawLine := DrawWireFrame;
     2 : FDrawLine := DrawLineFS;  //Solid

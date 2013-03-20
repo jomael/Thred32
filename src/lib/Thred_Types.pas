@@ -60,6 +60,15 @@ type
 
   TArrayOfTSHRTPNT = array of TSHRTPNT;
 
+  TSHRTPNT2 = packed  record //thred stitch structure
+    x, y : Single;
+    at: Cardinal; //attribute
+    lin  : Word;	   //lin and grp must remain in this order for sort to work
+    grp  : Word;
+  end;
+
+  TArrayOfTSHRTPNT2 = array of TSHRTPNT2;
+
 
   TTXPNT = packed record		//textured fill point
     y : Single;
@@ -157,6 +166,7 @@ type
                         FTHFAZ );  // phase
 
   // ini file structure (INIFIL in thred.h, #691)
+  PThredIniFile = ^TThredIniFile;
   TThredIniFile = packed record
     DefaultDir                 : array [0..179] of Char;           // default directory    {defDir[180];}
     StitchColors               : T16Colors;                         // colors    {stchCols[16];}

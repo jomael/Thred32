@@ -205,14 +205,20 @@ object frmMain: TfrmMain
     Width = 30
     Height = 494
     Align = alLeft
-    SwatchList = swlDefault
-    ThumbWidth = 30
-    ThumbHeight = 20
+    Bitmap.ResamplerClassName = 'TNearestResampler'
+    BitmapAlign = baCustom
     ParentShowHint = False
     Scale = 1.000000000000000000
     ScaleMode = smNormal
+    ScrollBars.ShowHandleGrip = True
+    ScrollBars.Style = rbsDefault
+    ScrollBars.Size = 16
     ShowHint = True
+    OverSize = 0
     TabOrder = 5
+    SwatchList = swlDefault
+    ThumbWidth = 30
+    ThumbHeight = 20
     CellBorderStyle = borContrasGrid
     FrameColor = clSilver
   end
@@ -222,15 +228,21 @@ object frmMain: TfrmMain
     Width = 33
     Height = 494
     Align = alLeft
-    SwatchList = swlCustom
-    ThumbWidth = 30
-    ThumbHeight = 20
+    Bitmap.ResamplerClassName = 'TNearestResampler'
+    BitmapAlign = baCustom
     ParentShowHint = False
     PopupMenu = pmSwa
     Scale = 1.000000000000000000
     ScaleMode = smNormal
+    ScrollBars.ShowHandleGrip = True
+    ScrollBars.Style = rbsDefault
+    ScrollBars.Size = 16
     ShowHint = True
+    OverSize = 0
     TabOrder = 6
+    SwatchList = swlCustom
+    ThumbWidth = 30
+    ThumbHeight = 20
     CellBorderStyle = borContrasGrid
     FrameColor = clSilver
   end
@@ -249,16 +261,22 @@ object frmMain: TfrmMain
       Height = 46
       Align = alLeft
       AutoSize = True
-      GrowFlow = NHeight2Right
-      SwatchList = swlCustom
-      ThumbWidth = 16
-      ThumbHeight = 16
+      Bitmap.ResamplerClassName = 'TNearestResampler'
+      BitmapAlign = baCustom
       ParentShowHint = False
       PopupMenu = pmSwa
       Scale = 1.000000000000000000
       ScaleMode = smNormal
+      ScrollBars.ShowHandleGrip = True
+      ScrollBars.Style = rbsDefault
+      ScrollBars.Size = 16
       ShowHint = True
+      OverSize = 0
       TabOrder = 0
+      GrowFlow = NHeight2Right
+      SwatchList = swlCustom
+      ThumbWidth = 16
+      ThumbHeight = 16
       CellBorderStyle = borContrasGrid
       FrameColor = clGray
     end
@@ -999,6 +1017,7 @@ object frmMain: TfrmMain
       end
       object mnu_FILL_HOR: TMenuItem
         Caption = 'Horizontal'
+        OnClick = mnu_FILL_HORClick
       end
       object mnu_FILANG: TMenuItem
         Caption = 'Angle'
@@ -1014,6 +1033,7 @@ object frmMain: TfrmMain
         end
         object mnu_HORCLP: TMenuItem
           Caption = 'Horizontal'
+          OnClick = mnu_HORCLPClick
         end
         object mnu_ANGCLP: TMenuItem
           Caption = 'Angle'
@@ -1130,10 +1150,6 @@ object frmMain: TfrmMain
   object swlDefault: TgmSwatchList
     Left = 64
     Top = 104
-  end
-  object dlgOpenSwa: TOpenSwatchDialog
-    Left = 240
-    Top = 168
   end
   object dlgColor1: TColorDialog
     Left = 128

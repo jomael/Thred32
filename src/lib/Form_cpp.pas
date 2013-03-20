@@ -2447,45 +2447,48 @@ end;
 //#2418        filinsb(tpnt);                                                                   
 //#2419        stspace=tspac;                                                                   
 //#2420    }                                                                       
-//#2421                                                                           
+//#2421
+procedure oclp(clp: TArrayOfFloatPoint; nclp : Cardinal);
 //#2422    void oclp(FLPNT* clp,unsigned nclp){
-//#2423                                                                           
-//#2424        unsigned    ind;                                                               
-//#2425                                                                           
-//#2426        if(!chkMap(NOCLP))                                                                   
-//#2427        {                                                                   
-//#2428            for(ind=0;ind<nclp;ind++){                                                               
-//#2429                                                                           
-//#2430                clpnu[ind].x=clp[ind].x;                                                           
-//#2431                clpnu[ind].y=clp[ind].y;                                                           
-//#2432            }                                                               
-//#2433            clprct.left=clprct.right=clpnu[0].x;                                                               
-//#2434            clprct.bottom=clprct.top=clpnu[0].y;                                                               
-//#2435            for(ind=1;ind<(unsigned)nclp;ind++){                                                               
-//#2436                                                                           
-//#2437                if(clpnu[ind].x<clprct.left)                                                           
-//#2438                    clprct.left=clpnu[ind].x;                                                       
-//#2439                if(clpnu[ind].x>clprct.right)                                                           
-//#2440                    clprct.right=clpnu[ind].x;                                                       
-//#2441                if(clpnu[ind].y<clprct.bottom)                                                           
-//#2442                    clprct.bottom=clpnu[ind].y;                                                       
-//#2443                if(clpnu[ind].y>clprct.top)                                                           
-//#2444                    clprct.top=clpnu[ind].y;                                                       
-//#2445            }                                                               
-//#2446            clpsiz.cx=clprct.right-clprct.left;                                                               
-//#2447            clpsiz.cy=clprct.top-clprct.bottom;                                                               
-//#2448            clplen=nclp;                                                               
-//#2449        }                                                                   
-//#2450    }                                                                       
-//#2451                                                                           
-//#2452    float getblen(){                                                                       
-//#2453                                                                           
-//#2454        float        len;                                                           
-//#2455        unsigned    tlen;                                                               
-//#2456                                                                           
-//#2457        tlen=(formlst[clofind].nclp<<16)|formlst[clofind].res;                                                                   
-//#2458                                                                           
-//#2459        _asm{                                                                   
+//#2423
+//#2424        unsigned    ind;
+//#2425
+begin
+//#2426        if(!chkMap(NOCLP))
+//#2427        {
+//#2428            for(ind=0;ind<nclp;ind++){
+//#2429
+//#2430                clpnu[ind].x=clp[ind].x;
+//#2431                clpnu[ind].y=clp[ind].y;
+//#2432            }
+//#2433            clprct.left=clprct.right=clpnu[0].x;
+//#2434            clprct.bottom=clprct.top=clpnu[0].y;
+//#2435            for(ind=1;ind<(unsigned)nclp;ind++){
+//#2436
+//#2437                if(clpnu[ind].x<clprct.left)
+//#2438                    clprct.left=clpnu[ind].x;
+//#2439                if(clpnu[ind].x>clprct.right)
+//#2440                    clprct.right=clpnu[ind].x;
+//#2441                if(clpnu[ind].y<clprct.bottom)
+//#2442                    clprct.bottom=clpnu[ind].y;
+//#2443                if(clpnu[ind].y>clprct.top)
+//#2444                    clprct.top=clpnu[ind].y;
+//#2445            }
+//#2446            clpsiz.cx=clprct.right-clprct.left;
+//#2447            clpsiz.cy=clprct.top-clprct.bottom;
+//#2448            clplen=nclp;
+//#2449        }
+//#2450    }
+end;
+//#2451
+//#2452    float getblen(){
+//#2453
+//#2454        float        len;
+//#2455        unsigned    tlen;
+//#2456
+//#2457        tlen=(formlst[clofind].nclp<<16)|formlst[clofind].res;
+//#2458
+//#2459        _asm{
 //#2460                                                                           
 //#2461                mov        eax,tlen                                                   
 //#2462                mov        len,eax                                                   
@@ -4963,7 +4966,6 @@ begin
 				lins[spnt].grp  :=grpind;
 				lins[spnt].x    :=jpts[ine].x;
 				lins[spnt].y  :=jpts[ine].y;
-
         inc(spnt);
         inc(ine);
 
@@ -13847,412 +13849,417 @@ end;
 //#13321        clipnts[xpnt].flg=1;                                                                   
 //#13322        xpnt++;                                                                   
 //#13323    }                                                                       
-//#13324                                                                           
+//#13324
+procedure clpcon();
+
 //#13325    void clpcon(){
-//#13326                                                                           
-//#13327        RECT        nrct;                                                           
-//#13328        unsigned    ind,ine,inf,ing,nof,clpneg;                                                               
-//#13329        unsigned    strt,fin,segxs,segps,seg,clrnum;                                                               
-//#13330        unsigned    cnt;                                                               
-//#13331        int            tine;                                                       
-//#13332        FLPNT        ploc;                                                           
-//#13333        double        tlen,minx;                                                           
-//#13334        float        fnof;                                                           
-//#13335        unsigned    clpnof;                                                               
-//#13336        double        clpvof;                                                           
-//#13337        TXPNT*        ptx;                                                           
-//#13338                                                                           
-//#13339        duflt();                                                                   
-//#13340        clpwid=clpsiz.cx+frmpnt->fspac;                                                                   
-//#13341        if(chkMap(ISUND))                                                                   
-//#13342            clpwid=frmpnt->uspac;                                                               
-//#13343        if(frmpnt->fspac<0)                                                                   
-//#13344            clpneg=1;                                                               
-//#13345        else                                                                   
-//#13346            clpneg=0;                                                               
-//#13347        if(clpwid<CLPMINAUT)                                                                   
-//#13348            clpwid=(float)CLPMINAUT;                                                               
-//#13349        if(chkMap(TXFIL))                                                                   
-//#13350        {                                                                   
-//#13351            if(txad&&frmpnt->dhx.txt.ind+frmpnt->dhx.txt.cnt<=txad)                                                               
-//#13352                clpwid=frmpnt->fspac;                                                           
-//#13353            else                                                               
-//#13354                return;                                                           
-//#13355        }                                                                   
-//#13356        lens=new double[sids+1];                                                                   
-//#13357        clplens=new double[sids];                                                                   
-//#13358        clpsrt=new CLIPSORT[sids];                                                                   
-//#13359        pclpsrt=new CLIPSORT*[sids];                                                                   
-//#13360        ine=leftsid();                                                                   
-//#13361        tlen=0;                                                                   
-//#13362        lens[ine]=0;                                                                   
-//#13363        ine=nxt(ine);                                                                   
-//#13364        for(ind=0;ind<=sids;ind++){                                                                   
-//#13365                                                                           
-//#13366            inf=nxt(ine);                                                               
-//#13367            lens[ine]=tlen;                                                               
-//#13368            clplens[ine]=hypot(flt[inf].x-flt[ine].x,flt[inf].y-flt[ine].y);                                                               
-//#13369            tlen+=clplens[ine];                                                               
-//#13370            ine=inf;                                                               
-//#13371        }                                                                   
-//#13372        clpcirc=tlen;                                                                   
-//#13373        clpcirc2=tlen/2;                                                                   
-//#13374        clpseq=(FLPNT*)&stchs[MAXSEQ];                                                                   
-//#13375    //    clpsegs=(CLPSEG*)&bseq;                                                                   
-//#13376        clpsegs=(CLPSEG*)&stchs[MAXSEQ];                                                                   
-//#13377        nrct.left=floor(frmpnt->rct.left/clpwid);                                                                   
-//#13378        nrct.right=ceil(frmpnt->rct.right/clpwid);                                                                   
-//#13379        nrct.bottom=floor(frmpnt->rct.bottom/clpsiz.cy-1);                                                                   
-//#13380        nrct.top=ceil(frmpnt->rct.top/clpsiz.cy+1)+2;                                                                   
-//#13381        nof=0;                                                                   
-//#13382        if(frmpnt->wpar>1)                                                                   
-//#13383            clpnof=frmpnt->wpar;                                                               
-//#13384        else                                                                   
-//#13385            clpnof=0;                                                               
-//#13386        if(clpnof){                                                                   
-//#13387                                                                           
-//#13388            nrct.top++;                                                               
-//#13389            if(frmpnt->fspac<0){                                                               
-//#13390                                                                           
-//#13391                nrct.bottom--;                                                           
-//#13392                nrct.left-=(float)clpsiz.cx/clpwid;                                                           
-//#13393                nrct.right+=(float)clpsiz.cx/clpwid;                                                           
-//#13394            }                                                               
-//#13395        }                                                                   
-//#13396        if(clpneg&&!clpnof)                                                                   
-//#13397            nrct.left-=(float)clpsiz.cx/clpwid;                                                               
-//#13398        if(nrct.bottom<0){                                                                   
-//#13399                                                                           
-//#13400            nof=1-nrct.bottom;                                                               
-//#13401            nrct.bottom+=nof;                                                               
-//#13402            nrct.top+=nof;                                                               
-//#13403            fnof=clpsiz.cy*nof;                                                               
-//#13404            for(ind=0;ind<sids;ind++)                                                               
-//#13405                flt[ind].y+=fnof;                                                           
-//#13406        }                                                                   
-//#13407    /*                                                                       
-//#13408        ing=0;                                                                   
-//#13409        for(ind=nrct.left;ind<=(unsigned)nrct.right;ind++){                                                                   
-//#13410                                                                           
-//#13411            ploc.x=ind*clpwid;                                                               
-//#13412            for(ine=nrct.bottom;ine<=(unsigned)nrct.top;ine++){                                                               
-//#13413                                                                           
-//#13414                ploc.y=ine*clpsiz.cy;                                                           
-//#13415                for(inf=0;inf<clplen;inf++){                                                           
-//#13416                                                                           
-//#13417                    stchs[ing].x=ploc.x+clpnu[inf].x;                                                       
-//#13418                    stchs[ing].y=ploc.y+clpnu[inf].y;                                                       
-//#13419                    stchs[ing].at=0;                                                       
-//#13420                    ing++;                                                       
-//#13421                                                                           
-//#13422                }                                                           
-//#13423            }                                                               
-//#13424        }                                                                   
-//#13425        hed.stchs=ing;                                                                   
-//#13426        return;*/                                                                   
-//#13427                                                                           
-//#13428    //    clipnts=(CLIPNT*)&stchs[MAXSEQ];                                                                   
-//#13429        clipnts=(CLIPNT*)&bseq;                                                                   
-//#13430        vclpx=(VCLPX*)&opnt;                                                                   
-//#13431        segxs=0;                                                                   
-//#13432        for(ind=0;ind<sids;ind++){                                                                   
-//#13433                                                                           
-//#13434            strt=floor(flt[ind].x/clpwid);                                                               
-//#13435            fin=floor((flt[nxt(ind)].x)/clpwid);                                                               
-//#13436            if(strt>fin){                                                               
-//#13437                                                                           
-//#13438                ine=strt;                                                           
-//#13439                strt=fin;                                                           
-//#13440                fin=ine;                                                           
-//#13441            }                                                               
-//#13442            if(frmpnt->fspac<0)                                                               
-//#13443                fin+=clpsiz.cx/clpwid;                                                           
-//#13444            if(fin>(unsigned)nrct.right)                                                               
-//#13445                fin=nrct.right;                                                           
-//#13446            if(clpneg)                                                               
-//#13447                strt-=(float)clpsiz.cx/clpwid;                                                           
-//#13448            for(ine=strt;ine<=fin;ine++){                                                               
-//#13449                vclpx[segxs].sid=ind;                                                           
-//#13450                vclpx[segxs++].seg=ine;                                                           
-//#13451            }                                                               
-//#13452        }                                                                   
-//#13453        qsort((void*)vclpx,segxs,8,clpcmp);                                                                   
-//#13454        iclpx=(unsigned*)&vclpx[segxs];                                                                   
-//#13455        ine=1;inf=vclpx[0].seg;                                                                   
-//#13456        iclpx[0]=0;                                                                   
-//#13457        for(ind=1;ind<segxs;ind++){                                                                   
-//#13458                                                                           
-//#13459            if(vclpx[ind].seg!=inf){                                                               
-//#13460                                                                           
-//#13461                iclpx[ine++]=ind;                                                           
-//#13462                inf=vclpx[ind].seg;                                                           
-//#13463            }                                                               
-//#13464        }                                                                   
-//#13465        iclpx[ine]=ind;                                                                   
-//#13466        isrct.left=isrct.right=flt[0].x;                                                                   
-//#13467        isrct.top=isrct.bottom=flt[0].y;                                                                   
-//#13468        for(ind=1;ind<sids;ind++)                                                                   
-//#13469        {                                                                   
-//#13470            if(flt[ind].x>isrct.right)                                                               
-//#13471                isrct.right=flt[ind].x;                                                           
-//#13472            if(flt[ind].x<isrct.left)                                                               
-//#13473                isrct.left=flt[ind].x;                                                           
-//#13474            if(flt[ind].y>isrct.top)                                                               
-//#13475                isrct.top=flt[ind].y;                                                           
-//#13476            if(flt[ind].y<isrct.bottom)                                                               
-//#13477                isrct.bottom=flt[ind].y;                                                           
-//#13478        }                                                                   
-//#13479        segps=ine;                                                                   
-//#13480        ind=vstrt=cnt=0;                                                                   
-//#13481        seg=vclpx[0].seg;                                                                   
-//#13482        clrnum=(nrct.top>>5)+1;                                                                   
-//#13483        xpnt=0;                                                                   
-//#13484        for(ind=0;ind<segps;ind++){                                                                   
-//#13485                                                                           
-//#13486            vstrt=iclpx[ind];                                                               
-//#13487            vfin=iclpx[ind+1];                                                               
-//#13488            ploc.x=clpwid*(ind+nrct.left);                                                               
-//#13489            clpvof=0;                                                               
-//#13490            if(chkMap(TXFIL))                                                               
-//#13491            {                                                               
-//#13492                tine=(ind+nrct.left)%frmpnt->dhx.txt.lins;                                                           
-//#13493                clplen=txsegs[tine].cnt;                                                           
-//#13494                ptx=&txpnts[frmpnt->dhx.txt.ind+txsegs[tine].lin];                                                           
-//#13495                vpnt0.x=ploc.x;                                                           
-//#13496                if(frmpnt->txof)                                                           
-//#13497                {                                                           
-//#13498                    inf=(ind+nrct.left)/frmpnt->dhx.txt.lins;                                                       
-//#13499                    clpvof=fmod(frmpnt->txof*inf,frmpnt->dhx.txt.hi);                                                       
-//#13500                }                                                           
-//#13501            }                                                               
-//#13502            else                                                               
-//#13503            {                                                               
-//#13504                if(clpnof)                                                           
-//#13505                    clpvof=(float)(ind%clpnof)/clpnof*clpsiz.cy;                                                       
-//#13506                vpnt0.x=ploc.x+clpnu[0].x;                                                           
-//#13507            }                                                               
-//#13508            vpnt0.y=nrct.bottom*clpsiz.cy;                                                               
-//#13509            if(clpnof)                                                               
-//#13510                clpvof=(float)(ind%clpnof)/clpnof*clpsiz.cy;                                                           
-//#13511            for(tine=nrct.bottom;tine<nrct.top;tine++){                                                               
-//#13512                                                                           
-//#13513                ploc.y=tine*clpsiz.cy-clpvof;                                                           
-//#13514                vpnt1.x=ploc.x+clpnu[0].x;                                                           
-//#13515                vpnt1.y=ploc.y+clpnu[0].y;                                                           
-//#13516                if(!xpnt){                                                           
-//#13517                                                                           
-//#13518                    vpnt0.x=vpnt1.x;                                                       
-//#13519                    vpnt0.y=vpnt1.y;                                                       
-//#13520                }                                                           
-//#13521                for(inf=0;inf<clplen;inf++){                                                           
-//#13522                                                                           
-//#13523                    if(chkMap(TXFIL))                                                       
-//#13524                    {                                                       
-//#13525                        vpnt1.x=ploc.x;                                                   
-//#13526                        vpnt1.y=ploc.y+ptx[inf].y;                                                   
-//#13527                    }                                                       
-//#13528                    else                                                       
-//#13529                    {                                                       
-//#13530                        vpnt1.x=ploc.x+clpnu[inf].x;                                                   
-//#13531                        vpnt1.y=ploc.y+clpnu[inf].y;                                                   
-//#13532                    }                                                       
-//#13533                    clipnts[xpnt].x=vpnt0.x;                                                       
-//#13534                    clipnts[xpnt].y=vpnt0.y;                                                       
-//#13535                    if(isin(vpnt0.x,vpnt0.y))                                                       
-//#13536                    {                                                       
-//#13537                        if(xpnt&&clipnts[xpnt-1].flg==2)                                                   
-//#13538                            inspnt();                                               
-//#13539                        clipnts[xpnt].flg=0;                                                   
-//#13540                    }                                                       
-//#13541                    else                                                       
-//#13542                    {                                                       
-//#13543                        if(xpnt&&!clipnts[xpnt-1].flg)                                                   
-//#13544                            inspnt();                                               
-//#13545                        clipnts[xpnt].flg=2;                                                   
-//#13546                    }                                                       
-//#13547                    xpnt++;                                                       
-//#13548                    cnt=insect();                                                       
-//#13549                    if(cnt)                                                       
-//#13550                    {                                                       
-//#13551                        for(ing=0;ing<cnt;ing++){                                                   
-//#13552                                                                           
-//#13553                            clipnts[xpnt].sid=pclpsrt[ing]->lin;                                               
-//#13554                            clipnts[xpnt].x=pclpsrt[ing]->pnt.x;                                               
-//#13555                            clipnts[xpnt].y=pclpsrt[ing]->pnt.y;                                               
-//#13556                            clipnts[xpnt].flg=1;                                               
-//#13557                            xpnt++;                                               
-//#13558                            if(xpnt>MAXSEQ<<2)                                               
-//#13559                                goto clpskp;                                           
-//#13560                        }                                                   
-//#13561                    }                                                       
-//#13562                    vpnt0.x=vpnt1.x;                                                       
-//#13563                    vpnt0.y=vpnt1.y;                                                       
-//#13564                }                                                           
-//#13565            }                                                               
-//#13566            clipnts[xpnt-1].flg=2;                                                               
-//#13567        }                                                                   
-//#13568    clpskp:;                                                                       
-//#13569                                                                           
-//#13570        clipnts[xpnt].flg=2;                                                                   
-//#13571        if(nof){                                                                   
-//#13572                                                                           
-//#13573            fnof=nof*clpsiz.cy;                                                               
-//#13574            for(ind=0;ind<xpnt;ind++)                                                               
-//#13575                clipnts[ind].y-=fnof;                                                           
-//#13576            for(ind=0;ind<sids;ind++)                                                               
-//#13577                flt[ind].y-=fnof;                                                           
-//#13578        }                                                                   
-//#13579    #define CLPVU 0                                                                       
-//#13580    #define CLPNOP 0                                                                       
-//#13581                                                                           
-//#13582    #if CLPVU==1                                                                       
-//#13583                                                                           
-//#13584        goto clp1skp;                                                                   
-//#13585                                                                           
-//#13586    #endif                                                                       
-//#13587                                                                           
-//#13588        pcseg=0;                                                                   
-//#13589        regof=vclpx[0].seg;                                                                   
-//#13590        rstMap(FILDIR);                                                                   
-//#13591        ine=0;                                                                   
-//#13592        if(xpnt)                                                                   
-//#13593        {                                                                   
-//#13594            for(ind=0;ind<xpnt-1;ind++){                                                               
-//#13595                                                                           
-//#13596                switch(clipnts[ind].flg)                                                           
-//#13597                {                                                           
-//#13598                case 0:        //inside                                                   
-//#13599                                                                           
-//#13600                    setMap(FILDIR);                                                       
-//#13601                    break;                                                       
-//#13602                                                                           
-//#13603                case 1:        //line                                                   
-//#13604                                                                           
-//#13605                    if(toglMap(FILDIR))                                                       
-//#13606                        clpnseg(ine,ind);                                                   
-//#13607                    else                                                       
-//#13608                        ine=ind;                                                   
-//#13609                    break;                                                       
-//#13610                                                                           
-//#13611                case 2:        //outside                                                   
-//#13612                                                                           
-//#13613                    rstMap(FILDIR);                                                       
-//#13614                    break;                                                       
-//#13615                }                                                           
-//#13616            }                                                               
-//#13617        }                                                                   
-//#13618                                                                           
-//#13619    #if CLPVU==1                                                                       
-//#13620                                                                           
-//#13621    clp1skp:;                                                                       
-//#13622                                                                           
-//#13623    #endif                                                                       
-//#13624                                                                           
-//#13625        delete lens;                                                                   
-//#13626        delete clplens;                                                                   
-//#13627        delete clpsrt;                                                                   
-//#13628        delete pclpsrt;                                                                   
-//#13629                                                                           
-//#13630        if(pcseg){                                                                   
-//#13631                                                                           
-//#13632            clplim=pcseg>>3;                                                               
-//#13633            clplim=pcseg>>1;                                                               
-//#13634            if(!clplim)                                                               
-//#13635                clplim=1;                                                           
-//#13636            if(clplim>12)                                                               
-//#13637                clplim=12;                                                           
-//#13638            plens=(float**)&clpsegs[pcseg];                                                               
-//#13639            ine=0;                                                               
-//#13640            for(ind=0;ind<pcseg;ind++){                                                               
-//#13641                                                                           
-//#13642                plens[ine++]=&clpsegs[ind].blen;                                                           
-//#13643                plens[ine++]=&clpsegs[ind].elen;                                                           
-//#13644            }                                                               
-//#13645            qsort((void*)plens,ine,4,lencmp);                                                               
-//#13646            ind=sizeof(CLPSEG);                                                               
-//#13647            for(ind=0;ind<ine;ind++){                                                               
-//#13648                                                                           
-//#13649                inf=lenref(plens[ind]);                                                           
-//#13650                ing=inf>>1;                                                           
-//#13651                if(inf&1)                                                           
-//#13652                    clpsegs[ing].eind=ind;                                                       
-//#13653                else                                                           
-//#13654                    clpsegs[ing].bind=ind;                                                       
-//#13655            }                                                               
-//#13656                                                                           
-//#13657    #if CLPVU==1                                                                       
-//#13658                                                                           
-//#13659            for(ind=0;ind<xpnt;ind++){                                                               
-//#13660                                                                           
-//#13661                stchs[ind].x=clipnts[ind].x;                                                           
-//#13662                stchs[ind].y=clipnts[ind].y;                                                           
-//#13663                stchs[ind].at=0;                                                           
-//#13664            }                                                               
-//#13665            hed.stchs=xpnt;                                                               
-//#13666    #endif                                                                       
-//#13667                                                                           
-//#13668    #if    CLPVU==2                                                                   
-//#13669                                                                           
-//#13670            inf=0;                                                               
-//#13671            for(ind=0;ind<pcseg;ind++){                                                               
-//#13672                                                                           
-//#13673                for(ine=clpsegs[ind].strt;ine<=clpsegs[ind].fin;ine++){                                                           
-//#13674                                                                           
-//#13675                    stchs[inf].x=clipnts[ine].x;                                                       
-//#13676                    stchs[inf].y=clipnts[ine].y;                                                       
-//#13677                    stchs[inf++].at=ind&0xf;                                                       
-//#13678                }                                                           
-//#13679            }                                                               
-//#13680            hed.stchs=inf;                                                               
-//#13681                                                                           
-//#13682    #endif                                                                       
-//#13683                                                                           
-//#13684            minx=1e99;                                                               
-//#13685                                                                           
-//#13686    #if CLPVU==0                                                                       
-//#13687                                                                           
-//#13688            xpnt=0;                                                               
-//#13689            setMap(FILDIR);                                                               
-//#13690            seqpnt=0;                                                               
-//#13691            pcseg2=pcseg<<1;                                                               
-//#13692            vclpsid=clpsegs[0].asid;                                                               
-//#13693            strtlen=clpsegs[0].elen;                                                               
-//#13694            ritseg();                                                               
-//#13695            while(nucseg()){                                                               
-//#13696                                                                           
-//#13697                if(seqpnt>MAXSEQ-3)                                                           
-//#13698                    break;                                                       
-//#13699                ritseg();                                                           
-//#13700            }                                                               
-//#13701            chksid(0);                                                               
-//#13702            if(seqpnt>MAXSEQ-100)                                                               
-//#13703                seqpnt=MAXSEQ-100;                                                           
-//#13704            ine=0;inf=0;                                                               
-//#13705            for(ind=0;ind<seqpnt;ind++){                                                               
-//#13706                                                                           
-//#13707                if(vscmp(ind,ine)){                                                           
-//#13708                                                                           
-//#13709                    ine++;                                                       
-//#13710                    oseq[ine].x=oseq[ind].x;                                                       
-//#13711                    oseq[ine].y=oseq[ind].y;                                                       
-//#13712                }                                                           
-//#13713                else                                                           
-//#13714                    inf++;                                                       
-//#13715            }                                                               
-//#13716            seqpnt=ine;                                                               
-//#13717            if(chkMap(WASNEG)){                                                               
-//#13718                                                                           
-//#13719                for(ind=0;ind<seqpnt;ind++)                                                           
-//#13720                    oseq[ind].x-=fltof;                                                       
-//#13721                for(ind=0;ind<sids;ind++)                                                           
-//#13722                    flt[ind].x-=fltof;                                                       
-//#13723                frmpnt->rct.left-=fltof;                                                           
-//#13724                frmpnt->rct.right-=fltof;                                                           
-//#13725            }                                                               
-//#13726    #endif                                                                       
-//#13727        }                                                                   
-//#13728    }                                                                       
+//#13326
+//#13327        RECT        nrct;
+//#13328        unsigned    ind,ine,inf,ing,nof,clpneg;
+//#13329        unsigned    strt,fin,segxs,segps,seg,clrnum;
+//#13330        unsigned    cnt;
+//#13331        int            tine;
+//#13332        FLPNT        ploc;
+//#13333        double        tlen,minx;
+//#13334        float        fnof;
+//#13335        unsigned    clpnof;
+//#13336        double        clpvof;
+//#13337        TXPNT*        ptx;
+//#13338
+begin
+//#13339        duflt();
+//#13340        clpwid=clpsiz.cx+frmpnt->fspac;
+//#13341        if(chkMap(ISUND))
+//#13342            clpwid=frmpnt->uspac;
+//#13343        if(frmpnt->fspac<0)
+//#13344            clpneg=1;
+//#13345        else
+//#13346            clpneg=0;
+//#13347        if(clpwid<CLPMINAUT)
+//#13348            clpwid=(float)CLPMINAUT;
+//#13349        if(chkMap(TXFIL))
+//#13350        {
+//#13351            if(txad && frmpnt->dhx.txt.ind + frmpnt->dhx.txt.cnt <= txad)
+//#13352                clpwid=frmpnt->fspac;
+//#13353            else
+//#13354                return;
+//#13355        }
+//#13356        lens=new double[sids+1];
+//#13357        clplens=new double[sids];
+//#13358        clpsrt=new CLIPSORT[sids];
+//#13359        pclpsrt=new CLIPSORT*[sids];
+//#13360        ine=leftsid();
+//#13361        tlen=0;
+//#13362        lens[ine]=0;
+//#13363        ine=nxt(ine);
+//#13364        for(ind=0;ind<=sids;ind++){
+//#13365
+//#13366            inf=nxt(ine);
+//#13367            lens[ine]=tlen;
+//#13368            clplens[ine]=hypot(flt[inf].x-flt[ine].x,flt[inf].y-flt[ine].y);
+//#13369            tlen+=clplens[ine];
+//#13370            ine=inf;
+//#13371        }
+//#13372        clpcirc=tlen;
+//#13373        clpcirc2=tlen/2;
+//#13374        clpseq=(FLPNT*)&stchs[MAXSEQ];
+//#13375    //    clpsegs=(CLPSEG*)&bseq;
+//#13376        clpsegs=(CLPSEG*)&stchs[MAXSEQ];
+//#13377        nrct.left=floor(frmpnt->rct.left/clpwid);
+//#13378        nrct.right=ceil(frmpnt->rct.right/clpwid);
+//#13379        nrct.bottom=floor(frmpnt->rct.bottom/clpsiz.cy-1);
+//#13380        nrct.top=ceil(frmpnt->rct.top/clpsiz.cy+1)+2;
+//#13381        nof=0;
+//#13382        if(frmpnt->wpar>1)
+//#13383            clpnof=frmpnt->wpar;
+//#13384        else
+//#13385            clpnof=0;
+//#13386        if(clpnof){
+//#13387
+//#13388            nrct.top++;
+//#13389            if(frmpnt->fspac<0){
+//#13390
+//#13391                nrct.bottom--;
+//#13392                nrct.left-=(float)clpsiz.cx/clpwid;
+//#13393                nrct.right+=(float)clpsiz.cx/clpwid;
+//#13394            }
+//#13395        }
+//#13396        if(clpneg&&!clpnof)
+//#13397            nrct.left-=(float)clpsiz.cx/clpwid;
+//#13398        if(nrct.bottom<0){
+//#13399
+//#13400            nof=1-nrct.bottom;
+//#13401            nrct.bottom+=nof;
+//#13402            nrct.top+=nof;
+//#13403            fnof=clpsiz.cy*nof;
+//#13404            for(ind=0;ind<sids;ind++)
+//#13405                flt[ind].y+=fnof;
+//#13406        }
+//#13407    /*
+//#13408        ing=0;
+//#13409        for(ind=nrct.left;ind<=(unsigned)nrct.right;ind++){
+//#13410
+//#13411            ploc.x=ind*clpwid;
+//#13412            for(ine=nrct.bottom;ine<=(unsigned)nrct.top;ine++){
+//#13413
+//#13414                ploc.y=ine*clpsiz.cy;
+//#13415                for(inf=0;inf<clplen;inf++){
+//#13416
+//#13417                    stchs[ing].x=ploc.x+clpnu[inf].x;
+//#13418                    stchs[ing].y=ploc.y+clpnu[inf].y;
+//#13419                    stchs[ing].at=0;
+//#13420                    ing++;
+//#13421
+//#13422                }
+//#13423            }
+//#13424        }
+//#13425        hed.stchs=ing;
+//#13426        return;*/
+//#13427
+//#13428    //    clipnts=(CLIPNT*)&stchs[MAXSEQ];
+//#13429        clipnts=(CLIPNT*)&bseq;
+//#13430        vclpx=(VCLPX*)&opnt;
+//#13431        segxs=0;
+//#13432        for(ind=0;ind<sids;ind++){
+//#13433
+//#13434            strt=floor(flt[ind].x/clpwid);
+//#13435            fin=floor((flt[nxt(ind)].x)/clpwid);
+//#13436            if(strt>fin){
+//#13437
+//#13438                ine=strt;
+//#13439                strt=fin;
+//#13440                fin=ine;
+//#13441            }
+//#13442            if(frmpnt->fspac<0)
+//#13443                fin+=clpsiz.cx/clpwid;
+//#13444            if(fin>(unsigned)nrct.right)
+//#13445                fin=nrct.right;
+//#13446            if(clpneg)
+//#13447                strt-=(float)clpsiz.cx/clpwid;
+//#13448            for(ine=strt;ine<=fin;ine++){
+//#13449                vclpx[segxs].sid=ind;
+//#13450                vclpx[segxs++].seg=ine;
+//#13451            }
+//#13452        }
+//#13453        qsort((void*)vclpx,segxs,8,clpcmp);
+//#13454        iclpx=(unsigned*)&vclpx[segxs];
+//#13455        ine=1;inf=vclpx[0].seg;
+//#13456        iclpx[0]=0;
+//#13457        for(ind=1;ind<segxs;ind++){
+//#13458
+//#13459            if(vclpx[ind].seg!=inf){
+//#13460
+//#13461                iclpx[ine++]=ind;
+//#13462                inf=vclpx[ind].seg;
+//#13463            }
+//#13464        }
+//#13465        iclpx[ine]=ind;
+//#13466        isrct.left=isrct.right=flt[0].x;
+//#13467        isrct.top=isrct.bottom=flt[0].y;
+//#13468        for(ind=1;ind<sids;ind++)
+//#13469        {
+//#13470            if(flt[ind].x>isrct.right)
+//#13471                isrct.right=flt[ind].x;
+//#13472            if(flt[ind].x<isrct.left)
+//#13473                isrct.left=flt[ind].x;
+//#13474            if(flt[ind].y>isrct.top)
+//#13475                isrct.top=flt[ind].y;
+//#13476            if(flt[ind].y<isrct.bottom)
+//#13477                isrct.bottom=flt[ind].y;
+//#13478        }
+//#13479        segps=ine;
+//#13480        ind=vstrt=cnt=0;
+//#13481        seg=vclpx[0].seg;
+//#13482        clrnum=(nrct.top>>5)+1;
+//#13483        xpnt=0;
+//#13484        for(ind=0;ind<segps;ind++){
+//#13485
+//#13486            vstrt=iclpx[ind];
+//#13487            vfin=iclpx[ind+1];
+//#13488            ploc.x=clpwid*(ind+nrct.left);
+//#13489            clpvof=0;
+//#13490            if(chkMap(TXFIL))
+//#13491            {
+//#13492                tine=(ind+nrct.left)%frmpnt->dhx.txt.lins;
+//#13493                clplen=txsegs[tine].cnt;
+//#13494                ptx=&txpnts[frmpnt->dhx.txt.ind+txsegs[tine].lin];
+//#13495                vpnt0.x=ploc.x;
+//#13496                if(frmpnt->txof)
+//#13497                {
+//#13498                    inf=(ind+nrct.left)/frmpnt->dhx.txt.lins;
+//#13499                    clpvof=fmod(frmpnt->txof*inf,frmpnt->dhx.txt.hi);
+//#13500                }
+//#13501            }
+//#13502            else
+//#13503            {
+//#13504                if(clpnof)
+//#13505                    clpvof=(float)(ind%clpnof)/clpnof*clpsiz.cy;
+//#13506                vpnt0.x=ploc.x+clpnu[0].x;
+//#13507            }
+//#13508            vpnt0.y=nrct.bottom*clpsiz.cy;
+//#13509            if(clpnof)
+//#13510                clpvof=(float)(ind%clpnof)/clpnof*clpsiz.cy;
+//#13511            for(tine=nrct.bottom;tine<nrct.top;tine++){
+//#13512
+//#13513                ploc.y=tine*clpsiz.cy-clpvof;
+//#13514                vpnt1.x=ploc.x+clpnu[0].x;
+//#13515                vpnt1.y=ploc.y+clpnu[0].y;
+//#13516                if(!xpnt){
+//#13517
+//#13518                    vpnt0.x=vpnt1.x;
+//#13519                    vpnt0.y=vpnt1.y;
+//#13520                }
+//#13521                for(inf=0;inf<clplen;inf++){
+//#13522
+//#13523                    if(chkMap(TXFIL))
+//#13524                    {
+//#13525                        vpnt1.x=ploc.x;
+//#13526                        vpnt1.y=ploc.y+ptx[inf].y;
+//#13527                    }
+//#13528                    else
+//#13529                    {
+//#13530                        vpnt1.x=ploc.x+clpnu[inf].x;
+//#13531                        vpnt1.y=ploc.y+clpnu[inf].y;
+//#13532                    }
+//#13533                    clipnts[xpnt].x=vpnt0.x;
+//#13534                    clipnts[xpnt].y=vpnt0.y;
+//#13535                    if(isin(vpnt0.x,vpnt0.y))
+//#13536                    {
+//#13537                        if(xpnt&&clipnts[xpnt-1].flg==2)
+//#13538                            inspnt();
+//#13539                        clipnts[xpnt].flg=0;
+//#13540                    }
+//#13541                    else
+//#13542                    {
+//#13543                        if(xpnt&&!clipnts[xpnt-1].flg)
+//#13544                            inspnt();
+//#13545                        clipnts[xpnt].flg=2;
+//#13546                    }
+//#13547                    xpnt++;
+//#13548                    cnt=insect();
+//#13549                    if(cnt)
+//#13550                    {
+//#13551                        for(ing=0;ing<cnt;ing++){
+//#13552
+//#13553                            clipnts[xpnt].sid=pclpsrt[ing]->lin;
+//#13554                            clipnts[xpnt].x=pclpsrt[ing]->pnt.x;
+//#13555                            clipnts[xpnt].y=pclpsrt[ing]->pnt.y;
+//#13556                            clipnts[xpnt].flg=1;
+//#13557                            xpnt++;
+//#13558                            if(xpnt>MAXSEQ<<2)
+//#13559                                goto clpskp;
+//#13560                        }
+//#13561                    }
+//#13562                    vpnt0.x=vpnt1.x;
+//#13563                    vpnt0.y=vpnt1.y;
+//#13564                }
+//#13565            }
+//#13566            clipnts[xpnt-1].flg=2;
+//#13567        }
+//#13568    clpskp:;
+//#13569
+//#13570        clipnts[xpnt].flg=2;
+//#13571        if(nof){
+//#13572
+//#13573            fnof=nof*clpsiz.cy;
+//#13574            for(ind=0;ind<xpnt;ind++)
+//#13575                clipnts[ind].y-=fnof;
+//#13576            for(ind=0;ind<sids;ind++)
+//#13577                flt[ind].y-=fnof;
+//#13578        }
+//#13579    #define CLPVU 0
+//#13580    #define CLPNOP 0
+//#13581
+//#13582    #if CLPVU==1
+//#13583
+//#13584        goto clp1skp;
+//#13585
+//#13586    #endif
+//#13587
+//#13588        pcseg=0;
+//#13589        regof=vclpx[0].seg;
+//#13590        rstMap(FILDIR);
+//#13591        ine=0;
+//#13592        if(xpnt)
+//#13593        {
+//#13594            for(ind=0;ind<xpnt-1;ind++){
+//#13595
+//#13596                switch(clipnts[ind].flg)
+//#13597                {
+//#13598                case 0:        //inside
+//#13599
+//#13600                    setMap(FILDIR);
+//#13601                    break;
+//#13602
+//#13603                case 1:        //line
+//#13604
+//#13605                    if(toglMap(FILDIR))
+//#13606                        clpnseg(ine,ind);
+//#13607                    else
+//#13608                        ine=ind;
+//#13609                    break;
+//#13610
+//#13611                case 2:        //outside
+//#13612
+//#13613                    rstMap(FILDIR);
+//#13614                    break;
+//#13615                }
+//#13616            }
+//#13617        }
+//#13618
+//#13619    #if CLPVU==1
+//#13620
+//#13621    clp1skp:;
+//#13622
+//#13623    #endif
+//#13624
+//#13625        delete lens;
+//#13626        delete clplens;
+//#13627        delete clpsrt;
+//#13628        delete pclpsrt;
+//#13629
+//#13630        if(pcseg){
+//#13631
+//#13632            clplim=pcseg>>3;
+//#13633            clplim=pcseg>>1;
+//#13634            if(!clplim)
+//#13635                clplim=1;
+//#13636            if(clplim>12)
+//#13637                clplim=12;
+//#13638            plens=(float**)&clpsegs[pcseg];
+//#13639            ine=0;
+//#13640            for(ind=0;ind<pcseg;ind++){
+//#13641
+//#13642                plens[ine++]=&clpsegs[ind].blen;
+//#13643                plens[ine++]=&clpsegs[ind].elen;
+//#13644            }
+//#13645            qsort((void*)plens,ine,4,lencmp);
+//#13646            ind=sizeof(CLPSEG);
+//#13647            for(ind=0;ind<ine;ind++){
+//#13648
+//#13649                inf=lenref(plens[ind]);
+//#13650                ing=inf>>1;
+//#13651                if(inf&1)
+//#13652                    clpsegs[ing].eind=ind;
+//#13653                else
+//#13654                    clpsegs[ing].bind=ind;
+//#13655            }
+//#13656
+//#13657    #if CLPVU==1
+//#13658
+//#13659            for(ind=0;ind<xpnt;ind++){
+//#13660
+//#13661                stchs[ind].x=clipnts[ind].x;
+//#13662                stchs[ind].y=clipnts[ind].y;
+//#13663                stchs[ind].at=0;
+//#13664            }
+//#13665            hed.stchs=xpnt;
+//#13666    #endif
+//#13667
+//#13668    #if    CLPVU==2
+//#13669
+//#13670            inf=0;
+//#13671            for(ind=0;ind<pcseg;ind++){
+//#13672
+//#13673                for(ine=clpsegs[ind].strt;ine<=clpsegs[ind].fin;ine++){
+//#13674
+//#13675                    stchs[inf].x=clipnts[ine].x;
+//#13676                    stchs[inf].y=clipnts[ine].y;
+//#13677                    stchs[inf++].at=ind&0xf;
+//#13678                }
+//#13679            }
+//#13680            hed.stchs=inf;
+//#13681
+//#13682    #endif
+//#13683
+//#13684            minx=1e99;
+//#13685
+//#13686    #if CLPVU==0
+//#13687
+//#13688            xpnt=0;
+//#13689            setMap(FILDIR);
+//#13690            seqpnt=0;
+//#13691            pcseg2=pcseg<<1;
+//#13692            vclpsid=clpsegs[0].asid;
+//#13693            strtlen=clpsegs[0].elen;
+//#13694            ritseg();
+//#13695            while(nucseg()){
+//#13696
+//#13697                if(seqpnt>MAXSEQ-3)
+//#13698                    break;
+//#13699                ritseg();
+//#13700            }
+//#13701            chksid(0);
+//#13702            if(seqpnt>MAXSEQ-100)
+//#13703                seqpnt=MAXSEQ-100;
+//#13704            ine=0;inf=0;
+//#13705            for(ind=0;ind<seqpnt;ind++){
+//#13706
+//#13707                if(vscmp(ind,ine)){
+//#13708
+//#13709                    ine++;
+//#13710                    oseq[ine].x=oseq[ind].x;
+//#13711                    oseq[ine].y=oseq[ind].y;
+//#13712                }
+//#13713                else
+//#13714                    inf++;
+//#13715            }
+//#13716            seqpnt=ine;
+//#13717            if(chkMap(WASNEG)){
+//#13718
+//#13719                for(ind=0;ind<seqpnt;ind++)
+//#13720                    oseq[ind].x-=fltof;
+//#13721                for(ind=0;ind<sids;ind++)
+//#13722                    flt[ind].x-=fltof;
+//#13723                frmpnt->rct.left-=fltof;
+//#13724                frmpnt->rct.right-=fltof;
+//#13725            }
+//#13726    #endif
+//#13727        }
+//#13728    }
 //#13729
+end;
+
 procedure vrtsclp();
 //#13730    void vrtsclp(){
 begin
