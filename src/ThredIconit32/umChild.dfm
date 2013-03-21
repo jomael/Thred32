@@ -36,10 +36,11 @@ object fcDesign: TfcDesign
     Bitmap.Resampler.TableSize = 32
     BitmapAlign = baCustom
     Scale = 1.000000000000000000
-    ScaleMode = smScale
+    ScaleMode = smNormal
     ScrollBars.ShowHandleGrip = True
     ScrollBars.Style = rbsDefault
     ScrollBars.Size = 16
+    ScrollBars.Visibility = svAuto
     OverSize = 0
     TabOrder = 0
     TabStop = True

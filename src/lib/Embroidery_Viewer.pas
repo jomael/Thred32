@@ -4,12 +4,13 @@ interface
 
 uses
   Classes, Embroidery_Items,
-  gmCore_Viewer;
+  gmCore_Viewer, GR32_Image;
 
 type
   TgmEmbroideryViewer = class(TgmCoreViewer)
   private
-
+    FShapeList: TEmbroideryList;
+    procedure DrawStitchs;
   protected
 
   public
@@ -26,21 +27,53 @@ type
 implementation
 
 uses
-  gmCore_Items;
+  gmCore_Items, Embroidery_Painter, Embroidery_Fill;
 
 { TgmGraphicViewer }
 
 constructor TgmEmbroideryViewer.Create(AOwner: TComponent);
 begin
   inherited;
-  //FPicture := TPicture.Create;
-
+  FShapeList := TEmbroideryList.Create(self);
+  ScaleMode := smOptimal;
+  ScrollBars.Visibility := svHidden;
 end;
 
 destructor TgmEmbroideryViewer.Destroy;
 begin
-  //FPicture.Free;
+  FShapeList.Free;
   inherited;
+end;
+
+procedure TgmEmbroideryViewer.DrawStitchs;
+var
+  LPainter : TEmbroideryPainterClass ;
+  j : Integer;
+  LShapeItem : TEmbroideryItem;
+begin
+  LPainter := TEmbroideryPhotoPainter;
+  
+  BeginUpdate;
+  try
+    Bitmap.SetSize(Round(FShapeList.HupWidth), Round(FShapeList.HupHeight));
+      LPainter.BeginPaint(Bitmap);
+
+      if FShapeList.Count > 0 then
+      //for i := 0 to FStitchs.Header.fpnt -1 do
+      for j := 0 to FShapeList.Count -1 do
+      begin
+        LShapeItem := FShapeList[j];
+        if Length(LShapeItem.Stitchs^) <= 0 then
+          fnhrz(LShapeItem, nil);
+
+        LPainter.Paint(Bitmap, LShapeItem);
+      end;
+      
+    LPainter.EndPaint(Bitmap);
+  finally
+    EndUpdate;
+    Changed;
+  end;
 end;
 
 function TgmEmbroideryViewer.GetReaderFilter: string;
@@ -50,7 +83,8 @@ end;
 
 procedure TgmEmbroideryViewer.LoadFromFile(const FileName: string);
 begin
-  //FPicture.LoadFromFile(FileName);
+  FShapeList.LoadFromFile(FileName);
+  DrawStitchs();
   //Self.Bitmap.Assign(FPicture.Graphic);
 end;
 

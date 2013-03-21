@@ -9323,4 +9323,8 @@ object DM: TDM
       F39F01FFF87FFFFFFFFFFFFFFFFFFFFF00000000000000000000000000000000
       000000000000}
   end
+  object dlgOpenPic1: TOpenPictureDialog
+    Left = 176
+    Top = 168
+  end
 end

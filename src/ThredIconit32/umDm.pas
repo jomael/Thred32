@@ -4,7 +4,7 @@ interface
 
 uses
   SysUtils, Classes, Graphics, Forms, StdActns, ActnList, ImgList, Controls, Dialogs, Menus,
-  AppEvnts;
+  AppEvnts, ExtDlgs;
 
   
 {$DEFINE DISABLED_IL}
@@ -95,6 +95,7 @@ type
     actDqDebug_Toggle: TAction;
     actDqDebug_Jump: TAction;
     actDqDebug_Western: TAction;
+    dlgOpenPic1: TOpenPictureDialog;
     procedure actOpenStitchExecute(Sender: TObject);
     procedure actFileNew1Execute(Sender: TObject);
     procedure actHelpAbout1Execute(Sender: TObject);
@@ -138,6 +139,7 @@ begin
   //with TOpenStitchsDialog.Create(Self) do
   //with TOpenDialog.Create(self) do
   with TgmOpenDialog.Create(Self) do
+  //with TOpenPictureDialog.Create(self) do
   begin
     ViewerClassName := TgmEmbroideryViewer.ClassName;
     Options := Options + [ofAllowMultiSelect];

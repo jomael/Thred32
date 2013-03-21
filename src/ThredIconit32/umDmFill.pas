@@ -1576,7 +1576,7 @@ begin
 
   //if Assigned(AStitchForm.Ini) then
     //LIni := AStitchForm.Ini^;
-  LIni.StitchSpacing := 1;//0.45;//self.gbrSpace1.Position/10;
+  LIni.StitchSpacing := 10;//0.45;//self.gbrSpace1.Position/10;
 
   LLowY  := High(Integer);// LShape.Points[0].X;
   LHighY := Low(Integer);// LLowX;

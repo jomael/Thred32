@@ -73,6 +73,8 @@ procedure TdmTool.actToolSelectExecute(Sender: TObject);
 begin
   with TAction(sender) do
   begin
+               //this call the integrator to use tgmToolShapeSelect
+               // as current mouse listener (Editor Tool).
     Checked := gmSelectTool(TgmtoolShapeSelect);
     if Checked then
       with TgmtoolShapeSelect(gmActiveTool) do
@@ -98,7 +100,12 @@ procedure TdmTool.actToolShapeExecute(Sender: TObject);
 begin
   with TAction(Sender) do
   begin
+     // this call the integrator to use TgmtoolShape
+     // as current mouse listener (Editor Tool).
+     // if TgmtoolShape is available,
+     // so the toolbutton(sender) is being checked
     Checked := gmSelectTool(TgmtoolShape);
+    
     if Checked then
     begin
       with TgmtoolShape(gmActiveTool) do
