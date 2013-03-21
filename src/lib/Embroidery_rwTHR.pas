@@ -84,7 +84,8 @@ var
 	led : Cardinal;
 	len : Cardinal;	//length of strhed + length of stitch data
   formCount,
-  vervar,i,j,red : Integer;
+  vervar,i,j,k,m,n,red : Integer;
+  at,formIndex : Cardinal;
   LHeader : TSTRHED;
   item  : TSHRTPNT;
   hedx : TSTREX;
@@ -112,7 +113,7 @@ var
   clpad,satkad,fltad : Integer;
 
   //EMBROIDERY SHAPE
-  LShape : TgmShapeInfo;
+  LShape : PgmShapeInfo;
   
 
   procedure TransferFromOldFormFormat();
@@ -340,8 +341,8 @@ begin
     formCount := 0;
   {$ENDIF}
     //prepare Embroidery
-    FillChar(LShape, SizeOf(TgmShapeInfo), 0);
-    LShape.Kind := skPolygon;
+    //FillChar(LShape, SizeOf(TgmShapeInfo), 0);
+    //LShape.Kind := skPolygon;
     
   if formCount = 0 then
   begin
@@ -439,8 +440,45 @@ begin
     for i := 0 to formCount -1 do
     begin
       //Lformlst[i].flt := adflt(Lformlst[i].sids);
-      LShape.Points  := adflt(Lformlst[i].sids);
-      LDesign.AttachShape(@LShape, emNew );
+      //LShape.Points  := adflt(Lformlst[i].sids);
+      //LDesign.AttachShape(@LShape, emNew );
+      LItem := TEmbroideryItem( LDesign.Add);
+      LShape := LItem.Add;
+      LShape^.Points  := adflt(Lformlst[i].sids);
+
+      {LStitchCount := 1024;Lformlst[i].endp - Lformlst[i].strt +1;
+      SetLength(LStitchs, LStitchCount);
+      FillChar(LStitchs[0], SizeOf(TStitchPoint) * LStitchCount, 0);
+      for j := 0 to LStitchCount -1  do
+      begin
+        LStitchs[j].X := LThredStitchs[j + Lformlst[i].strt].x;
+        LStitchs[j].Y := LThredStitchs[j + Lformlst[i].strt].y;
+        LStitchs[j].at := LThredStitchs[j + Lformlst[i].strt].at;
+
+      end;}
+      LStitchCount := LHeader.stchs +1;
+      SetLength(LStitchs, LStitchCount);
+      FillChar(LStitchs[0], SizeOf(TStitchPoint) * LStitchCount, 0);
+      k := 0; 
+      for j := 0 to LStitchCount do
+      begin
+        formIndex := (LThredStitchs[j].at and FRMSK) shr FRMSHFT;
+        if formIndex = i then
+        begin
+          //LStitchs[k] := LThredStitchs[j];
+          LStitchs[k].X := LThredStitchs[j].x;
+          LStitchs[k].Y := LThredStitchs[j].y;
+          LStitchs[k].at := LThredStitchs[j].at;
+          Inc(k);
+        end;  
+
+        //LStitchs := Lflts[i].y := {hedx.yhup -}(hedx.yhup - Lflts[i].y);
+      end;
+      SetLength(LStitchs, k);
+      SetLength(Litem.Stitchs^,k);
+      LItem.Stitchs^ := LStitchs;
+      SetLength(LStitchs,0);
+      
 
 
       //adflt(Lformlst[i].flt, Lformlst[i].sids);

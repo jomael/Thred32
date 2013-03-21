@@ -165,7 +165,7 @@ begin
   FShapeList := TEmbroideryList.Create(self);
   //FDrawLine := Draw3DLine;//DrawLineStippled;//DrawLineFS;
   //FPainter  := TEmbroideryPainter;
-  DrawQuality := DQDEBUG;// DQINDOORPHOTO;
+  DrawQuality := DQINDOORPHOTO;//DQDEBUG;//  
   FUseOrdinalColor := True;
 
 //  FSelectedIndex := -1;
