@@ -114,7 +114,8 @@ uses
 
   Thred_Constants,
   Embroidery_Lines32, Embroidery_Defaults {Thred_Defaults} ,
-  umMain, umDm, umDmFill, Math;
+  Embroidery_Fill,
+  umMain, umDm, Math;
 
 {$R *.dfm}
 {$R VirtualTrees.res}
