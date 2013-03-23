@@ -517,7 +517,7 @@ var d : integer;
   b : TSHRTPNT;
   i : TStitchItem;
 begin
-  {Stream.Read(b,SizeOf(TSHRTPNT));
+  Stream.Read(b,SizeOf(TSHRTPNT));
   with TStitchItem(AItem) do
   begin
     x := b.x;

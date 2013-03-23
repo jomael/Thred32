@@ -37,23 +37,36 @@ unit Embroidery_Painter;
 interface
 
 uses
-  GR32,
+  GR32, GR32_Image,
   Embroidery_Items;
 
 type
-  TEmbroideryPaintStage = (epsBeginPaint, epsPaint, epsEndPaint);
-  
+  TEmbroideryPaintStage = (epsBeginPaint, epsPaint, epsPaintBuffer, epsEndPaint);
+
   TEmbroideryPainter = class(TObject)
   private
+    FImage32: TCustomImage32;
+
   protected
-    class procedure PaintShape(B: TBitmap32; AnItem: TEmbroideryItem); virtual;
-    //procedure PaintLine(B: TBitmap32; TopLeft, RightBottom : TStitchPoint);  TStitchLine
-    class procedure PaintLine(B: TBitmap32; ALine : TStitchLine; AColor: TColor32); virtual;
+    FWantToClear: Boolean;
+    procedure PaintShape(B: TBitmap32; AnItem: TEmbroideryItem); virtual;
+    procedure PaintLine(B: TBitmap32; ALine : TStitchLine; AColor: TColor32); virtual;
+
+    procedure BeginPaint(B: TBitmap32); virtual;
+
+    //procedure PaintBitmap(B: TBitmap32; AnItem: TEmbroideryItem = nil; AState: TEmbroideryPaintStage = epsPaint); virtual;
+    //procedure PaintBuffer(B: TBitmap32; AnItem: TEmbroideryItem = nil; AState: TEmbroideryPaintStage = epsPaint); virtual;
+    procedure RepeatPaint(B: TBitmap32; AShapeList: TEmbroideryList; AState: TEmbroideryPaintStage);
+
+    procedure PaintBitmap(B: TBitmap32; AnItem: TEmbroideryItem = nil; AState: TEmbroideryPaintStage = epsPaint); virtual;
+    procedure PaintBuffer(B: TBitmap32; AnItem: TEmbroideryItem = nil; AState: TEmbroideryPaintStage = epsPaint); virtual;
+
+    procedure EndPaint(B: TBitmap32); virtual;
   public
-    class procedure BeginPaint(B: TBitmap32); virtual;
-    //procedure Paint(B: TBitmap32; AState: TEmbroideryPaintStage; AnItem: TEmbroideryItem = nil );
-    class procedure Paint(B: TBitmap32; AnItem: TEmbroideryItem = nil; AState: TEmbroideryPaintStage = epsPaint); virtual;
-    class procedure EndPaint(B: TBitmap32); virtual;
+    constructor Create(AImage32: TCustomImage32);
+    //function GetWantToClear: Boolean; virtual;
+    procedure Paint(AShapeList: TEmbroideryList; AState: TEmbroideryPaintStage = epsPaint); virtual;
+    property WantToClear : Boolean read FWantToClear write FWantToClear;
   end;
 
   TEmbroideryPainterClass = class of TEmbroideryPainter;
@@ -61,10 +74,10 @@ type
 
   TEmbroideryPhotoPainter = class(TEmbroideryPainter)
   protected
-    class procedure PaintLine(B: TBitmap32; ALine : TStitchLine; AColor: TColor32); override;
+    procedure PaintLine(B: TBitmap32; ALine : TStitchLine; AColor: TColor32); override;
   end;
 
-
+  {
   TEmbroideryOutDoorPhotoPainter = class(TEmbroideryPainter)
   protected
     class procedure PaintLine(B: TBitmap32; ALine : TStitchLine; AColor: TColor32); override;
@@ -129,6 +142,11 @@ type
     class procedure PaintShape(B: TBitmap32; AnItem: TEmbroideryItem); override;
   end;
 
+  TEmbroideryByRGNSPainter = class(TEmbroideryByLinPainter)
+  protected
+    class procedure PaintShape(B: TBitmap32; AnItem: TEmbroideryItem); override;
+  end;  }
+
 implementation
 
 uses
@@ -137,8 +155,9 @@ uses
   Embroidery_Defaults;
 
 const
-  VERTICES = 10;
-  LEdgeColors : array[0..VERTICES-1] of TColor32 = (clYellow32, clLime32, clAqua32, clBlueViolet32, clFuchsia32, clred32,
+  VERTICES = 11;
+  LEdgeColors : array[0..VERTICES-1] of TColor32 = (
+      clYellow32, clLime32, clAqua32, clDodgerBlue32, clBlueViolet32, clFuchsia32, clred32,
       clGray32, clLightGray32, clblack32,  clDarkOrange32);
   TRA = clTrWhite32;
 
@@ -208,33 +227,77 @@ end;
   
 { TEmbroideryPainter }
 
-class procedure TEmbroideryPainter.BeginPaint(B: TBitmap32);
+procedure TEmbroideryPainter.BeginPaint(B: TBitmap32);
 begin
-  B.Clear(clWhite32);
+  if Self.WantToClear then
+    B.Clear(clWhite32);
 end;
 
-class procedure TEmbroideryPainter.EndPaint(B: TBitmap32);
+constructor TEmbroideryPainter.Create(AImage32: TCustomImage32);
+begin
+  inherited Create;
+  FWantToClear := True;
+  FImage32 := AImage32;
+end;
+
+procedure TEmbroideryPainter.EndPaint(B: TBitmap32);
 begin
 
 end;
 
-class procedure TEmbroideryPainter.Paint(B: TBitmap32; AnItem: TEmbroideryItem;
+
+procedure TEmbroideryPainter.Paint(AShapeList: TEmbroideryList;
+  AState: TEmbroideryPaintStage);
+begin
+  case AState of
+    epsPaintBuffer :
+            RepeatPaint(FImage32.Buffer, AShapeList, AState);
+    else
+            RepeatPaint(FImage32.Bitmap, AShapeList, AState);
+  end;
+end;
+
+procedure TEmbroideryPainter.RepeatPaint(B: TBitmap32; AShapeList: TEmbroideryList;
+  AState: TEmbroideryPaintStage);
+var i : Integer;
+begin
+  BeginPaint(B);
+
+  for i := 0 to AShapeList.Count -1 do
+  begin
+    if AState = epsPaintBuffer then
+      PaintBuffer(B, AShapeList[i])
+    else
+      PaintBitmap(B, AShapeList[i]);
+  end;
+
+
+  EndPaint(B);
+end;
+
+procedure TEmbroideryPainter.PaintBitmap(B: TBitmap32; AnItem: TEmbroideryItem;
   AState: TEmbroideryPaintStage);
 begin
   case AState of
     epsBeginPaint : BeginPaint(B);
-    epsPaint      : PaintShape(B, AnItem, );
+    epsPaint      : PaintShape(B, AnItem);
     epsEndPaint   : EndPaint(B);
   end;
 end;
 
-class procedure TEmbroideryPainter.PaintLine(B: TBitmap32; ALine: TStitchLine; AColor: TColor32);
+procedure TEmbroideryPainter.PaintBuffer(B: TBitmap32;
+  AnItem: TEmbroideryItem; AState: TEmbroideryPaintStage);
+begin
+
+end;
+
+procedure TEmbroideryPainter.PaintLine(B: TBitmap32; ALine: TStitchLine; AColor: TColor32);
 begin
   with ALine do
     B.LineFS(Start.x, Start.y, Finish.x, Finish.y, AColor);
 end;
 
-class procedure TEmbroideryPainter.PaintShape(B: TBitmap32;
+procedure TEmbroideryPainter.PaintShape(B: TBitmap32;
   AnItem: TEmbroideryItem);
 var
   LStitchs : TArrayOfStitchPoint;
@@ -302,9 +365,10 @@ begin
   end;
 end;
 
+
 { TEmbroideryPhotoPainter }
 
-class procedure TEmbroideryPhotoPainter.PaintLine(B: TBitmap32;
+procedure TEmbroideryPhotoPainter.PaintLine(B: TBitmap32;
   ALine: TStitchLine; AColor: TColor32);
 var h, x, y : TFloat;
   Cs : TArrayOfColor32;
@@ -341,465 +405,6 @@ begin
   end;
   
 end;
-
-
-{ TEmbroideryOutDoorPhotoPainter }
-
-class procedure TEmbroideryOutDoorPhotoPainter.PaintLine(B: TBitmap32;
-  ALine: TStitchLine; AColor: TColor32);
-var h, x, y : TFloat;
-  Cs : TArrayOfColor32;  
-begin
-  with Line2FloatRect(ALine) do
-  begin
-    x := right - left;
-    y := bottom - top;
-    h := hypot(x,y);
-
-    if h = 0 then exit;
-
-    //B.StippleCounter := 0;
-    B.StippleStep := 4/h;
-    setlength(Cs,5);
-    Cs[0] := Lighten(AColor, - 64);
-    Cs[1] := AColor;//Lighten(C, 11);
-    Cs[2] := Lighten(AColor, 151);
-    Cs[3] := AColor;//Lighten(C, 11);
-    Cs[4] := Lighten(AColor, - 64); EMMS;
-    B.SetStipple(Cs);
-
-
-    B.StippleCounter := 0;
-    B.LineFSP(left, top, right, bottom);
-    B.StippleCounter := 0;
-    B.LineFSP(left, top, right, bottom);
-  end;
-
-end;
-
-{ TEmbroideryByLinPainter }
-
-class procedure TEmbroideryByLinPainter.PaintShapeBy(B: TBitmap32;
-  AnItem: TEmbroideryItem; Tag: Integer);
-var
-  LBarCount, 
-  w,x,y,i,j : Integer;
-  LFillPoints : TArrayOfStitchPoint;
-  x1,y1,x2,y2 : TFloat;
-  c1,c2 : TColor32;
-begin
-  //PArrayOfStitchPoint(LFillPoints) := AnItem.Stitchs;
-  LFillPoints := AnItem.Stitchs^;
-  LBarCount := Length(LFillPoints);
-  
-
-
-  //DRAWING.
-  //Tag := 2;
-  if LBarCount < 1 then
-    Exit;
-
-
-  //ABitmap32.PenColor := clRed32;
-
-  x := Round(LFillPoints[0].X);
-  y := Round(LFillPoints[0].Y);
-  B.MoveTo(x, y);
-
-  i := 0;
-
-
-  i := 0;
-  for j := 0 to (LBarCount - 1) do
-  begin
-    x1 := (LFillPoints[i].X);
-    y1 := (LFillPoints[i].Y);
-    //if chkDrawBoth.Checked then
-    begin
-      case Tag of
-        0 : c1 := LEdgeColors[LFillPoints[i].lin mod VERTICES] and TRA;
-        1 : c1 := LEdgeColors[LFillPoints[i].grp mod VERTICES] and TRA;
-        2 : c1 := LEdgeColors[LFillPoints[i].region mod VERTICES] and TRA;
-        3 : c1 := LEdgeColors[j mod VERTICES] and TRA;
-        4 : c1 := LEdgeColors[LFillPoints[i].NorthIndex mod VERTICES] and TRA;
-        5 : c1 := LEdgeColors[LFillPoints[i].WesternIndex mod VERTICES] and TRA;
-
-      end;
-      //ABitmap32.LineToS(x, y);
-      //ABitmap32.LineToFS(LFillPoints[i].X, LFillPoints[i].Y);
-    end;
-
-    if Tag = 20 then
-      B.LineToFSP(X1, Y1)
-    else
-      B.MoveToF(x1, y1);
-    //ABitmap32.MoveTo(x, y);
-
-    inc(i);
-    case Tag of
-      0 : c2 := LEdgeColors[LFillPoints[i].lin mod VERTICES] and TRA;
-      1 : c2 := LEdgeColors[LFillPoints[i].grp mod VERTICES] and TRA;
-      2 : c2 := LEdgeColors[LFillPoints[i].region mod VERTICES] and TRA;
-      3 : c2 := c1;//LEdgeColors[j mod VERTICES] and TRA;
-      4 : c2 := LEdgeColors[LFillPoints[i].NorthIndex mod VERTICES] and TRA;
-      5 : c2 := LEdgeColors[LFillPoints[i].WesternIndex mod VERTICES] and TRA;
-
-    end;
-
-    x2 := (LFillPoints[i].X);
-    y2 := (LFillPoints[i].Y);
-
-    //three line below is backup line drawing, because in "GRP" draw, each line is end with white
-    {Bitmap32.PenColor := c2;
-    ABitmap32.LineToFS(X2, Y2); //it move the begin line
-    ABitmap32.MoveToF(x1, y1); //set back to original begin line
-    }
-
-    //ABitmap32.LineToS(x, y);
-    B.SetStipple([c1,c1,c2,c2, c2,c2]);
-    B.StippleCounter := 0;
-    //ABitmap32.LineToFS(x2,y2);
-    B.StippleStep := 3.5/ max(Max(x2,x1) - Min(x2,x1),1);
-    //ABitmap32.PenColor := c2;
-    B.LineToFSP(X2, Y2);
-    inc(i);
-    if i >= LBarCount -1 then break;
-  end;
-
-  w := 2;
-  for i := 0 to (LBarCount - 1) do
-  begin
-    x := Round(LFillPoints[i].X);
-    y := Round(LFillPoints[i].Y);
-
-    case Tag of
-      0 : B.FillRectS(x - w, y - w, x + w, y + w, LEdgeColors[LFillPoints[i].lin mod VERTICES]);
-      1 : B.FillRectS(x - w, y - w, x + w, y + w, LEdgeColors[LFillPoints[i].grp mod VERTICES]);
-    end;
-
-  end;                       
-
-    //SetLength(FFillPoints, 0);
-    //FFillPoints := nil;
-
-
-end;
-
-class procedure TEmbroideryByLinPainter.PaintShape(B: TBitmap32;
-  AnItem: TEmbroideryItem);
-begin
-  PaintShapeBy(B, AnItem, 0);
-end;
-
-
-
-class procedure TEmbroideryByLinPainter.PaintText(B: TBitmap32;
-  AnItem: TEmbroideryItem; Tag: Integer);
-var
-  LLines : TArrayOfStitchLine;
-  W,H,
-  LastRegion, i : Integer;
-  L,R : TFloatRect;
-  Drawn : Boolean;
-begin
-  //REGION
-  LastRegion := -1;
-
-  R := FloatRect(High(Integer), High(Integer), Low(Integer), Low(Integer));
-  //sort by sequence of : Jumps, lin
-  PArrayOfStitchLine(LLines) :=  @AnItem.Stitchs^[0];
-  W := b.TextWidth('10') div 2;
-  H := b.TextHeight('198') div 2;
-
-  for i := 0 to High(AnItem.Stitchs^) div 2 do
-  with LLines[i] do
-  begin
-    Drawn := False;
-    if (Start.region <> LastRegion)  then
-    begin
-      if i > 0 then //dont draw in first detection
-      begin
-      with R do
-        B.Textout(
-          Round(Left + (Right - Left) /2) - W ,
-          Round(Top + (Bottom - Top) /2) - H,
-          IntToStr(LastRegion) );
-      B.FrameRectS(MakeRect( R, rrOutside), clBlack32);
-      Drawn := True;
-      end;
-      LastRegion := Start.region;
-
-      R := FloatRect(High(Integer), High(Integer), Low(Integer), Low(Integer));
-    end;
-
-    if R.Left > Start.x then
-      R.Left := Start.x;
-    if R.Top > Start.y then
-      R.Top := Start.y;
-
-    if R.Right < Finish.x then
-      R.Right := Finish.x;
-    if R.Bottom < Finish.y then
-      R.Bottom := Finish.y;
-
-    if (i = High(AnItem.Stitchs^) div 2) and not Drawn then //last line
-    begin
-      with R do
-        B.Textout(
-          Round(Left + (Right - Left) /2) - W ,
-          Round(Top + (Bottom - Top) /2) - H,
-          IntToStr(LastRegion) );
-      B.FrameRectS(MakeRect(R), clTrBlack32);
-    end;
-
-
-
-  end;
-
-
-    {for j := LRegions[i].X div 2   to LRegions[i].Y div 2   do
-    begin
-      if LLines[j].Start.jump > 1 then
-        if LLines[j].Start.lin <> LastJump then
-        begin
-          LastJump := LLines[j].Start.lin;
-          Inc(z);
-        end;
-      LLines[j].Start.region := z;
-      LLines[j].Finish.region := z;
-    end;}
-
-
-
-
-  PArrayOfStitchLine(LLines) := nil;
-end;
-
-{ TEmbroideryByGrpPainter }
-
-class procedure TEmbroideryByGrpPainter.PaintShape(B: TBitmap32;
-  AnItem: TEmbroideryItem);
-begin
-  PaintShapeBy(B, AnItem, 1);
-end;
-
-{ TEmbroideryByRegionPainter }
-
-class procedure TEmbroideryByRegionPainter.PaintShape(B: TBitmap32;
-  AnItem: TEmbroideryItem);
-begin
-  PaintShapeBy(B, AnItem, 2);
-  PaintText(B,AnItem,2);
-end;
-
-{ TEmbroideryByJumpPainter }
-
-class procedure TEmbroideryByJumpPainter.PaintShape(B: TBitmap32;
-  AnItem: TEmbroideryItem);
-begin
-  PaintShapeBy(B, AnItem, 4);
-end;
-
-{ TEmbroideryByWesternPainter }
-
-class procedure TEmbroideryByWesternPainter.PaintShape(B: TBitmap32;
-  AnItem: TEmbroideryItem);
-begin
-  PaintShapeBy(B, AnItem, 5);
-end;
-
-{ TEmbroideryHotPressurePainter }
-
-class procedure TEmbroideryHotPressurePainter.BeginPaint(B: TBitmap32);
-begin
-  //B.FillRectS(MakeRect(R), ClBlack32);
-  B.Clear(clBlack32);
-end;
-
-class procedure TEmbroideryHotPressurePainter.EndPaint(B: TBitmap32);
-var
-  R : TRect;
-//BEST FOR LOOKING THE MOST VISITED POINT
-var h, dx, dy : TFloat;
-  L,i,X,Y : integer;
-  V : byte;
-  Cs : TArrayOfColor32;
-  P : PColor32Array;
-begin
-  R := B.BoundsRect;
-//exit;//debug
-    if not assigned(UHotPressureColors) then
-      BuildHotPressureColors;
-    with R do
-    for y := max(Top,0) to min(Bottom, B.Height) -1 do
-    begin
-      P := B.ScanLine[y];
-      for x := max(left,0) to min(right, B.Width) -1 do
-      begin
-        V := P[x] and $FF;
-        P^[x] := UHotPressureColors[V];
-      end;
-    end;
-
-    //debug
-    {B.StippleStep := 255/(B.Width-1);
-    B.SetStipple(UHotPressureColors);
-    B.StippleCounter := 0;
-    for y := 0 to B.Height div 8 do
-    begin
-      B.StippleCounter := 0;
-      B.LineFSP(0, y, B.Width-1, y);
-    end;}
-end;
-
-class procedure TEmbroideryHotPressurePainter.PaintLine(B: TBitmap32;
-  ALine: TStitchLine; AColor: TColor32);
-//BEST FOR LOOKING THE MOST VISITED POINT
-var h, dx, dy : TFloat;
-  L,i,X,Y : integer;
-  V : byte;
-  Cs : TArrayOfColor32;
-  P : PColor32Array;
-  R : TFloatRect;
-begin
-
-  R := Line2FloatRect(ALine);
-
-
-
-
-
-    //DrawXRay(B, R, C, sdlLine);
-    //exit;//
-    with R do
-    begin
-      dx := right - left;
-      dy := bottom - top;
-      h := hypot(dx,dy);
-
-      if h = 0 then exit;
-
-      L := floor(h) div 2; //pixel hot
-      L := max(L, 3);
-      B.StippleStep := {4}(L-1)/h;
-      setlength(Cs,{5}L);
-      Cs[0] := $77FFFFFF; // calling EMMS each time after call to Lighten() to avoid "invalid floating operation" error
-      Cs[L-1] := Cs[0];
-      for i := 1 to L-2 do
-      begin
-        Cs[i] := 0;
-      end;
-
-
-      B.SetStipple(Cs);
-
-
-      B.StippleCounter := 0;
-      B.LineFSP(left, top, right, bottom);
-      //B.StippleCounter := 0;
-      //B.LineFSP(left, top, right, bottom);
-    end;
-
-end;
-
-{ TEmbroideryMountainPainter }
-
-class procedure TEmbroideryMountainPainter.BeginPaint(B: TBitmap32);
-begin
-  B.Clear(ClBlack32);
-
-end;
-
-class procedure TEmbroideryMountainPainter.EndPaint(B: TBitmap32);
-var h, dx, dy : TFloat;
-  L,i,X,Y : integer;
-  P : PColor32Array;
-  V : byte;
-begin
-  if not assigned(UMountainColors) then
-      BuildMountainColors;
-    with B.BoundsRect do
-    for y := max(Top,0) to min(Bottom, B.Height) -1 do
-    begin
-      P := B.ScanLine[y];
-      for x := max(left,0) to min(right, B.Width) -1 do
-      begin
-        V := P[x] and $FF;
-        P^[x] := UMountainColors[V];
-      end;
-    end;
-
-    //debug
-    {B.StippleStep := 255/(B.Width-1);
-    B.SetStipple(UHotPressureColors);
-    B.StippleCounter := 0;
-    for y := 0 to B.Height div 8 do
-    begin
-      B.StippleCounter := 0;
-      B.LineFSP(0, y, B.Width-1, y);
-    end;}
-
-end;
-
-class procedure TEmbroideryMountainPainter.PaintLine(B: TBitmap32;
-  ALine: TStitchLine; AColor: TColor32);
-//BEST FOR LOOKING THE MOST OVERLAPED ZONE
-var h, dx, dy : TFloat;
-  L,i,X,Y : integer;
-  V : byte;
-  Cs : TArrayOfColor32;
-  P : PColor32Array;
-begin  
-//DrawXRay(B, R, C, sdlLine);
-    //exit;//
-    
-    with Line2FloatRect(ALine) do
-    begin
-      dx := right - left;
-      dy := bottom - top;
-      h := hypot(dx,dy);
-
-      if h = 0 then exit;
-
-      L := floor(h) div 3; //pixel hot
-      L := max(L, 3); //atleast pixels
-      B.StippleStep := {4}(L-1)/h;
-      setlength(Cs,{5}L);
-      Cs[0] := clBlack32; // calling EMMS each time after call to Lighten() to avoid "invalid floating operation" error
-      Cs[L-1] := Cs[0];
-      for i := 1 to L-2 do
-      begin
-        Cs[i] := $22FFFFFF;
-      end;
-
-
-      B.SetStipple(Cs);
-
-
-      B.StippleCounter := 0;
-      B.LineFSP(left, top, right, bottom);
-      //B.StippleCounter := 0;
-      //B.LineFSP(left, top, right, bottom);
-    end;
-
-end;
-
-{ TEmbroideryXRayPainter }
-
-class procedure TEmbroideryXRayPainter.BeginPaint(B: TBitmap32);
-begin
-  B.Clear(clBlack32);
-
-end;
-
-class procedure TEmbroideryXRayPainter.PaintLine(B: TBitmap32;
-  ALine: TStitchLine; AColor: TColor32);
-begin
-  with Line2FloatRect(ALine) do
-    B.LineFS(left, top, right, bottom, $10FFFFFF, True);
-
-end;
-
 
 
 initialization

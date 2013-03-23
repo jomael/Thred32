@@ -495,12 +495,19 @@ type
   end; //RNGCNT;
 
 
-  TRGN = record//region for sequencing vertical fills
+
+  {TRGN = record//region for sequencing vertical fills
     strt,		//start line of region
     fin, //end;		//end line of region
     brk,
     cntbrk : Cardinal;
-  end;  //RGN;
+  end;  //RGN;}
+  TRGN = packed record
+    StartLine: Cardinal;
+    EndLine  : Cardinal;
+    brk      : Cardinal;
+    cntbrk   : Cardinal;
+  end;
 
 
   TRCON = record		//pmap: path map for sequencing

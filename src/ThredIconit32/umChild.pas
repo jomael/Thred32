@@ -49,7 +49,7 @@ type
     gmSource : TgmIntegratorSource;
     FUseOrdinalColor: boolean;
     //FDrawLine : TEmbroidery_LineProc;
-    FPainter  : TEmbroideryPainterClass;
+    FPainter  : TEmbroideryPainter;
     
     //FSelections : TArrayOfArrayOfInteger;// TArrayOfPArrayOfgmShapeInfo;
     //FShapes : TArrayOfTgmShapeInfo;
@@ -60,6 +60,7 @@ type
     procedure SetUseOrdinalColor(const Value: boolean);
     function GetPolyPolygons: PArrayOfArrayOfgmShapeInfo;
     function GetSelections: PArrayOfArrayOfInteger;
+    procedure SetPainter(const Value: TEmbroideryPainter);
 //    function GetPolyPolygons: PArrayOfArrayOfgmShapeInfo;
 //    procedure SetSelectedIndex(const Value: Integer);
 //    function GetSelections: PArrayOfArrayOfInteger;
@@ -71,7 +72,8 @@ type
     procedure WMExitSizeMove(var Msg: TMessage) ; message WM_EXITSIZEMOVE;
     procedure WMPosChanging(var Msg : TMessage); message WM_WINDOWPOSCHANGING;
 
-
+    //property PainterClass : TEmbroideryPainter read FPainter write SetPainter;
+    property Painter : TEmbroideryPainter read FPainter write SetPainter;
   public
     { Public declarations }
     procedure DrawStitchs;
@@ -114,7 +116,7 @@ uses
 
   Thred_Constants,
   Embroidery_Lines32, Embroidery_Defaults {Thred_Defaults} ,
-  Embroidery_Fill,
+  Embroidery_Fill, Embroidery_Fill_LCON,
   umMain, umDm, Math;
 
 {$R *.dfm}
@@ -166,7 +168,7 @@ begin
   FShapeList := TEmbroideryList.Create(self);
   //FDrawLine := Draw3DLine;//DrawLineStippled;//DrawLineFS;
   //FPainter  := TEmbroideryPainter;
-  DrawQuality := DQINDOORPHOTO;//DQDEBUG;//  
+  DrawQuality := DQBASICSOLID;//DQINDOORPHOTO;//DQDEBUG;//  
   FUseOrdinalColor := True;
 
 //  FSelectedIndex := -1;
@@ -355,6 +357,8 @@ var i,j : Integer;
   LShapeItem : TEmbroideryItem;
   LPolyPolyGon : TArrayOfgmShapeInfo;
   LStitchs : TArrayOfStitchPoint;
+  M : TBitmap32;
+  BackgroundFileName : string;
 begin
   {$IFDEF DEBUGLOG} ActiveIntegrator.DoDebugLog(Self, 'DrawStitchs', 0); {$ENDIF}
 
@@ -377,26 +381,54 @@ begin
   zRat.x := 1; //debug
   zRat.Y := 1; //debug
 
-
   with imgStitchs do
   begin
     BeginUpdate;
     try
-      //Bitmap.Clear(clWhite32);
+
+      //if not FPainter.WantToClear then      begin
+        BackgroundFileName := ExtractFilePath(Application.ExeName)+'\Assets\bg.bmp';
+        if FileExists(BackgroundFileName) then
+        begin
+          M:= TBitmap32.Create;
+          try
+            M.LoadFromFile(BackgroundFileName);
+            for i := 0 to Bitmap.Height div M.Height do
+            for j := 0 to Bitmap.Width div M.Width do
+            begin
+              M.DrawTo(Bitmap, j * M.Width, i* M.Height);
+            end;
+          finally
+            M.Free;
+          end;
+          FPainter.WantToClear := False;
+        end
+        else
+          //Bitmap.Clear(clWhite32);
+          FPainter.WantToClear := True;
+      //end;
+
+      //
 
       //R := FloatRect(Bitmap.BoundsRect);
       //FDrawLine(Bitmap, R, clWhite32, sdlStart);
-      FPainter.BeginPaint(Bitmap);
+//      FPainter.BeginPaint(Bitmap);
 
       if FShapeList.Count > 0 then
-      //for i := 0 to FStitchs.Header.fpnt -1 do
+
       for j := 0 to FShapeList.Count -1 do
       begin
         LShapeItem := FShapeList[j];
-        if Length(LShapeItem.Stitchs^) <= 0 then
-          fnhrz(LShapeItem, nil);
 
-        FPainter.Paint(Bitmap, LShapeItem);
+        // DO FILLING ALGORITHM HERE, IF NECESSARY
+        if Length(LShapeItem.Stitchs^) <= 0 then
+        begin
+          fnhrz(LShapeItem, nil);
+          LCON(LShapeItem);
+        end;
+      end;
+
+      FPainter.Paint(FShapeList);
 
         //STITCH
         //PArrayOfStitchPoint(LStitchs) := LShapeItem.Stitchs;
@@ -465,9 +497,9 @@ begin
         //if i = FSelectedIndex then
           //LXorPoints := LPoints;
         }
-      end;//for
+      //end;//for
 
-      FPainter.EndPaint(Bitmap);
+      //FPainter.EndPaint(Bitmap);
 
       //if FSelectedIndex >= 0 then
         LDrawSelection();
@@ -549,17 +581,19 @@ begin
     //it is modified by my own (childform) render quality menu.
     case Value of
       //1 : FDrawLine := DrawWireFrame;
-      2 : FPainter  := TEmbroideryPainter;  //Solid
-      3 : FPainter  := TEmbroideryPhotoPainter;  //Photo
-      4 : FPainter  := TEmbroideryOutDoorPhotoPainter;//Outdoor Photo
-      5 : FPainter  := TEmbroideryMountainPainter;
-      6 : FPainter  := TEmbroideryXRayPainter;        //
-      7 : FPainter  := TEmbroideryHotPressurePainter;
-      8 : FPainter  := TEmbroideryByLinPainter;
-      9 : FPainter  := TEmbroideryByGrpPainter;
-      10 : FPainter  := TEmbroideryByRegionPainter ;
-      11 : FPainter  := TEmbroideryByJumpPainter ;
-      12 : FPainter  := TEmbroideryByWesternPainter ;
+      2 : Painter  := TEmbroideryPainter.Create(imgStitchs);  //Solid
+      3 : Painter  := TEmbroideryPhotoPainter.Create(imgStitchs);  //Photo
+      {4 : Painter  := TEmbroideryOutDoorPhotoPainter;//Outdoor Photo
+      5 : Painter  := TEmbroideryMountainPainter;
+      6 : Painter  := TEmbroideryXRayPainter;        //
+      7 : Painter  := TEmbroideryHotPressurePainter;
+      8 : Painter  := TEmbroideryByLinPainter;
+      9 : Painter  := TEmbroideryByGrpPainter;
+      10 : Painter  := TEmbroideryByRegionPainter ;
+      11 : Painter  := TEmbroideryByJumpPainter ;
+      12 : Painter  := TEmbroideryByWesternPainter ;
+      13 : Painter  := TEmbroideryByRGNSPainter;
+      }
     end;
     //pb.Repaint;
     self.DrawStitchs;
@@ -679,6 +713,13 @@ end;
 function TfcDesign.GetSelections: PArrayOfArrayOfInteger;
 begin
 
+end;
+
+procedure TfcDesign.SetPainter(const Value: TEmbroideryPainter);
+begin
+  if Assigned(FPainter) then
+    FreeAndNil(FPainter);
+  FPainter := Value;
 end;
 
 end.

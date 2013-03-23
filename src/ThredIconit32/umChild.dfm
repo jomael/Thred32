@@ -1,6 +1,6 @@
 object fcDesign: TfcDesign
-  Left = 391
-  Top = 349
+  Left = 321
+  Top = 159
   Width = 594
   Height = 377
   Caption = 'MDI Child'

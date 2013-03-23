@@ -103,6 +103,7 @@ type
     actDqDebugWestern1: TMenuItem;
     btnGroupXOR: TToolButton;
     ToolButton4: TToolButton;
+    actDqDebugRGNS1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure appevents1Hint(Sender: TObject);
@@ -117,6 +118,7 @@ type
     FParamsLoaded : boolean;
     FIdentLog : Integer;
     FActUpdateLog : Boolean;
+    procedure rullerVOnSetBound(Sender : TObject);
     function GetActiveChild: TfcDesign;
     procedure SetActiveChild(const Value: TfcDesign);
     procedure DebugLog(Sender : TObject; const Msg : string; Ident : Integer);
@@ -166,6 +168,7 @@ begin
   ActiveIntegrator.OnDebugLog := self.DebugLog;
   FActUpdateLog := True;
 
+  rullerV.OnSetBound := rullerVOnSetBound;
 end;
 
 procedure TMainForm.FormActivate(Sender: TObject);
@@ -311,6 +314,15 @@ procedure TMainForm.appevents1ActionUpdate(Action: TBasicAction;
 begin
   if FActUpdateLog then
   DebugLog(Self,Action.Name+': Update', 0);
+end;
+
+procedure TMainForm.rullerVOnSetBound(Sender: TObject);
+var L : Integer;
+begin
+  L := rullerV.ClientToScreen(Point(rullerV.Width,0)).X;
+
+  rullerH.ZeroPixel :=   rullerH.ScreenToClient(Point(L,0)).X;
+//
 end;
 
 end.

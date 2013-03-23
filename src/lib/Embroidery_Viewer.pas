@@ -47,16 +47,16 @@ end;
 
 procedure TgmEmbroideryViewer.DrawStitchs;
 var
-  LPainter : TEmbroideryPainterClass ;
+  LPainter : TEmbroideryPainter ;
   j : Integer;
   LShapeItem : TEmbroideryItem;
 begin
-  LPainter := TEmbroideryPhotoPainter;
+  LPainter :=  TEmbroideryPhotoPainter.Create(Self) ;//TEmbroideryPainter ;
   
   BeginUpdate;
   try
     Bitmap.SetSize(Round(FShapeList.HupWidth), Round(FShapeList.HupHeight));
-      LPainter.BeginPaint(Bitmap);
+      {LPainter.BeginPaint(Bitmap);
 
       if FShapeList.Count > 0 then
       //for i := 0 to FStitchs.Header.fpnt -1 do
@@ -68,11 +68,13 @@ begin
 
         LPainter.Paint(Bitmap, LShapeItem);
       end;
-      
-    LPainter.EndPaint(Bitmap);
+
+    LPainter.EndPaint(Bitmap);}
+    LPainter.Paint(FShapeList, epsPaint);
   finally
     EndUpdate;
     Changed;
+    LPainter.Free;
   end;
 end;
 

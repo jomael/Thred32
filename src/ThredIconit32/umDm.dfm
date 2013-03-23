@@ -3873,6 +3873,15 @@ object DM: TDM
     Images = ilQuality
     Left = 240
     Top = 16
+    object actDqDebug_Toggle: TAction
+      Tag = 8
+      Category = 'View'
+      Caption = 'Debug_Toggle'
+      GroupIndex = 12
+      ImageIndex = 11
+      OnExecute = actQualityChanged
+      OnUpdate = actQualityUpdate
+    end
     object actDqSolid: TAction
       Tag = 2
       Category = 'View'
@@ -3987,15 +3996,6 @@ object DM: TDM
       OnExecute = actQualityChanged
       OnUpdate = actQualityUpdate
     end
-    object actDqDebug_Toggle: TAction
-      Tag = 8
-      Category = 'View'
-      Caption = 'Debug_Toggle'
-      GroupIndex = 12
-      ImageIndex = 11
-      OnExecute = actQualityChanged
-      OnUpdate = actQualityUpdate
-    end
     object actDqDebug_Jump: TAction
       Tag = 11
       Category = 'View'
@@ -4019,6 +4019,15 @@ object DM: TDM
       AutoCheck = True
       Caption = 'Use Ordinal Color'
       ImageIndex = 8
+    end
+    object actDqDebug_RGNS: TAction
+      Tag = 13
+      Category = 'View'
+      Caption = 'Debug_RGNS'
+      GroupIndex = 12
+      ImageIndex = 13
+      OnExecute = actQualityChanged
+      OnUpdate = actQualityUpdate
     end
   end
   object il1TBX: TImageList

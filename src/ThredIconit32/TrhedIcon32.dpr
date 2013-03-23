@@ -12,7 +12,8 @@ uses
   Embroidery_Painter in '..\lib\Embroidery_Painter.pas',
   Embroidery_rwTHR in '..\lib\Embroidery_rwTHR.pas',
   Embroidery_Viewer in '..\lib\Embroidery_Viewer.pas',
-  Embroidery_Fill in '..\lib\Embroidery_Fill.pas';
+  Embroidery_Fill in '..\lib\Embroidery_Fill.pas',
+  Embroidery_Fill_LCON in '..\lib\Embroidery_Fill_LCON.pas';
 
 {$R *.RES}
 

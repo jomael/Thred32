@@ -96,6 +96,7 @@ type
     actDqDebug_Jump: TAction;
     actDqDebug_Western: TAction;
     dlgOpenPic1: TOpenPictureDialog;
+    actDqDebug_RGNS: TAction;
     procedure actOpenStitchExecute(Sender: TObject);
     procedure actFileNew1Execute(Sender: TObject);
     procedure actHelpAbout1Execute(Sender: TObject);
@@ -138,10 +139,13 @@ begin
 
   //with TOpenStitchsDialog.Create(Self) do
   //with TOpenDialog.Create(self) do
-  with TgmOpenDialog.Create(Self) do
-  //with TOpenPictureDialog.Create(self) do
+  ////with TgmOpenDialog.Create(Self) do
+  //with TOpenPictureDialog.Create(self)
+  //with TPreviewFileDialog.Create(Self) do
+  //with TMyOpenDialog.Create(self) do
+  with TOurPictureDialog.Create(Self) do
   begin
-    ViewerClassName := TgmEmbroideryViewer.ClassName;
+    ViewerClassName := TgmEmbroideryViewer.ClassName;    
     Options := Options + [ofAllowMultiSelect];
     if Execute then
       for i := 0 to Files.Count -1  do
@@ -248,7 +252,7 @@ begin
       actDqTogglePhoto.Assign(LAction);
       actDqTogglePhoto.Tag := LAction.Tag;
     end;
-    if (LAction <> actDqDebug_Toggle) and (LAction.Tag in [8,9,10,11,12]) then
+    if (LAction <> actDqDebug_Toggle) and (LAction.Tag in [8,9,10,11,12,13]) then
     begin
       actDqDebug_Toggle.Assign(LAction);
       actDqDebug_Toggle.Tag := LAction.Tag;

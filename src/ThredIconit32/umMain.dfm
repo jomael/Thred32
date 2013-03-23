@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 356
-  Top = 372
+  Left = 217
+  Top = 273
   Width = 860
   Height = 530
   Caption = 'Thred-32'
@@ -108,8 +108,9 @@ object MainForm: TMainForm
     Align = alTop
     Color = clBtnFace
     ParentColor = False
+    PopupMenu = pmDqDebug
     UOM = uPixel
-    ZeroPixel = 64
+    ZeroPixel = 32
     DPI = 96.000000000000000000
     TickNumber = 100
     TickDecimalPoint = 0
@@ -130,6 +131,7 @@ object MainForm: TMainForm
     Align = alLeft
     Color = clBtnFace
     ParentColor = False
+    PopupMenu = pmDqDebug
     UOM = uPixel
     ZeroPixel = 0
     DPI = 96.000000000000000000
@@ -495,6 +497,7 @@ object MainForm: TMainForm
     ParentFont = False
     ScrollBars = ssVertical
     TabOrder = 5
+    Visible = False
   end
   object ctrlbr2: TControlBar
     Left = 0
@@ -603,6 +606,9 @@ object MainForm: TMainForm
     end
     object actDqDebugWestern1: TMenuItem
       Action = DM.actDqDebug_Western
+    end
+    object actDqDebugRGNS1: TMenuItem
+      Action = DM.actDqDebug_RGNS
     end
   end
 end

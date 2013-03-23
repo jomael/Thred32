@@ -54,16 +54,22 @@ type
     NorthIndex, //= Region, from top to bottom index for each a shape 
     WesternIndex, //from left to right in each NorthIndex
 
-    
-    Region, //final. used for sequence stitching order.
+
+    rgns, //LCON   
+
+
+    Region, //final x2nie used for sequence stitching order.
     at: Cardinal; //attribute
     case Integer of
       0 : (X, Y : TFloat);
       1 : (Point : TFloatPoint);
   end;
+  PStitchPoint = ^TStitchPoint;
   
   TArrayOfStitchPoint = array of TStitchPoint;
   PArrayOfStitchPoint = ^TArrayOfStitchPoint;
+
+  TArrayOfPStitchPoint = array of PStitchPoint;
 
   TStitchLine = record
     Start,
@@ -173,7 +179,7 @@ var
 constructor TEmbroideryList.Create(AOwner: TComponent);
 begin
   inherited;
-  FHupSize := FloatPoint(LHUPX, LHUPY);
+  FHupSize := FloatPoint(SHUPX, SHUPY);
   SetLength(FColors,16);
   Move(defCol[0], FColors[0], 4 * 16);
 end;
