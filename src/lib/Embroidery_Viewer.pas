@@ -20,6 +20,7 @@ type
     //for universal file dialog
     procedure LoadFromFile(const FileName: string); override;
     function GetReaderFilter : string; override;
+    function GetWriterFilter : string; override; 
 
   published
 
@@ -52,7 +53,7 @@ var
   LShapeItem : TEmbroideryItem;
 begin
   LPainter :=  TEmbroideryPhotoPainter.Create(Self) ;//TEmbroideryPainter ;
-  
+  LPainter.WantToCalcRect := True;
   BeginUpdate;
   try
     Bitmap.SetSize(Round(FShapeList.HupWidth), Round(FShapeList.HupHeight));
@@ -71,6 +72,7 @@ begin
 
     LPainter.EndPaint(Bitmap);}
     LPainter.Paint(FShapeList, epsPaint);
+    LPainter.CropDrawnRect();
   finally
     EndUpdate;
     Changed;
@@ -81,6 +83,11 @@ end;
 function TgmEmbroideryViewer.GetReaderFilter: string;
 begin
   Result := TEmbroideryList.ReadersFilter;
+end;
+
+function TgmEmbroideryViewer.GetWriterFilter: string;
+begin
+  Result := TEmbroideryList.WritersFilter;
 end;
 
 procedure TgmEmbroideryViewer.LoadFromFile(const FileName: string);

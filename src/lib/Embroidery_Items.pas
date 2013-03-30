@@ -54,11 +54,11 @@ type
     NorthIndex, //= Region, from top to bottom index for each a shape 
     WesternIndex, //from left to right in each NorthIndex
 
-
-    rgns, //LCON   
-
-
-    Region, //final x2nie used for sequence stitching order.
+    rgnSeq, //rgns, //LCON
+    brk, cntbrk,//LCON
+    Region,
+    Reserved1 : Word; //final x2nie used for sequence stitching order.
+    
     at: Cardinal; //attribute
     case Integer of
       0 : (X, Y : TFloat);
@@ -119,6 +119,7 @@ type
     property Ini : PThredIniFile read GetIni;
     property Stitchs : PArrayOfStitchPoint read GetStitchs;
   published
+    //property StitchArray : TArrayOfStitchPoint read FStitchs write FStitchs;//debug for component to string & vise versa
   end;
 
 

@@ -37,6 +37,11 @@ unit Embroidery_Painter;
 interface
 
 uses
+  {$IFDEF FPC}
+    LCLIntf, LCLType, LMessages, Types,
+  {$ELSE}
+    Windows, Messages,
+  {$ENDIF}
   GR32, GR32_Image,
   Embroidery_Items;
 
@@ -46,9 +51,11 @@ type
   TEmbroideryPainter = class(TObject)
   private
     FImage32: TCustomImage32;
-
+    FWantToCalcRect: Boolean;
+    procedure DoCalcRect( ALine : TStitchLine); 
   protected
     FWantToClear: Boolean;
+    FDrawnRect : TFloatRect;
     procedure PaintShape(B: TBitmap32; AnItem: TEmbroideryItem); virtual;
     procedure PaintLine(B: TBitmap32; ALine : TStitchLine; AColor: TColor32); virtual;
 
@@ -66,7 +73,15 @@ type
     constructor Create(AImage32: TCustomImage32);
     //function GetWantToClear: Boolean; virtual;
     procedure Paint(AShapeList: TEmbroideryList; AState: TEmbroideryPaintStage = epsPaint); virtual;
+
+    //after paint procs
+    function GetDrawnSize: TPoint; //used by such fileOpenDlg
+    function GetDrawnRect: TRect; //used by such fileOpenDlg
+    procedure CropDrawnRect; //used by such fileOpenDlg
+
+    //before paint procs
     property WantToClear : Boolean read FWantToClear write FWantToClear;
+    property WantToCalcRect : Boolean read FWantToCalcRect write FWantToCalcRect;
   end;
 
   TEmbroideryPainterClass = class of TEmbroideryPainter;
@@ -110,11 +125,49 @@ type
   end;
 
 
-
+  }
   //----------------- BELOW ARE DEBUG PAINTERS:
   // ----------------not attended for production ----------------
 
-  TEmbroideryByLinPainter = class(TEmbroideryPainter)
+  TEmbroideryDebugPainter = class(TEmbroideryPainter)
+  protected
+
+    procedure PaintShape(B: TBitmap32; AnItem: TEmbroideryItem); override;
+    procedure CalcColor(P1,P2: TStitchPoint; var C1,C2: TColor32); virtual;
+    procedure MapColor(V1,V2: Word; var C1,C2: TColor32); overload;
+    procedure MapColor(AValue: Word; var C1,C2: TColor32); overload;
+    procedure MapColor(AValue: Word; var AColor: TColor32); overload;
+  end;
+
+  TEmbroideryDebugLinPainter = class(TEmbroideryDebugPainter);
+
+  TEmbroideryDebugGrpPainter = class(TEmbroideryDebugPainter)
+  protected
+    procedure CalcColor(P1,P2: TStitchPoint; var C1,C2: TColor32); override;
+  end;
+
+  TEmbroideryDebugRegionPainter = class(TEmbroideryDebugPainter)
+  protected
+    procedure CalcColor(P1,P2: TStitchPoint; var C1,C2: TColor32); override;
+  end;
+
+  TEmbroideryDebugRgnsPainter = class(TEmbroideryDebugPainter)
+  protected
+    procedure CalcColor(P1,P2: TStitchPoint; var C1,C2: TColor32); override;
+  end;
+
+  TEmbroideryDebugBrkPainter = class(TEmbroideryDebugPainter)
+  protected
+    procedure CalcColor(P1,P2: TStitchPoint; var C1,C2: TColor32); override;
+  end;
+
+  TEmbroideryDebugCntBrkPainter = class(TEmbroideryDebugPainter)
+  protected
+    procedure CalcColor(P1,P2: TStitchPoint; var C1,C2: TColor32); override;
+  end;
+
+
+  {TEmbroideryByLinPainter = class(TEmbroideryPainter)
   private
     class procedure PaintShapeBy(B: TBitmap32; AnItem: TEmbroideryItem; Tag : Integer); 
     class procedure PaintText(B: TBitmap32; AnItem: TEmbroideryItem; Tag : Integer); 
@@ -231,6 +284,8 @@ procedure TEmbroideryPainter.BeginPaint(B: TBitmap32);
 begin
   if Self.WantToClear then
     B.Clear(clWhite32);
+  FDrawnRect := FloatRect(B.Width * FImage32.ScaleX * 2, B.Height * FImage32.ScaleY * 2,
+    0,0);
 end;
 
 constructor TEmbroideryPainter.Create(AImage32: TCustomImage32);
@@ -295,6 +350,7 @@ procedure TEmbroideryPainter.PaintLine(B: TBitmap32; ALine: TStitchLine; AColor:
 begin
   with ALine do
     B.LineFS(Start.x, Start.y, Finish.x, Finish.y, AColor);
+  DoCalcRect(ALine);
 end;
 
 procedure TEmbroideryPainter.PaintShape(B: TBitmap32;
@@ -366,6 +422,66 @@ begin
 end;
 
 
+procedure TEmbroideryPainter.DoCalcRect(ALine: TStitchLine);
+begin
+  if FWantToCalcRect then
+    with FDrawnRect do
+    begin
+      Left := Min(Left,  Min(ALine.Start.X, ALine.Finish.X));
+      Top := Min(Top,  Min(ALine.Start.Y, ALine.Finish.Y));
+      Right := Max(Right,  Max(ALine.Start.X, ALine.Finish.X));
+      Bottom := Max(Bottom,  Max(ALine.Start.Y, ALine.Finish.Y));
+    end;
+end;
+
+function TEmbroideryPainter.GetDrawnSize: TPoint;
+var R: TRect;
+begin
+  R := GetDrawnRect;
+  OffsetRect(R, -R.Left, -R.Top); //set pos to zero
+  Result := R.BottomRight;
+end;
+
+function TEmbroideryPainter.GetDrawnRect: TRect;
+begin
+  Result.Left   := Max(0, Floor(FDrawnRect.Left));
+  Result.Top    := Max(0,Floor(FDrawnRect.Top));
+  Result.Right  := Min(FImage32.Bitmap.Width, Floor(FDrawnRect.Right));
+  Result.Bottom := Min(FImage32.Bitmap.Height, Floor(FDrawnRect.Bottom));
+end;
+
+procedure TEmbroideryPainter.CropDrawnRect;
+var R : TRect;
+  Src,Dst : PColor32Array;
+  x,y, w,h : Integer;
+  B : TBitmap32;
+begin
+  R:= GetDrawnRect;
+  w := r.Right - r.Left +1;
+  h := r.Bottom - r.Top +1;
+  if (h=0) or (w=0) then Exit;
+
+  B := TBitmap32.Create;
+  try
+  B.Assign(FImage32.Bitmap);
+  FImage32.Bitmap.SetSize(W,H);
+
+  FImage32.Bitmap.Draw(FImage32.Bitmap.BoundsRect, R, B);
+
+  {for y := 0 to h -1 do
+  begin
+    Src := B.ScanLine[y+ R.Top-1 ];
+    Dst := FImage32.Bitmap.ScanLine[y];
+    for x := 0 to w-1 do
+    begin
+      Dst[x] := Src[x + R.Left-1];
+    end;
+  end;}
+  finally
+    B.Free;
+  end;
+end;
+
 { TEmbroideryPhotoPainter }
 
 procedure TEmbroideryPhotoPainter.PaintLine(B: TBitmap32;
@@ -403,9 +519,202 @@ begin
       //raise Exception.Create(Format('x:%f y:%f -(%f,%f,%f,%f)',[x,y, Left, Top, Right, Bottom ]));
     end;
   end;
-  
+  DoCalcRect(ALine);
 end;
 
+
+{ TEmbroideryDebugPainter }
+
+procedure TEmbroideryDebugPainter.CalcColor(P1, P2: TStitchPoint; var C1,
+  C2: TColor32);
+begin
+  MapColor(P1.lin, P2.lin, C1,C2);
+end;
+
+procedure TEmbroideryDebugPainter.MapColor(V1, V2: Word; var C1,
+  C2: TColor32);
+begin
+  //C1 := LEdgeColors[V1 mod VERTICES] and TRA;
+  //C2 := LEdgeColors[V2 mod VERTICES] and TRA;
+  MapColor(V1,C1);
+  MapColor(V2,C2);
+end;
+
+procedure TEmbroideryDebugPainter.MapColor(AValue: Word; var C1,
+  C2: TColor32);
+begin
+  MapColor(AValue, C1 );
+  C2 := C1;
+end;
+
+procedure TEmbroideryDebugPainter.MapColor(AValue: Word;
+  var AColor: TColor32);
+begin
+  AColor := LEdgeColors[AValue mod VERTICES] and TRA;
+end;
+
+procedure TEmbroideryDebugPainter.PaintShape(B: TBitmap32;
+  AnItem: TEmbroideryItem);
+var
+  LBarCount, 
+  w,x,y,i,j : Integer;
+  LFillPoints : TArrayOfStitchPoint;
+  x1,y1,x2,y2 : TFloat;
+  c1,c2 : TColor32;
+begin
+  //PArrayOfStitchPoint(LFillPoints) := AnItem.Stitchs;
+  LFillPoints := AnItem.Stitchs^;
+  LBarCount := Length(LFillPoints);
+  
+
+
+  //DRAWING.
+  //Tag := 2;
+  if LBarCount < 1 then
+    Exit;
+
+
+  //ABitmap32.PenColor := clRed32;
+
+  x := Round(LFillPoints[0].X);
+  y := Round(LFillPoints[0].Y);
+  B.MoveTo(x, y);
+
+  i := 0;
+
+
+  i := 0;
+  for j := 0 to (LBarCount - 1) do
+  begin
+    x1 := (LFillPoints[i].X);
+    y1 := (LFillPoints[i].Y);
+    x2 := (LFillPoints[i+1].X);
+    y2 := (LFillPoints[i+1].Y);
+
+    B.MoveToF(x1, y1);
+    
+    //if chkDrawBoth.Checked then
+    {begin
+      case Tag of
+        0 : c1 := LEdgeColors[LFillPoints[i].lin mod VERTICES] and TRA;
+        1 : c1 := LEdgeColors[LFillPoints[i].grp mod VERTICES] and TRA;
+        2 : c1 := LEdgeColors[LFillPoints[i].region mod VERTICES] and TRA;
+        3 : c1 := LEdgeColors[j mod VERTICES] and TRA;
+        4 : c1 := LEdgeColors[LFillPoints[i].NorthIndex mod VERTICES] and TRA;
+        5 : c1 := LEdgeColors[LFillPoints[i].WesternIndex mod VERTICES] and TRA;
+        13 : c1 := LEdgeColors[LFillPoints[i].rgns mod VERTICES] and TRA;
+
+      end;
+      //ABitmap32.LineToS(x, y);
+      //ABitmap32.LineToFS(LFillPoints[i].X, LFillPoints[i].Y);
+    end;
+
+    if Tag = 20 then
+      B.LineToFSP(X1, Y1)
+    else
+    //ABitmap32.MoveTo(x, y);
+
+    inc(i);
+    case Tag of
+      0 : c2 := LEdgeColors[LFillPoints[i].lin mod VERTICES] and TRA;
+      1 : c2 := LEdgeColors[LFillPoints[i].grp mod VERTICES] and TRA;
+      2 : c2 := LEdgeColors[LFillPoints[i].region mod VERTICES] and TRA;
+      3 : c2 := c1;//LEdgeColors[j mod VERTICES] and TRA;
+      4 : c2 := LEdgeColors[LFillPoints[i].NorthIndex mod VERTICES] and TRA;
+      5 : c2 := LEdgeColors[LFillPoints[i].WesternIndex mod VERTICES] and TRA;
+      13 : c2 := c1;
+    end;
+    }
+    
+    CalcColor(LFillPoints[i],LFillPoints[i+1], c1,c2);
+
+
+    //three line below is backup line drawing, because in "GRP" draw, each line is end with white
+    {Bitmap32.PenColor := c2;
+    ABitmap32.LineToFS(X2, Y2); //it move the begin line
+    ABitmap32.MoveToF(x1, y1); //set back to original begin line
+    }
+
+    if c1 = c2 then
+    begin
+      B.PenColor := c1;
+      B.LineToFS(x2,y2);
+    end
+    else
+    begin
+      //ABitmap32.LineToS(x, y);
+      B.SetStipple([c1,c1,c2,c2, c2,c2]);
+      B.StippleCounter := 0;
+      //ABitmap32.LineToFS(x2,y2);
+      B.StippleStep := 3.5/ max(Max(x2,x1) - Min(x2,x1),1);
+      //ABitmap32.PenColor := c2;
+      B.LineToFSP(X2, Y2);
+    end;
+
+    inc(i,2);
+
+    if i >= LBarCount -1 then break;
+  end;
+
+  {w := 2;
+  for i := 0 to (LBarCount - 1) do
+  begin
+    x := Round(LFillPoints[i].X);
+    y := Round(LFillPoints[i].Y);
+
+    case Tag of
+      0 : B.FillRectS(x - w, y - w, x + w, y + w, LEdgeColors[LFillPoints[i].lin mod VERTICES]);
+      1 : B.FillRectS(x - w, y - w, x + w, y + w, LEdgeColors[LFillPoints[i].grp mod VERTICES]);
+    end;
+
+  end;}                       
+
+    //SetLength(FFillPoints, 0);
+    //FFillPoints := nil;
+
+
+
+end;
+
+{ TEmbroideryDebugGrpPainter }
+
+procedure TEmbroideryDebugGrpPainter.CalcColor(P1, P2: TStitchPoint;
+  var C1, C2: TColor32);
+begin
+  MapColor(P1.grp, P2.grp, C1,C2);
+end;
+
+{ TEmbroideryDebugRegionPainter }
+
+procedure TEmbroideryDebugRegionPainter.CalcColor(P1, P2: TStitchPoint;
+  var C1, C2: TColor32);
+begin
+  MapColor(P1.Region, P2.Region, C1,C2);
+end;
+
+{ TEmbroideryDebugRgnsPainter }
+
+procedure TEmbroideryDebugRgnsPainter.CalcColor(P1, P2: TStitchPoint;
+  var C1, C2: TColor32);
+begin
+  MapColor(P1.rgnSeq, C1,C2);
+end;
+
+{ TEmbroideryDebugCntBrkPainter }
+
+procedure TEmbroideryDebugCntBrkPainter.CalcColor(P1, P2: TStitchPoint;
+  var C1, C2: TColor32);
+begin
+  MapColor(P1.cntbrk, C1,C2);
+end;
+
+{ TEmbroideryDebugBrkPainter }
+
+procedure TEmbroideryDebugBrkPainter.CalcColor(P1, P2: TStitchPoint;
+  var C1, C2: TColor32);
+begin
+  MapColor(P1.brk, C1,C2);
+end;
 
 initialization
   UHotPressureColors := nil;
