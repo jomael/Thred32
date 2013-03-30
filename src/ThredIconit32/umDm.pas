@@ -97,6 +97,10 @@ type
     actDqDebug_Western: TAction;
     dlgOpenPic1: TOpenPictureDialog;
     actDqDebug_RGNS: TAction;
+    actDqDebug_Brk: TAction;
+    actDqDebug_CntBrk: TAction;
+    actEditUndo: TAction;
+    actEditRedo: TAction;
     procedure actOpenStitchExecute(Sender: TObject);
     procedure actFileNew1Execute(Sender: TObject);
     procedure actHelpAbout1Execute(Sender: TObject);
@@ -110,6 +114,11 @@ type
     procedure DataModuleCreate(Sender: TObject);
     procedure actEditDeleteUpdate(Sender: TObject);
     procedure actEditDeleteExecute(Sender: TObject);
+    procedure actEditUndoExecute(Sender: TObject);
+    procedure actEditUndoUpdate(Sender: TObject);
+    procedure actEditRedoUpdate(Sender: TObject);
+    procedure actEditUndoHint(var HintStr: String; var CanShow: Boolean);
+    procedure actEditRedoExecute(Sender: TObject);
   private
     { Private declarations }
     FChildInc : Integer;
@@ -126,7 +135,8 @@ uses
   umDmTool, gmTool_Shape,
   gmIntegrator, gmTool_Zoom,  gmTool_Hand, 
   gmSwatch_rwTHR, //gmSwatch_rwACO, gmSwatch_rwSWA,
-  Stitch_FileDlg, gmCore_FileDlg {universal FileDlg}, Embroidery_Viewer, stitch_Items,
+  Stitch_FileDlg, gmCore_FileDlg {universal FileDlg},
+  Embroidery_Viewer, Embroidery_Items, stitch_Items,
   Thred_Constants,
   
   umChild, umMain,
@@ -174,35 +184,37 @@ begin
 end;
 
 procedure TDM.actFileSave1Execute(Sender: TObject);
-///var LStitchs : TStitchList;
+var LStitchs : TEmbroideryList;
 begin
   assert(assigned(Application.Mainform.ActiveMDIChild));// error should happen in programming level.
-///
-{  LStitchs := TfcDesign(Application.MainForm.ActiveMDIChild).Stitchs;
+
+  LStitchs := TfcDesign(Application.MainForm.ActiveMDIChild).ShapeList;
   if LStitchs.FileName <> '' then
   begin
     LStitchs.SaveToFile(LStitchs.FileName);
   end
   else
-}  
+     actFileSaveAs1Execute(Sender);
 //    mnu_FILE_SAVE3Click(Sender); //SaveAs
 end;
 
 procedure TDM.actFileSaveAs1Execute(Sender: TObject);
-///var LStitchs : TStitchList;
+var LStitchs : TEmbroideryList;
 begin
   assert(assigned(Application.Mainform.ActiveMDIChild));// error should happen in programming level.
-///
-{  LStitchs := TfcDesign(Application.MainForm.ActiveMDIChild).Stitchs;
-  with TSaveStitchsDialog.Create(Self) do
+
+  LStitchs := TfcDesign(Application.MainForm.ActiveMDIChild).ShapeList;
+  //with TSaveStitchsDialog.Create(Self) do
+    with TOurPictureSaveDialog.Create(Self) do
   begin
+    ViewerClassName := TgmEmbroideryViewer.ClassName;    
     if Execute then
       LStitchs.SaveToFile(FileName);
 
 
     Free;
   end;
-}  
+  
 end;
 
 procedure TDM.actFileSaveAs1Update(Sender: TObject);
@@ -285,6 +297,53 @@ procedure TDM.actEditDeleteExecute(Sender: TObject);
 begin
   if gmActiveTool is TgmtoolShapeBase then
     TgmtoolShapeBase(gmActiveTool).DeleteSelection;
+end;
+
+procedure TDM.actEditUndoExecute(Sender: TObject);
+var frm : TfcDesign;
+begin
+  frm := TfcDesign(Application.MainForm.ActiveMDIChild);
+  if Assigned(frm) then
+  begin
+    frm.UndoRedo.Undo;
+  end;
+end;
+
+procedure TDM.actEditUndoUpdate(Sender: TObject);
+var frm : TfcDesign;
+begin
+  frm := nil;
+  with Application.MainForm do
+  begin
+    frm := (ActiveMDIChild as TfcDesign);
+    TAction(Sender).Enabled := Assigned(frm) and (frm.UndoRedo.CanUndo);
+  end;
+end;
+
+procedure TDM.actEditRedoUpdate(Sender: TObject);
+var frm : TfcDesign;
+begin
+  frm := TfcDesign(Application.MainForm.ActiveMDIChild);
+  TAction(Sender).Enabled := Assigned(frm) and frm.UndoRedo.CanRedo;
+end;
+
+procedure TDM.actEditUndoHint(var HintStr: String; var CanShow: Boolean);
+var frm : TfcDesign;
+begin
+  HintStr := 'Undo';
+  frm := TfcDesign(Application.MainForm.ActiveMDIChild);
+  if Assigned(frm) and frm.UndoRedo.CanUndo then
+
+end;
+
+procedure TDM.actEditRedoExecute(Sender: TObject);
+var frm : TfcDesign;
+begin
+  frm := TfcDesign(Application.MainForm.ActiveMDIChild);
+  if Assigned(frm) then
+  begin
+    frm.UndoRedo.Redo;
+  end;
 end;
 
 end.

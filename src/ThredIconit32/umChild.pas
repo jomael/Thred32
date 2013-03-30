@@ -8,6 +8,7 @@ uses
   GR32, GR32_Image, GR32_Layers,
 {GraphicsMagic}
   gmIntegrator, //gmGridBased_List,
+  gmCore_UndoRedo,
   //gmSwatch_List,
   gmIntercept_GR32_Image,
 {Thred32}
@@ -56,11 +57,13 @@ type
     //FPolyPolygons : TArrayOfArrayOfgmShapeInfo;
     FShapeList: TEmbroideryList;
     FDrawQuality: Integer;
+    FUndoRedo: TgmUndoRedo;
     procedure SetDrawQuality(const Value: Integer);
     procedure SetUseOrdinalColor(const Value: boolean);
     function GetPolyPolygons: PArrayOfArrayOfgmShapeInfo;
     function GetSelections: PArrayOfArrayOfInteger;
     procedure SetPainter(const Value: TEmbroideryPainter);
+    procedure RefreshScreenEvent(Sender:TObject);
 //    function GetPolyPolygons: PArrayOfArrayOfgmShapeInfo;
 //    procedure SetSelectedIndex(const Value: Integer);
 //    function GetSelections: PArrayOfArrayOfInteger;
@@ -80,7 +83,8 @@ type
 //    function AddShape(AddMode: TgmEditMode; Index : Integer = -1) : PgmShapeInfo;
     procedure LoadFromFile(const AFileName: string);
     property DrawQuality : Integer read FDrawQuality write SetDrawQuality;// render func index
-    property UseOrdinalColor : boolean read FUseOrdinalColor write SetUseOrdinalColor;    
+    property UseOrdinalColor : boolean read FUseOrdinalColor write SetUseOrdinalColor;
+    property UndoRedo : TgmUndoRedo read FUndoRedo;
 
     property Modified : boolean read FModified;
     {$IFDEF MODERNITEM}
@@ -161,14 +165,17 @@ begin
 
   imgStitchs.Bitmap.SetSize(400,400);// hup size
   imgStitchs.Bitmap.Clear(clWhite32);
-  
+
   gmSource := TgmIntegratorSource.Create(self);
   gmSource.Img32 := imgStitchs;
 
   FShapeList := TEmbroideryList.Create(self);
+  FUndoRedo := TgmUndoRedo.Create(self);
+  FUndoRedo.Target := FShapeList;
+  FUndoRedo.OnUndoRedo := RefreshScreenEvent;
   //FDrawLine := Draw3DLine;//DrawLineStippled;//DrawLineFS;
   //FPainter  := TEmbroideryPainter;
-  DrawQuality := DQBASICSOLID;//DQINDOORPHOTO;//DQDEBUG;//  
+  DrawQuality := DQBASICSOLID;//DQINDOORPHOTO;//DQDEBUG;//
   FUseOrdinalColor := True;
 
 //  FSelectedIndex := -1;
@@ -587,13 +594,15 @@ begin
       5 : Painter  := TEmbroideryMountainPainter;
       6 : Painter  := TEmbroideryXRayPainter;        //
       7 : Painter  := TEmbroideryHotPressurePainter;
-      8 : Painter  := TEmbroideryByLinPainter;
-      9 : Painter  := TEmbroideryByGrpPainter;
-      10 : Painter  := TEmbroideryByRegionPainter ;
-      11 : Painter  := TEmbroideryByJumpPainter ;
+      }8 : Painter  := TEmbroideryDebugLinPainter.Create(imgStitchs);
+      9 : Painter  := TEmbroideryDebugGrpPainter.Create(imgStitchs);
+      10 : Painter  := TEmbroideryDebugRegionPainter.Create(imgStitchs);
+      {11 : Painter  := TEmbroideryByJumpPainter ;
       12 : Painter  := TEmbroideryByWesternPainter ;
-      13 : Painter  := TEmbroideryByRGNSPainter;
-      }
+      }13 : Painter  := TEmbroideryDebugRgnsPainter.Create(imgStitchs);
+      14 : Painter  := TEmbroideryDebugBrkPainter.Create(imgStitchs);
+      15 : Painter  := TEmbroideryDebugCntBrkPainter.Create(imgStitchs);
+
     end;
     //pb.Repaint;
     self.DrawStitchs;
@@ -720,6 +729,11 @@ begin
   if Assigned(FPainter) then
     FreeAndNil(FPainter);
   FPainter := Value;
+end;
+
+procedure TfcDesign.RefreshScreenEvent(Sender: TObject);
+begin
+  DrawStitchs();
 end;
 
 end.

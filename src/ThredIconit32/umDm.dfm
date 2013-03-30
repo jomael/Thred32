@@ -1,8 +1,8 @@
 object DM: TDM
   OldCreateOrder = False
   OnCreate = DataModuleCreate
-  Left = 815
-  Top = 221
+  Left = 520
+  Top = 222
   Height = 327
   Width = 534
   object il1: TImageList
@@ -1060,6 +1060,23 @@ object DM: TDM
       ImageIndex = 5
       OnExecute = actEditDeleteExecute
       OnUpdate = actEditDeleteUpdate
+    end
+    object actEditUndo: TAction
+      Category = 'Edit'
+      Caption = '&Undo'
+      ImageIndex = 3
+      ShortCut = 16474
+      OnExecute = actEditUndoExecute
+      OnHint = actEditUndoHint
+      OnUpdate = actEditUndoUpdate
+    end
+    object actEditRedo: TAction
+      Category = 'Edit'
+      Caption = '&Redo'
+      ImageIndex = 4
+      ShortCut = 24666
+      OnExecute = actEditRedoExecute
+      OnUpdate = actEditRedoUpdate
     end
   end
   object mm1: TMainMenu
@@ -4015,7 +4032,6 @@ object DM: TDM
       OnUpdate = actQualityUpdate
     end
     object actUseOrdinalColor: TAction
-      Category = 'View'
       AutoCheck = True
       Caption = 'Use Ordinal Color'
       ImageIndex = 8
@@ -4026,6 +4042,22 @@ object DM: TDM
       Caption = 'Debug_RGNS'
       GroupIndex = 12
       ImageIndex = 13
+      OnExecute = actQualityChanged
+      OnUpdate = actQualityUpdate
+    end
+    object actDqDebug_Brk: TAction
+      Tag = 14
+      Category = 'View'
+      Caption = 'DqDebug_Brk'
+      GroupIndex = 12
+      OnExecute = actQualityChanged
+      OnUpdate = actQualityUpdate
+    end
+    object actDqDebug_CntBrk: TAction
+      Tag = 15
+      Category = 'View'
+      Caption = 'Debug_CntBrk'
+      GroupIndex = 12
       OnExecute = actQualityChanged
       OnUpdate = actQualityUpdate
     end

@@ -104,6 +104,17 @@ type
     btnGroupXOR: TToolButton;
     ToolButton4: TToolButton;
     actDqDebugRGNS1: TMenuItem;
+    btnDaisy: TToolButton;
+    ToolButton5: TToolButton;
+    btnShapeDaisy: TToolButton;
+    btnDqDebug_Brk: TToolButton;
+    btnDqDebug_CntBrk: TToolButton;
+    btn12: TToolButton;
+    btn13: TToolButton;
+    btn14: TToolButton;
+    btnEditUndo: TToolButton;
+    ToolButton7: TToolButton;
+    btnEditRedo: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure appevents1Hint(Sender: TObject);
@@ -113,6 +124,9 @@ type
     procedure appevents1Exception(Sender: TObject; E: Exception);
     procedure appevents1ActionUpdate(Action: TBasicAction;
       var Handled: Boolean);
+    procedure btnDaisyClick(Sender: TObject);
+    procedure btn13Click(Sender: TObject);
+    procedure btn14Click(Sender: TObject);
   private
     { Private declarations }
     FParamsLoaded : boolean;
@@ -142,9 +156,10 @@ uses
   about,
   GR32_Polygons,
   gmIntegrator, gmTool_Shape, gmShape, //gmGradient,
+  gmCore_UndoRedo,
   umDmTool
   //uFormSelector
-  ;
+  , umDaisyDlg;
 
 
 
@@ -297,7 +312,7 @@ begin
     space := space + '   ';
 
   mmo1.Lines.Add(Format('(%d) @%s %s : %s',[ FIdentLog, FormatDateTime('HH:mm:ss.zzz',now), space + Sender.ClassName, msg]) );
-  
+
   if Ident > 0 then
     Inc(FIdentLog, Ident);
   {$ENDIF}
@@ -322,6 +337,80 @@ begin
   L := rullerV.ClientToScreen(Point(rullerV.Width,0)).X;
 
   rullerH.ZeroPixel :=   rullerH.ScreenToClient(Point(L,0)).X;
+//
+end;
+
+procedure TMainForm.btnDaisyClick(Sender: TObject);
+begin
+  frmDaisyDlg.ShowModal
+end;
+
+procedure TMainForm.btn13Click(Sender: TObject);
+  function ComponentToString(Component: TComponent): string;
+
+  var
+    BinStream:TMemoryStream;
+    StrStream: TStringStream;
+    s: string;
+  begin
+    BinStream := TMemoryStream.Create;
+    try
+      StrStream := TStringStream.Create(s);
+      try
+        BinStream.WriteComponent(Component);
+        BinStream.Seek(0, soFromBeginning);
+        ObjectBinaryToText(BinStream, StrStream);
+        StrStream.Seek(0, soFromBeginning);
+        Result:= StrStream.DataString;
+      finally
+        StrStream.Free;
+
+      end;
+    finally
+      BinStream.Free
+    end;
+  end;
+var
+  s : string;
+begin
+  s := '?';
+  if GetActiveChild() <> nil then
+    s := ComponentToString(self.GetActiveChild.ShapeList);
+  mmo1.Lines.Text := s;
+end;
+
+procedure TMainForm.btn14Click(Sender: TObject);
+    procedure StringToComponent(Value: string; Component: TComponent);
+    var
+      StrStream:TStringStream;
+      BinStream: TMemoryStream;
+    begin
+      StrStream := TStringStream.Create(Value);
+      try
+        BinStream := TMemoryStream.Create;
+        try
+          ObjectTextToBinary(StrStream, BinStream);
+          BinStream.Seek(0, soFromBeginning);
+          BinStream.ReadComponent(Component);
+
+        finally
+          BinStream.Free;
+        end;
+      finally
+        StrStream.Free;
+      end;
+    end;
+
+var
+  s : string;
+begin
+  s := mmo1.Lines.Text;
+  if s <> '' then
+  begin
+    if GetActiveChild() <> nil then
+      StringToComponent(s, self.GetActiveChild.ShapeList);
+
+  end;  
 //
 end;
 

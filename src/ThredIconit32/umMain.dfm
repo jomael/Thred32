@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 217
-  Top = 273
-  Width = 860
+  Left = 216
+  Top = 178
+  Width = 812
   Height = 530
   Caption = 'Thred-32'
   Color = clAppWorkSpace
@@ -21,7 +21,7 @@ object MainForm: TMainForm
   object spl1: TSplitter
     Left = 0
     Top = 386
-    Width = 852
+    Width = 804
     Height = 3
     Cursor = crVSplit
     Align = alBottom
@@ -29,7 +29,7 @@ object MainForm: TMainForm
   object pnlStatusBar: TPanel
     Left = 0
     Top = 478
-    Width = 852
+    Width = 804
     Height = 25
     Align = alBottom
     BevelOuter = bvNone
@@ -37,7 +37,7 @@ object MainForm: TMainForm
     object pnlHint: TPanel
       Left = 0
       Top = 0
-      Width = 711
+      Width = 663
       Height = 25
       Align = alClient
       Alignment = taLeftJustify
@@ -47,7 +47,7 @@ object MainForm: TMainForm
       TabOrder = 0
     end
     object pnlZoom: TPanel
-      Left = 711
+      Left = 663
       Top = 0
       Width = 141
       Height = 25
@@ -98,7 +98,7 @@ object MainForm: TMainForm
   object rullerH: TgmRuller
     Left = 0
     Top = 52
-    Width = 852
+    Width = 804
     Height = 24
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -109,7 +109,7 @@ object MainForm: TMainForm
     Color = clBtnFace
     ParentColor = False
     PopupMenu = pmDqDebug
-    UOM = uPixel
+    UOM = uCm
     ZeroPixel = 32
     DPI = 96.000000000000000000
     TickNumber = 100
@@ -132,7 +132,7 @@ object MainForm: TMainForm
     Color = clBtnFace
     ParentColor = False
     PopupMenu = pmDqDebug
-    UOM = uPixel
+    UOM = uCm
     ZeroPixel = 0
     DPI = 96.000000000000000000
     TickNumber = 100
@@ -144,7 +144,7 @@ object MainForm: TMainForm
   object ctrlbr1: TControlBar
     Left = 0
     Top = 0
-    Width = 852
+    Width = 804
     Height = 52
     Align = alTop
     AutoSize = True
@@ -155,7 +155,7 @@ object MainForm: TMainForm
     object tb1: TToolBar
       Left = 11
       Top = 2
-      Width = 326
+      Width = 414
       Height = 22
       AutoSize = True
       Color = clBtnFace
@@ -248,11 +248,51 @@ object MainForm: TMainForm
         Caption = 'ToolButton1'
         ImageIndex = 13
       end
+      object btn12: TToolButton
+        Left = 292
+        Top = 0
+        Width = 8
+        Caption = 'btn12'
+        ImageIndex = 14
+        Style = tbsSeparator
+      end
+      object btn13: TToolButton
+        Left = 300
+        Top = 0
+        Caption = 'btn13'
+        ImageIndex = 14
+        OnClick = btn13Click
+      end
+      object btn14: TToolButton
+        Left = 323
+        Top = 0
+        Caption = 'btn14'
+        ImageIndex = 15
+        OnClick = btn14Click
+      end
+      object ToolButton7: TToolButton
+        Left = 346
+        Top = 0
+        Width = 8
+        Caption = 'ToolButton7'
+        ImageIndex = 17
+        Style = tbsSeparator
+      end
+      object btnEditUndo: TToolButton
+        Left = 354
+        Top = 0
+        Action = DM.actEditUndo
+      end
+      object btnEditRedo: TToolButton
+        Left = 377
+        Top = 0
+        Action = DM.actEditRedo
+      end
     end
     object tbChildren: TToolBar
-      Left = 350
+      Left = 438
       Top = 2
-      Width = 235
+      Width = 347
       Height = 22
       Caption = 'tbChildren'
       DragKind = dkDock
@@ -312,11 +352,21 @@ object MainForm: TMainForm
         Top = 0
         Action = DM.actUseOrdinalColor
       end
+      object btnDqDebug_Brk: TToolButton
+        Left = 218
+        Top = 0
+        Action = DM.actDqDebug_Brk
+      end
+      object btnDqDebug_CntBrk: TToolButton
+        Left = 241
+        Top = 0
+        Action = DM.actDqDebug_CntBrk
+      end
     end
     object pnl1: TPanel
-      Left = 598
-      Top = 2
-      Width = 185
+      Left = 670
+      Top = 28
+      Width = 132
       Height = 22
       Align = alRight
       BevelOuter = bvNone
@@ -326,7 +376,7 @@ object MainForm: TMainForm
     object tb3: TToolBar
       Left = 171
       Top = 28
-      Width = 358
+      Width = 486
       Height = 22
       Caption = 'tb3'
       DisabledImages = dmTool.il3
@@ -372,18 +422,38 @@ object MainForm: TMainForm
         Top = 0
         Action = dmTool.actShapeEllipse
       end
-      object btnGroupCombine: TToolButton
+      object btnShapeDaisy: TToolButton
         Left = 146
+        Top = 0
+        Action = dmTool.actShapeDaisy
+      end
+      object btnDaisy: TToolButton
+        Left = 169
+        Top = 0
+        Caption = 'btnDaisy'
+        ImageIndex = 13
+        OnClick = btnDaisyClick
+      end
+      object ToolButton5: TToolButton
+        Left = 192
+        Top = 0
+        Width = 8
+        Caption = 'ToolButton5'
+        ImageIndex = 14
+        Style = tbsSeparator
+      end
+      object btnGroupCombine: TToolButton
+        Left = 200
         Top = 0
         Action = dmTool.actGroupCombine
       end
       object btnGroupExtract: TToolButton
-        Left = 169
+        Left = 223
         Top = 0
         Action = dmTool.actGroupExtract
       end
       object ToolButton2: TToolButton
-        Left = 192
+        Left = 246
         Top = 0
         Width = 8
         Caption = 'ToolButton2'
@@ -391,22 +461,22 @@ object MainForm: TMainForm
         Style = tbsSeparator
       end
       object btnGroupIntersect: TToolButton
-        Left = 200
+        Left = 254
         Top = 0
         Action = dmTool.actGroupIntersect
       end
       object btnGroupUnion: TToolButton
-        Left = 223
+        Left = 277
         Top = 0
         Action = dmTool.actGroupUnion
       end
       object btnGroupTrim: TToolButton
-        Left = 246
+        Left = 300
         Top = 0
         Action = dmTool.actGroupTrim
       end
       object ToolButton3: TToolButton
-        Left = 269
+        Left = 323
         Top = 0
         Width = 8
         Caption = 'ToolButton3'
@@ -414,12 +484,12 @@ object MainForm: TMainForm
         Style = tbsSeparator
       end
       object btnGroupXOR: TToolButton
-        Left = 277
+        Left = 331
         Top = 0
         Action = dmTool.actGroupXOR
       end
       object ToolButton4: TToolButton
-        Left = 300
+        Left = 354
         Top = 0
         Width = 8
         Caption = 'ToolButton4'
@@ -427,7 +497,7 @@ object MainForm: TMainForm
         Style = tbsSeparator
       end
       object spinVertex: TSpinEdit
-        Left = 308
+        Left = 362
         Top = 0
         Width = 44
         Height = 22
@@ -482,7 +552,7 @@ object MainForm: TMainForm
   object mmo1: TMemo
     Left = 0
     Top = 389
-    Width = 852
+    Width = 804
     Height = 89
     Align = alBottom
     BevelOuter = bvNone
@@ -497,7 +567,6 @@ object MainForm: TMainForm
     ParentFont = False
     ScrollBars = ssVertical
     TabOrder = 5
-    Visible = False
   end
   object ctrlbr2: TControlBar
     Left = 0

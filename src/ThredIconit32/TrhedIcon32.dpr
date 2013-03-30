@@ -13,7 +13,10 @@ uses
   Embroidery_rwTHR in '..\lib\Embroidery_rwTHR.pas',
   Embroidery_Viewer in '..\lib\Embroidery_Viewer.pas',
   Embroidery_Fill in '..\lib\Embroidery_Fill.pas',
-  Embroidery_Fill_LCON in '..\lib\Embroidery_Fill_LCON.pas';
+  Embroidery_Fill_LCON in '..\lib\Embroidery_Fill_LCON.pas',
+  Embroidery_rwSHP in '..\lib\Embroidery_rwSHP.pas',
+  umDaisyDlg in 'umDaisyDlg.pas' {frmDaisyDlg},
+  gmCore_UndoRedo in '..\..\..\..\..\..\..\UI\GR32\graphicsmagic_svn\branches\GraphicsMagic_2_0_1\Source\gmCore_UndoRedo.pas';
 
 {$R *.RES}
 
@@ -24,5 +27,6 @@ begin
   Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TAboutBox, AboutBox);
   Application.CreateForm(TdmTool, dmTool);
+  Application.CreateForm(TfrmDaisyDlg, frmDaisyDlg);
   Application.Run;
 end.

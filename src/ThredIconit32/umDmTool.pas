@@ -28,6 +28,7 @@ type
     actGroupTrim: TAction;
     il3: TImageList;
     actGroupXOR: TAction;
+    actShapeDaisy: TAction;
     procedure actToolHandExecute(Sender: TObject);
     procedure actToolZoomExecute(Sender: TObject);
     procedure actToolLineModeExecute(Sender: TObject);
@@ -51,6 +52,7 @@ type
     procedure actToolLineBeforeMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure actToolLineFinalEdit(sender : TObject);
+    procedure actToolChanging(sender : TObject; const Info : string);
   public
     { Public declarations }
   end;
@@ -80,7 +82,8 @@ begin
       with TgmtoolShapeSelect(gmActiveTool) do
       begin
         OnBeforeMouseDown := actToolLineBeforeMouseDown;
-        OnFinalEdit := actToolLineFinalEdit;
+        OnFinalEdit       := actToolLineFinalEdit;
+        OnChanging        := actToolChanging;
       end;
 
   end;
@@ -113,6 +116,7 @@ begin
         OnBeforeMouseDown := actToolLineBeforeMouseDown;
         OnAfterMouseUp    := actToolLineAfterMouseUp;
         OnFinalEdit       := actToolLineFinalEdit;
+        OnChanging        := actToolChanging;
       end;
     end;
   end;
@@ -304,6 +308,11 @@ procedure TdmTool.actGroupXORExecute(Sender: TObject);
 begin
   if gmActiveTool is TgmtoolShapeBase then
     TgmtoolShapeBase(gmActiveTool).MakeXorSelection;
+end;
+
+procedure TdmTool.actToolChanging(sender: TObject; const Info : string);
+begin
+  TfcDesign(Application.MainForm.ActiveMDIChild).UndoRedo.AllocateUndo(Info);
 end;
 
 end.
