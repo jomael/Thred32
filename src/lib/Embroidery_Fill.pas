@@ -33,6 +33,12 @@ type
   TPointSortCompare = function (Item1, Item2: TStitchPoint): Integer;
   TCompareFunc = function (const Item1, Item2): Integer;
   TCmpFunc = function (var Data;  const A, B : Integer; Compare: Boolean): Integer;
+  TFloatRect = packed record
+    lin : Cardinal;
+  case Integer of
+    0: (Left, Top, Right, Bottom: TFloat);
+    1: (TopLeft, BottomRight: TFloatPoint);
+  end;
   TArrayOfFloatRect = array of TFloatRect;
   
 const
@@ -1570,7 +1576,7 @@ begin
 
   //if Assigned(AStitchForm.Ini) then
     //LIni := AStitchForm.Ini^;
-  LIni.StitchSpacing := 1;//0.45;//self.gbrSpace1.Position/10;
+  LIni.StitchSpacing := 10;//0.45;//self.gbrSpace1.Position/10;
 
   LLowY  := High(Integer);// LShape.Points[0].X;
   LHighY := Low(Integer);// LLowX;
@@ -1656,7 +1662,7 @@ begin
 
         //we need to sort all corner by Y of this polygon...
         //but in same time we also need to keep all sides in it's order.
-        // (if I sort directly the corner, the polygon then unpredicable shape.) 
+        // (if I sort directly the corner, the polygon then unpredicable shape.)
         //So, we make a copy of corners, not change order directly.
         SetLength(LCorners, LenSides);
         for j := 0 to LenSides - 1 do
@@ -1664,19 +1670,21 @@ begin
           LCorners[j].TopLeft := LShape^.Points[j];
           k := (j + 1) mod LenSides; //avoid range error, we connect the last to the first, if necessery.
           LCorners[j].BottomRight := LShape^.Points[k];
+          LCorners[j].lin := j;
 
           //okay, nice. but then we care the direction. it should be ascending only.
-          if LCorners[j].Bottom > LCorners[j].Top then
+          if LCorners[j].Bottom < LCorners[j].Top then
           begin
             //swap!
             LPoint1 := LCorners[j].BottomRight;
             LCorners[j].BottomRight := LCorners[j].TopLeft;
             LCorners[j].TopLeft := LPoint1;
-          end;  
+          end;
         end;
         //Move(LShape.Points[0], LCorners[0], SizeOf(TFloatPoint) * LenSides);
         //QuickSortFloatPointY(LCorners, 0, High(LCorners));
-        QuickSortFloatRectTop(LCorners, 0, High(LCorners));
+
+        //QuickSortFloatRectTop(LCorners, 0, High(LCorners)); //this is fine!
 
 
         //here the real calculation
@@ -1686,7 +1694,8 @@ begin
           begin
             LPoints[inf].X   := LProjPoint.X;
             LPoints[inf].y   := LProjPoint.y;
-            LPoints[inf].lin := j+LzY;//j;   //distinc corner index in whole shape, even different polygon
+            //LPoints[inf].lin := j+LzY;//j;   //distinc corner index in whole shape, even different polygon
+            LPoints[inf].lin := LCorners[j].lin+LzY;//j;   //distinc corner index in whole shape, even different polygon
             //inc(LzY);
 
             Inc(inf);
@@ -1701,7 +1710,7 @@ begin
     LJumps[i] := 0;
     if inf > 1 then
     begin
-      inf := inf and $FFFFFFFE; //EVENT only. DEL IF ODD
+      inf := inf and $FFFFFFFE; //EVEN only. DEL IF ODD
       LJumps[i] := inf div 2;
 
       FloatPointSort(LPoints, 0, inf - 1, @Compare_LinesInBar);

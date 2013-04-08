@@ -290,7 +290,7 @@ begin
   //LOAD STITCHS
   SetLength(LThredStitchs, LHeader.stchs);
   AStream.Read(LThredStitchs[0], LHeader.stchs * SizeOf(TSHRTPNT));
-  for i := 0 to LHeader.stchs do
+  for i := 0 to LHeader.stchs-1 do
   begin
     //Hey, Thred is updwon side. that is the first Y is in bottom, so we convert to delphi style
     LThredStitchs[i].y := {hedx.yhup -}(hedx.yhup - LThredStitchs[i].y);
@@ -459,7 +459,8 @@ begin
       LStitchCount := LHeader.stchs +1;
       SetLength(LStitchs, LStitchCount);
       FillChar(LStitchs[0], SizeOf(TStitchPoint) * LStitchCount, 0);
-      k := 0; 
+      k := 0;
+      if LHeader.stchs > 0 then 
       for j := 0 to LStitchCount do
       begin
         formIndex := (LThredStitchs[j].at and FRMSK) shr FRMSHFT;

@@ -54,7 +54,7 @@ type
     NorthIndex, //= Region, from top to bottom index for each a shape 
     WesternIndex, //from left to right in each NorthIndex
 
-    rgnSeq, //rgns, //LCON
+    rgns, //rgnSeq, //LCON
     brk, cntbrk,//LCON
     Region,
     Reserved1 : Word; //final x2nie used for sequence stitching order.

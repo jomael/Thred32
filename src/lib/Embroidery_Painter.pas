@@ -51,8 +51,11 @@ type
   TEmbroideryPainter = class(TObject)
   private
     FImage32: TCustomImage32;
+    FMultiply : TFloatPoint;
     FWantToCalcRect: Boolean;
-    procedure DoCalcRect( ALine : TStitchLine); 
+    procedure DoCalcRect( ALine : TStitchLine);
+    function GetMultiply(const Index: Integer): Single;
+    procedure SetMultiply(const Index: Integer; const Value: Single);
   protected
     FWantToClear: Boolean;
     FDrawnRect : TFloatRect;
@@ -82,6 +85,9 @@ type
     //before paint procs
     property WantToClear : Boolean read FWantToClear write FWantToClear;
     property WantToCalcRect : Boolean read FWantToCalcRect write FWantToCalcRect;
+    property Multiply : Single index 0 read GetMultiply write SetMultiply;
+    property MultiplyX : Single index 1 read GetMultiply write SetMultiply;
+    property MultiplyY : Single index 2 read GetMultiply write SetMultiply;
   end;
 
   TEmbroideryPainterClass = class of TEmbroideryPainter;
@@ -212,7 +218,8 @@ const
   LEdgeColors : array[0..VERTICES-1] of TColor32 = (
       clYellow32, clLime32, clAqua32, clDodgerBlue32, clBlueViolet32, clFuchsia32, clred32,
       clGray32, clLightGray32, clblack32,  clDarkOrange32);
-  TRA = clTrWhite32;
+  //TRA = clTrWhite32;
+  TRA = clWhite32;
 
 var
   UHotPressureColors,
@@ -293,6 +300,8 @@ begin
   inherited Create;
   FWantToClear := True;
   FImage32 := AImage32;
+  FMultiply.X := 1;
+  FMultiply.Y := 1;
 end;
 
 procedure TEmbroideryPainter.EndPaint(B: TBitmap32);
@@ -349,7 +358,9 @@ end;
 procedure TEmbroideryPainter.PaintLine(B: TBitmap32; ALine: TStitchLine; AColor: TColor32);
 begin
   with ALine do
-    B.LineFS(Start.x, Start.y, Finish.x, Finish.y, AColor);
+    B.LineFS(
+      Start.x * FMultiply.X, Start.y * FMultiply.Y,
+      Finish.x * FMultiply.X, Finish.y * FMultiply.Y, AColor);
   DoCalcRect(ALine);
 end;
 
@@ -379,7 +390,7 @@ begin
   else
     zoomRatio.X := zoomRatio.Y;
       
-  for i := 0 to High(LStitchs) do
+  for i := 0 to Length(LStitchs)-1 do
   begin
     // Bitmap.PenColor:= clBlack32;
     with LStitchs[i] do
@@ -482,6 +493,28 @@ begin
   end;
 end;
 
+function TEmbroideryPainter.GetMultiply(const Index: Integer): Single;
+begin
+  if Index in [0,1] then
+    Result := FMultiply.X
+  else
+    Result := FMultiply.Y;
+end;
+
+procedure TEmbroideryPainter.SetMultiply(const Index: Integer;
+  const Value: Single);
+begin
+  if Index = 0 then
+  begin
+    FMultiply.X := Value;
+    FMultiply.Y := Value;
+  end
+  else if Index = 1 then
+    FMultiply.X := Value
+  else
+    FMultiply.Y := Value;
+end;
+
 { TEmbroideryPhotoPainter }
 
 procedure TEmbroideryPhotoPainter.PaintLine(B: TBitmap32;
@@ -559,13 +592,28 @@ var
   LBarCount, 
   w,x,y,i,j : Integer;
   LFillPoints : TArrayOfStitchPoint;
-  x1,y1,x2,y2 : TFloat;
+  x1,y1,x2,y2, x3,y3 : TFloat;
   c1,c2 : TColor32;
+
 begin
   //PArrayOfStitchPoint(LFillPoints) := AnItem.Stitchs;
   LFillPoints := AnItem.Stitchs^;
   LBarCount := Length(LFillPoints);
-  
+
+  //VERTICE
+
+    for i := 0 to Length(AnItem.PolyPolygon^) -1 do
+    begin
+      for j := 0 to Length(AnItem.PolyPolygon^[i].Points) -1 do
+      begin
+        //Font.Color := WinColor(c[(VERTICES+i-1) mod VERTICES]);
+
+        with AnItem.PolyPolygon^[i].Points[j] do
+        begin
+          B.TextOut(Round(X * FMultiply.X), Round(Y * FMultiply.Y), IntToStr(J));
+        end;
+      end;
+    end;
 
 
   //DRAWING.
@@ -576,8 +624,8 @@ begin
 
   //ABitmap32.PenColor := clRed32;
 
-  x := Round(LFillPoints[0].X);
-  y := Round(LFillPoints[0].Y);
+  x := Round(LFillPoints[0].X * FMultiply.X);
+  y := Round(LFillPoints[0].Y * FMultiply.Y);
   B.MoveTo(x, y);
 
   i := 0;
@@ -586,10 +634,10 @@ begin
   i := 0;
   for j := 0 to (LBarCount - 1) do
   begin
-    x1 := (LFillPoints[i].X);
-    y1 := (LFillPoints[i].Y);
-    x2 := (LFillPoints[i+1].X);
-    y2 := (LFillPoints[i+1].Y);
+    x1 := (LFillPoints[i].X * FMultiply.X);
+    y1 := (LFillPoints[i].Y * FMultiply.Y);
+    x2 := (LFillPoints[i+1].X * FMultiply.X);
+    y2 := (LFillPoints[i+1].Y * FMultiply.Y);
 
     B.MoveToF(x1, y1);
     
@@ -646,7 +694,12 @@ begin
       B.SetStipple([c1,c1,c2,c2, c2,c2]);
       B.StippleCounter := 0;
       //ABitmap32.LineToFS(x2,y2);
-      B.StippleStep := 3.5/ max(Max(x2,x1) - Min(x2,x1),1);
+      //B.StippleStep := 3.5/ max(Max(x2,x1) - Min(x2,x1),1); //fine. but it only draw vertical stipple
+      x3 := Abs(x2-x1);
+      y3 := Abs(y2-y1);
+      B.StippleStep := 3.5/ Max( Max(x3,y3), 1);
+
+
       //ABitmap32.PenColor := c2;
       B.LineToFSP(X2, Y2);
     end;
@@ -697,7 +750,7 @@ end;
 procedure TEmbroideryDebugRgnsPainter.CalcColor(P1, P2: TStitchPoint;
   var C1, C2: TColor32);
 begin
-  MapColor(P1.rgnSeq, C1,C2);
+  MapColor(P1.rgns, C1,C2);
 end;
 
 { TEmbroideryDebugCntBrkPainter }

@@ -159,20 +159,20 @@ var
   e       : Integer;
   blin    : Cardinal;
   sind    : Cardinal;
-  cnt     : Cardinal;
-  priorGrp    : Cardinal;
+  cpnt,cnt  : Cardinal;
+  priorGrp  : Cardinal;
   opnt    : Cardinal;  // output pointer for sequencing
   tcon    : SmallInt;
   tpnt    : Cardinal;
   lconskip: Boolean;
 
-    rgnSeq    : array of TRGN;                   // a list of regions for sequencing
+    rgns    : array of TRGN;                   // a list of regions for sequencing
     srgns   : array of Cardinal;               // an array of subregion starts
     grinds  : array of Cardinal;               // array of group indices for sequencing
     visit   : array of Byte;                   // visited character map for sequencing
     minds   : array of Cardinal;
 
-  tableRegions : array of TRGN;
+  tempRegions : array of TRGN;
   tsrgns: array of Cardinal;
   tmap  : array of TRCON;
   rgcnt,
@@ -183,14 +183,15 @@ var
 begin
 //-- lcon() begin --------------------------------------------------------------
 
-  PArrayOfStitchPoint(lins) := @AStitchForm.Stitchs^[0];
+  lins := @AStitchForm.Stitchs^[0];
   spnt := Length(lins);
 
 
   //if form has lines
   LineCount := 0;
-  if spnt > 0 then
-  begin
+  if spnt <= 0 then
+    Exit; //<-- not save. we may further need further vars such "bseq"
+
     SetLength( seq, spnt div 2);
 
     // 1. copy LIN to SEQ, copy the only 1st-point of each line
@@ -199,31 +200,34 @@ begin
       seq[j] := @lins[j * 2];
       LineCount := j; //I dont trust the iterator J since it may be undefined after loop.
     end;
+    Inc(LineCount);
 
     //this is sorting the "seq" by this priority order: by Vertice, by MostLeft, by MostTop
-    PointSort(seq, 0, LineCount, sqcomp);
-  end;
+    PointSort(seq, 0, LineCount-1, sqcomp);
 
   //FIND REGIONS COUNT
   //DIVIDE "SEQ" (LINE) BY VERTICES.
 
-  SetLength(tableRegions, spnt); //maximum posible length = spnt
-  tableRegions[0].StartLine := 0;
-  blin := seq[0].lin;
+  SetLength(tempRegions, spnt); //maximum posible length = spnt
+  SetLength(visit, spnt);
+
+  tempRegions[0].StartLine := 0;
+  
+  blin := seq[0]^.lin;
   rgcnt := 0;
   j := 0;
   for i := 0 to (LineCount - 1) do
   begin
     if blin <> seq[i]^.lin then
     begin
-      tableRegions[rgcnt].EndLine := i - 1;
+      tempRegions[rgcnt].EndLine := i - 1;
       Inc(rgcnt);
-      tableRegions[rgcnt].StartLine := i;
+      tempRegions[rgcnt].StartLine := i;
       blin := seq[i]^.lin;
     end;
     j := i; //I dont trust the iterator "i" since it may be undefined after loop.
   end;
-  tableRegions[rgcnt].EndLine := j - 1;
+  tempRegions[rgcnt].EndLine := j;
   Inc(rgcnt);
   //this time, region_count was reached.
 
@@ -231,23 +235,24 @@ begin
   //x2nie immediatelly write the RGNS
   for i := 0 to rgcnt-1 do
   begin
-    for j :=tableRegions[i].StartLine  to tableRegions[i].EndLine do
+    for j :=tempRegions[i].StartLine  to tempRegions[i].EndLine do
     begin
       //lins[j].rgns := i;
-      seq[j]^.rgnSeq := i;
+      seq[j]^.rgns := i;
+      TArrayOfStitchPoint(@seq[j]^)[1].rgns := i;
     end;
   end;
 
-
+{ 
   //Region. copy table region into real Region.
-  SetLength(rgnSeq, rgcnt);
+  SetLength(rgns, rgcnt);
   SetLength(visit, rgcnt);
 
   for i := 0 to (rgcnt - 1) do
   begin
-    rgnSeq[i].StartLine := tableRegions[i].StartLine;
-    rgnSeq[i].EndLine   := tableRegions[i].EndLine;
-    rgnSeq[i].cntbrk    := 0;
+    rgns[i].StartLine := tempRegions[i].StartLine;
+    rgns[i].EndLine   := tempRegions[i].EndLine;
+    rgns[i].cntbrk    := 0;
     visit[i]          := 0;
   end;
 
@@ -265,12 +270,12 @@ begin
     //FIND TOTAL COUNT OF BARS FOR EACH REGION.
     
     //do that in a region having several LINE
-    if (rgnSeq[i].EndLine - rgnSeq[i].StartLine) > 1 then
+    if (rgns[i].EndLine - rgns[i].StartLine) > 1 then
     begin
-      priorGrp := seq[ rgnSeq[i].StartLine ]^.grp;
+      priorGrp := seq[ rgns[i].StartLine ]^.grp;
       
       //Okay, we now scanning per each LINE, from second bar.
-      for e := (rgnSeq[i].StartLine + 1) to rgnSeq[i].EndLine do
+      for e := (rgns[i].StartLine + 1) to rgns[i].EndLine do
       begin
         Inc(priorGrp);
 
@@ -279,7 +284,7 @@ begin
         begin
           if cnt = 0 then
           begin
-            rgnSeq[i].brk := sind; //start break
+            rgns[i].brk := sind; //start break
           end;
 
           Inc(cnt);
@@ -292,17 +297,17 @@ begin
       end;
     end;
 
-    rgnSeq[i].cntbrk := cnt;  // cnt = total count of bar
+    rgns[i].cntbrk := cnt;  // cnt = total count of bar
 
   end;
 
   //x2nie immediatelly write the RGNS
   for i := 0 to rgcnt-1 do
   begin
-    for j :=rgnSeq[i].StartLine  to rgnSeq[i].EndLine do
+    for j :=rgns[i].StartLine  to rgns[i].EndLine do
     begin
-      seq[j]^.brk := rgnSeq[i].brk;
-      seq[j]^.cntbrk := rgnSeq[i].cntbrk;
+      seq[j]^.brk := rgns[i].brk;
+      seq[j]^.cntbrk := rgns[i].cntbrk;
     end;
   end;
 
@@ -316,58 +321,55 @@ begin
     end;
   end;
 
-{  
-  tmap := nil;
+{  tmap := nil;
   SetLength(minds, rgcnt + 1);
 
   opnt := 0;
-  if rgcnt > 1 then
+  {if rgcnt > 1 then
   begin
-    e  := 0;
-    cpnt := 0;
 
+    j  := 0;  cpnt := 0;
+
+    //COMPARE REGION EACH OTHER
     for i := 0 to (rgcnt - 1) do
     begin
       minds[i] := cpnt;
       cnt        := 0;
       rgclos     := 0;
 
-      for e := 0 to (rgcnt - 1) do
-      begin
-        if i <> e then
+      for j := 0 to (rgcnt - 1) do
+        if i <> j then
         begin
-          tcon := regclos(i, e);
 
+          tcon := regclos(i, j);
           if tcon > 0 then
           begin
+
             SetLength(tmap, Length(tmap) + 1);
             tmap[cpnt].con  := tcon;
             tmap[cpnt].grpn := nxtgrp;
-            tmap[cpnt].vrt  := e;
+            tmap[cpnt].vrt  := j;
 
             Inc(cpnt);
             Inc(cnt);
           end;
         end;
-      end;
 
-      while (cnt = 0) do
-      begin
+      while (cnt = 0) do begin
+
         rgclos := rgclos + FIni.StitchSpace;
         cnt    := 0;
+        for j := 0 to (rgcnt - 1) do begin
 
-        for e := 0 to (rgcnt - 1) do
-        begin
-          if i <> e then
-          begin
-            tcon := regclos(i, e);
+          if i <> j then begin
 
-            if tcon <> 0 then
-            begin
+            tcon := regclos(i, j);
+            if tcon <> 0 then begin
+
               SetLength(tmap, Length(tmap) + 1);
               tmap[cpnt].con  := tcon;
               tmap[cpnt].grpn := nxtgrp;
-              tmap[cpnt].vrt  := e;
+              tmap[cpnt].vrt  := j;
 
               Inc(cpnt);
               Inc(cnt);
@@ -387,27 +389,27 @@ begin
     end;
 
     // find the leftmost region
-    priorGrp := $FFFFFFFF;
-    e  := 0;
+    sgrp := $FFFFFFFF;
+    j  := 0;
     for i := 0 to (rgcnt - 1) do
     begin
-      tpnt := rgns[i].StartLine;
+      tpnt := seq[rgns[i].StartLine];
 
-      if seq[tpnt].grp < priorGrp then
+      if tpnt^.grp < sgrp then
       begin
-        priorGrp := seq[tpnt].grp;
-        e  := i;
+        sgrp := tpnt^.grp;
+        j  := i;
       end; 
     end;
 
-    opnt   := 0;
+    opnt := 0;
     // find the leftmost region in pmap
     mpathi   := 1;
     lconskip := False;
 
     for i := 0 to (cpnt - 1) do
     begin
-      if pmap[i].vrt = e then
+      if pmap[i].vrt = j then
       begin
         lconskip := True;
         Break;
@@ -416,7 +418,7 @@ begin
 
     if not lconskip then
     begin
-      pmap[cpnt].vrt  := e;
+      pmap[cpnt].vrt  := j;
       pmap[cpnt].grpn := 0;
       i             := cpnt; 
     end;
@@ -425,36 +427,37 @@ begin
     tmpath[0].pcon := i;
     tmpath[0].cnt  := 1;
     tmpath[0].skp  := 0;
-    visit[e]     := 1;
-    dunrgn         := e;
+    visit[j]     := 1;
+    dunrgn         := j;
 
     while unvis() do
     begin
       nxtrgn();
     end;
 
-    e := 0;
+    j := 0;
     cnt := $FFFFFFFF;
 
     for i := 0 to (mpathi - 1) do
     begin
-      mpath[e].skp := tmpath[i].skp;
 
+      mpath[j].skp := tmpath[i].skp;
       if tmpath[i].pcon = $FFFFFFFF then
       begin
-        mpath[e].vrt := tmpath[i].cnt;
+      
+        mpath[j].vrt := tmpath[i].cnt;
         cnt            := tmpath[i].cnt;
 
-        Inc(e);
+        Inc(j);
       end
       else
       begin
         if tmpath[i].pcon <> cnt then
         begin
           cnt            := tmpath[i].pcon;
-          mpath[e].vrt := pmap[tmpath[i].pcon].vrt;
+          mpath[j].vrt := pmap[tmpath[i].pcon].vrt;
 
-          Inc(e);
+          Inc(j);
         end;
       end;
     end;
@@ -467,10 +470,10 @@ begin
       nxtseq(i);
     end;
 
-    e := (LineCount shr 5) + 1;
+    j := (lpnt shr 5) + 1;
 
-    SetLength(seqmap, e);
-    for i := 0 to (e - 1) do
+    SetLength(seqmap, j);
+    for i := 0 to (j - 1) do
     begin
       seqmap[i] := 0;
     end;
@@ -497,10 +500,10 @@ begin
     SetLength(pmap, 1);
     SetLength(mpath, 1);
 
-    e := (LineCount shr 5) + 1;
-    SetLength(seqmap, e);
+    j := (lpnt shr 5) + 1;
+    SetLength(seqmap, j);
 
-    for i := 0 to (e - 1) do
+    for i := 0 to (j - 1) do
     begin
       seqmap[i] := 0;
     end;
@@ -513,23 +516,39 @@ begin
     durgn(0);
   end;
 
-  Memo1.Lines.Clear;
-{  Memo1.Lines.Add( 'ind: ' + IntToStr(ind) );
-  Memo1.Lines.Add('');
-  for ii := 0 to (rgcnt - 1) do
-  begin
-    Memo1.Lines.Add( 'i:' + IntToStr(visit[ii]) );
-  end;
-  Memo1.Update;  }
 
-  SetLength(tableRegions, 0);
-  tableRegions := nil;
+
+  if opnt > 1 then
+  begin
+    imgvwDrawingArea.Bitmap.PenColor := clBlack32;
+    imgvwDrawingArea.Bitmap.MoveToF(bseq[0].x, bseq[0].y);
+    for ii := 1 to (opnt - 1) do
+    begin
+      imgvwDrawingArea.Bitmap.LineToFS(bseq[ii].x, bseq[ii].y);
+    end;
+
+    for ii := 0 to (opnt - 1) do
+    begin
+      imgvwDrawingArea.Bitmap.Textout( Round(bseq[ii].x), Round(bseq[ii].y) , IntToStr(ii));
+    end;
+
+    imgvwDrawingArea.Bitmap.Changed;
+  end;
+
+  SetLength(trgns, 0);
+  trgns := nil;
+
+  SetLength(tmap, 0);
+  tmap := nil;
+
+  SetLength(tempRegions, 0);
+  tempRegions := nil;
 
   SetLength(tmap, 0);
   tmap := nil;
   //reset
   PArrayOfStitchPoint(lins) := nil;
-
+}
 
 //------------------------------------------------------------------------------
 

@@ -10,6 +10,21 @@ uses
   Thred_Constants;
 
 type
+    // thred.h #346
+  THoopSetting = (hsSetCustomHoop = 1,  // SETCUST -- set the custom hoop
+                  hsSmallHoop     = 2,  // SMALHUP -- pfaf code for small hoop
+                  hsLargeHoop,          // LARGHUP -- pfaf code for large hoop
+                  hsHoop100,            // HUP100 -- 100 millimeter hoop
+                  hsCustomHoop);        // CUSTHUP -- user defined hoop size
+
+  // thred.h #668
+  {TFeatherFillTypes = (fftSine = 1,	             // FTHSIN -- sine
+                       fftHalfSine,	             // FTHSIN2 -- half sine
+	                     fftLine,	    	           // FTHLIN -- line
+	                     fftPsuedoRandomSequence,  // FTHPSG -- psuedo-random sequence
+	                     fftSawtooth,	             // FTHRMP -- sawtooth
+	                     fftPhase);                // FTHFAZ -- phase
+  }
   TOldNameCharArray = array [0..OLDNUM - 1, 0..MAX_PATH - 1] of Char;
   TArrayOfTColor = array of TColor;
   PArrayOfCardinal = ^TArrayOfCardinal;
@@ -21,6 +36,7 @@ type
     x, y : Double;
   end;
 
+  PSMALPNTL = ^TSMALPNTL;
   TSMALPNTL = record //smallpoint Line
     lin,	//lin and grp must remain in this order for sort to work
     grp : word;
@@ -28,6 +44,12 @@ type
   end;//SMALPNTL;
 
   TArrayOfTSMALPNTL = array of TSMALPNTL;
+  TArrayOfPSMALPNTL = array of PSMALPNTL;
+  PArrayOfTSMALPNTL = ^TArrayOfTSMALPNTL;
+
+  TDUBPNT = record
+    x, y : Double;
+  end;//DUBPNT
 
   PDUBPNTL = ^TDUBPNTL;
   TDUBPNTL = record
@@ -45,11 +67,19 @@ type
   TFLPNT = type TFloatPoint;
   TFLRCT = type TFloatRect;
   
-  TBSEQPNT = packed record
+  TBSEQPNT_packed = packed record
     x,
     y : Single;
     attr: Byte;
   end;//BSEQPNT;
+  TBSEQPNT = record
+    x,
+    y : Single;
+    attr: Byte;
+  end;//BSEQPNT;
+
+  TArrayOfBSEQPNT = array of TBSEQPNT; 
+
 
 
 
@@ -167,7 +197,7 @@ type
 
   // ini file structure (INIFIL in thred.h, #691)
   PThredIniFile = ^TThredIniFile;
-  TThredIniFile = packed record
+  TThredIniFile = packed record   
     DefaultDir                 : array [0..179] of Char;           // default directory    {defDir[180];}
     StitchColors               : T16Colors;                         // colors    {stchCols[16];}
     PrefStitchColors           : T16Colors;                         // stitch preference colors    {selStch[16];}
@@ -307,8 +337,9 @@ type
   //PSACANG = ^TSACANG;
   TSACANG = packed record
     case boolean of
-	    False : (sac : PArrayOfTSATCON);//PSATCON);
-	    True  : (ang : Single); //anle
+	    //False : (sac : PArrayOfTSATCON);//PSATCON);
+	    False : (sac : PSATCON);
+	    True  : (ang : Single); //angle
   end; //SACANG;
 
   TArrayOfTSACANG = array of TSACANG;
@@ -509,6 +540,8 @@ type
     cntbrk   : Cardinal;
   end;
 
+  PRGN = ^TRGN;
+
 
   TRCON = record		//pmap: path map for sequencing
     vrt,
@@ -519,13 +552,30 @@ type
 
   TArrayOfTRGN = array of TRGN;
 
-  TRGSEQ = packed record		//tmpath: temporary path connections
+  TRGSEQ_packed = packed record //for loading from blockread, compatibility mode.
     pcon : cardinal;		//pointer to pmap entry
     cnt : integer;
     skp : byte;		//path not found
   end; //RGSEQ;
 
-  TFSEQ = packed record		//mpath: path of sequenced regions
+  TRGSEQ = record		//tmpath: temporary path connections //faster
+    pcon : cardinal;		//pointer to pmap entry
+    cnt : integer;
+    skp : byte;		//path not found
+  end; //RGSEQ;
+
+  //TRGSEQArray = array [0..0] of TRGSEQ;
+  //PRGSEQArray = ^TRGSEQArray;
+
+  TArrayOfTRGSEQ = array of TRGSEQ; //x2nie+
+  PArrayOfTRGSEQ = ^TArrayOfTRGSEQ; //x2nie+
+  
+  TFSEQ_packed = packed record		//mpath: path of sequenced regions, compatibility mode
+    vrt,
+    grpn : Word;
+    skp : Byte;	//path not found
+  end; //FSEQ;
+  TFSEQ = record		//mpath: path of sequenced regions //faster
     vrt,
     grpn : Word;
     skp : Byte;	//path not found
