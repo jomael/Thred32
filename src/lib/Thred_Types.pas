@@ -251,8 +251,8 @@ type
     TearTwistStep              : Single;                           // tear twist step    {twststp;}
     TearTwistRatio             : Single;                           // tear twist ratio    {twstrat;}
     WavePoints                 : Word;                             // wave points    {wavpnts;}
-    WaveStarting               : Word;                             // wave starting point    {wavstrt;}
-    WaveEnding                 : Word;                             // wave ending point    {wavend;}
+    WaveStart                  : Word;                             // wave starting point    {wavstrt;}
+    WaveEnd                    : Word;                             // wave ending point    {wavend;}
     WaveLobes                  : Word;                             // wave lobes    {wavs;}
     FeatherFillType            : Byte;                             // feather fill type    {fthtyp;}
     FeatherUpCount             : Byte;                             // feather up count    {fthup;}
@@ -278,7 +278,7 @@ type
     TextureFillWidth           : Single;                           // textured fill width    {txtwid;}
     TextureFillSpacing         : Single;                           // textured fill spacing    {txtspac;}
     FormBoxPixels              : Word;                             // form box pixels    {frmbpix;}
-    DaisyHeatCount             : Word;                             // daisy heart count    {dazpcnt;}
+    DaisyHeartCount            : Word;                             // daisy heart count    {dazpcnt;}
     TextureEditorPixels        : Word;                             // texture editor pixels    {//texture editor pixels}
     ClipboardFillSpacing       : Single;                           // clipboard fill spacing    {clpspc;}
     DesignerName               : array [0..49] of Char;            // designer name    {desnam[50];}
@@ -337,8 +337,9 @@ type
   //PSACANG = ^TSACANG;
   TSACANG = packed record
     case boolean of
-	    //False : (sac : PArrayOfTSATCON);//PSATCON);
-	    False : (sac : PSATCON);
+	    False : (sac : PArrayOfTSATCON);//PSATCON);
+	    //False : (sac : PSATCON);
+      //False : (sac : TArrayOfTSATCON);
 	    True  : (ang : Single); //angle
   end; //SACANG;
 
@@ -533,7 +534,7 @@ type
     brk,
     cntbrk : Cardinal;
   end;  //RGN;}
-  TRGN = packed record
+  TRGN =  record
     StartLine: Cardinal;
     EndLine  : Cardinal;
     brk      : Cardinal;
@@ -581,6 +582,14 @@ type
     skp : Byte;	//path not found
   end; //FSEQ;
 
+  TFloatRect = packed record
+    lin : Cardinal;
+  case Integer of
+    0: (Left, Top, Right, Bottom: TFloat);
+    1: (TopLeft, BottomRight: TFloatPoint);
+  end;
+  TArrayOfFloatRect = array of TFloatRect;
+  
 implementation
 
 end.

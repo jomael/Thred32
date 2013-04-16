@@ -12,11 +12,10 @@ uses
   Embroidery_Painter in '..\lib\Embroidery_Painter.pas',
   Embroidery_rwTHR in '..\lib\Embroidery_rwTHR.pas',
   Embroidery_Viewer in '..\lib\Embroidery_Viewer.pas',
-  Embroidery_Fill in '..\lib\Embroidery_Fill.pas',
-  Embroidery_Fill_LCON in '..\lib\Embroidery_Fill_LCON.pas',
   Embroidery_rwSHP in '..\lib\Embroidery_rwSHP.pas',
   umDaisyDlg in 'umDaisyDlg.pas' {frmDaisyDlg},
-  gmCore_UndoRedo in '..\..\..\..\..\..\..\UI\GR32\graphicsmagic_svn\branches\GraphicsMagic_2_0_1\Source\gmCore_UndoRedo.pas';
+  gmCore_UndoRedo in '..\..\..\..\..\..\..\UI\GR32\graphicsmagic_svn\branches\GraphicsMagic_2_0_1\Source\gmCore_UndoRedo.pas',
+  Embroidery_Refill in '..\lib\Embroidery_Refill.pas';
 
 {$R *.RES}
 

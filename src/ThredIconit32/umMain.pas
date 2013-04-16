@@ -115,6 +115,7 @@ type
     btnEditUndo: TToolButton;
     ToolButton7: TToolButton;
     btnEditRedo: TToolButton;
+    btnDeleteFill: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure appevents1Hint(Sender: TObject);
@@ -127,6 +128,7 @@ type
     procedure btnDaisyClick(Sender: TObject);
     procedure btn13Click(Sender: TObject);
     procedure btn14Click(Sender: TObject);
+    procedure btnDeleteFillClick(Sender: TObject);
   private
     { Private declarations }
     FParamsLoaded : boolean;
@@ -412,6 +414,20 @@ begin
 
   end;  
 //
+end;
+
+procedure TMainForm.btnDeleteFillClick(Sender: TObject);
+var i : Integer;
+begin
+  if GetActiveChild() <> nil then
+    with GetActiveChild do
+      for i := 0 to ShapeList.Count -1 do
+      begin
+        ShapeList[i].ResetFill;
+
+      end;
+
+
 end;
 
 end.

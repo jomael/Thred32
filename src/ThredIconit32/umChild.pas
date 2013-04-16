@@ -13,11 +13,12 @@ uses
   gmIntercept_GR32_Image,
 {Thred32}
   Embroidery_Items, Embroidery_Painter,
-  Stitch_items, //Stitch_rwTHR, Stitch_rwPCS, Stitch_rwPES,
+  //Stitch_items, //Stitch_rwTHR, Stitch_rwPCS, Stitch_rwPES,
   Embroidery_rwTHR,
+  Embroidery_Refill,
 
   Menus, ActnList, ComCtrls, ToolWin, ExtCtrls, gmCore_Items,
-  gmGridBased, gmSwatch, gmShape ;
+  gmGridBased, gmSwatch, gmShape, GR32_RangeBars ;
 
 type
 {$DEFINE MODERNITEM}
@@ -30,6 +31,19 @@ type
     pnl1: TPanel;
     pbPreview: TPaintBox32;
     Panel1: TPanel;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    Button1: TButton;
+    Button2: TButton;
+    chkDrawgrid: TCheckBox;
+    chkVideo: TCheckBox;
+    gbrSpace1: TGaugeBar;
+    btnNewStar: TButton;
+    rg1: TRadioGroup;
+    Memo1: TMemo;
+    btnDump: TButton;
+    ToolBar1: TToolBar;
+    Splitter1: TSplitter;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -43,6 +57,8 @@ type
     procedure imgStitchsMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer; Layer: TCustomLayer);
     procedure FormDestroy(Sender: TObject);
+    procedure btnNewStarClick(Sender: TObject);
+    procedure btnDumpClick(Sender: TObject);
   private
     { Private declarations }
     FModified: boolean;
@@ -51,6 +67,7 @@ type
     FUseOrdinalColor: boolean;
     //FDrawLine : TEmbroidery_LineProc;
     FPainter  : TEmbroideryPainter;
+    FThred : TThred;
     
     //FSelections : TArrayOfArrayOfInteger;// TArrayOfPArrayOfgmShapeInfo;
     //FShapes : TArrayOfTgmShapeInfo;
@@ -64,6 +81,8 @@ type
     function GetSelections: PArrayOfArrayOfInteger;
     procedure SetPainter(const Value: TEmbroideryPainter);
     procedure RefreshScreenEvent(Sender:TObject);
+    procedure Verbose(const VerboseMsg: string);
+
 //    function GetPolyPolygons: PArrayOfArrayOfgmShapeInfo;
 //    procedure SetSelectedIndex(const Value: Integer);
 //    function GetSelections: PArrayOfArrayOfInteger;
@@ -120,7 +139,7 @@ uses
 
   Thred_Constants,
   Embroidery_Lines32, Embroidery_Defaults {Thred_Defaults} ,
-  Embroidery_Fill, Embroidery_Fill_LCON,
+  //Embroidery_Fill, Embroidery_Fill_LCON,
   umMain, umDm, Math;
 
 {$R *.dfm}
@@ -162,6 +181,9 @@ end;
 procedure TfcDesign.FormCreate(Sender: TObject);
 begin
   self.imgStitchs.Align := alClient;
+  FThred := TThred.Create;
+  FThred.VerboseProc := Verbose;
+  FThred.Ini := DM.ThredIni; //set it to pointer type?
 
   imgStitchs.Bitmap.SetSize(400,400);// hup size
   imgStitchs.Bitmap.Clear(clWhite32);
@@ -180,6 +202,9 @@ begin
 
 //  FSelectedIndex := -1;
 //  SetLength(FSelections,0);
+//DEBUG
+  btnNewStar.Click;
+  //btnDump.Click;
 end;
 
 procedure TfcDesign.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -430,8 +455,18 @@ begin
         // DO FILLING ALGORITHM HERE, IF NECESSARY
         if Length(LShapeItem.Stitchs^) <= 0 then
         begin
-          fnhrz(LShapeItem, nil);
-          LCON(LShapeItem);
+          //fnhrz(LShapeItem, nil);
+          //LCON(LShapeItem);
+          try
+            FThred.ResetVars(self);
+            //fnhrz(LShapeItem, nil);
+            self.FThred.fnvrt(LShapeItem);  LShapeItem.Stitchs^ := @self.FThred.publins^[0]; //FThred.lins := nil; 
+            //rulV.ZeroPixel := Round(LShapeItem.Stitchs^[0].Y);
+            self.FThred.LCON(LShapeItem);   LShapeItem.Stitchs^ := @self.FThred.pubbseq^[0]; 
+            Self.FThred.bakseq;             LShapeItem.Stitchs^ := @self.FThred.pubOseq^[0];
+          except
+            Verbose('ERROR ON bakseq');
+          end;
         end;
       end;
 
@@ -734,6 +769,55 @@ end;
 procedure TfcDesign.RefreshScreenEvent(Sender: TObject);
 begin
   DrawStitchs();
+end;
+
+procedure TfcDesign.btnNewStarClick(Sender: TObject);
+var
+  x,y : Integer;
+  LShape : TEmbroideryItem;
+  LPolygon : PgmShapeInfo;
+begin
+  FShapeList.ClearSelections;
+  FShapeList.Clear;
+  LShape := TEmbroideryItem(FShapeList.Add);
+  LPolygon := LShape.Add;
+
+  LPolygon.Centroid := FloatPoint(
+        imgStitchs.Bitmap.Width div 2-1,
+        imgStitchs.Bitmap.Height div 2-1
+  );
+  //LPolygon.Delta := FloatPoint( LPolygon.Centroid.X /3 *2, LPolygon.Centroid.Y /3 * 2);
+  LPolygon.Delta := FloatPoint( 162, 171);
+  LPolygon.Kind := skStar;
+  LPolygon.Star.VertexCount := 5;
+  LPolygon.Star.Straight := True;
+
+  BuildStarPoints(LPolygon^, [smAngled]);
+
+  //TStarForm(FStitchForm).EndingPoint := Point(x + 162, y + 171);
+  Self.DrawStitchs;
+end;
+
+procedure TfcDesign.btnDumpClick(Sender: TObject);
+var i : Integer;
+begin
+  if FShapeList.Count < 1 then Exit;
+
+  with TEmbroideryItem(FShapeList[0]) do
+    for i := 0 to Length(Stitchs^) -1 do
+    begin
+      with Stitchs^[i] do
+      begin
+        Memo1.Lines.Add(Format('lin[%d] R:%d  L:%d  g:%d  x:%.0f   y:%.0f',[i, rgns, lin, grp, x, y]))
+        //Memo1.Lines.Add(Format('lin[%d]  L:%d  g:%d  x:%.2f   y:%.fd',[i, lin, grp, x, y]))
+      end;
+    end;
+
+end;
+
+procedure TfcDesign.Verbose(const VerboseMsg: string);
+begin
+  Memo1.Lines.Add(VerboseMsg);
 end;
 
 end.

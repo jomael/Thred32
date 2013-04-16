@@ -34,6 +34,17 @@ AT_CWLK =256;		//center walk
     7 : FDrawLine := DrawHotPressure;
     }
 
+// daisy codes
+  DAISY_PETALS                = 5;   // DAZPETS -- petals (thred.h #23)
+  DAISY_COUNT                 = 10;  // DAZCNT -- petal points (thred.h #24)
+  DAISY_INNER_COUNT           = 2;   // DAZICNT -- petal inner points (thred.h #25)
+  DAISY_LENGTH                = 15;  // DAZLEN -- diameter (thred.h #26)
+  DAISY_PETAL_LENGTH          = 20;  // DAZPLEN -- petal length (thred.h #27)
+  DAISY_HOLE_LENGTH           = 5;   // DAZHLEN -- hole size (thred.h #28)
+  DAISY_TYPE                  = 5;   // DAZTYP -- border type (thred.h #29)
+  DAISY_MIRROR_COUNT          = 7;   // DAZMCNT -- morror count (thred.h #30)
+  // end of daisy codes
+      
 // compile switches (thred.h #1)
   //PESACT     = 0;		// compile pes code. we use PES in different approach.
 

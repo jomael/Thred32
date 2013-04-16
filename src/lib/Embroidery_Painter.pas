@@ -76,7 +76,7 @@ type
     constructor Create(AImage32: TCustomImage32);
     //function GetWantToClear: Boolean; virtual;
     procedure Paint(AShapeList: TEmbroideryList; AState: TEmbroideryPaintStage = epsPaint); virtual;
-
+    procedure Assign(Src : TEmbroideryPainter); virtual;
     //after paint procs
     function GetDrawnSize: TPoint; //used by such fileOpenDlg
     function GetDrawnRect: TRect; //used by such fileOpenDlg
@@ -515,20 +515,41 @@ begin
     FMultiply.Y := Value;
 end;
 
+procedure TEmbroideryPainter.Assign(Src: TEmbroideryPainter);
+begin
+  FImage32 := Src.FImage32;
+  FMultiply := Src.FMultiply;
+  FWantToCalcRect := Src.FWantToCalcRect;
+  FWantToClear := Src.FWantToClear;
+  FDrawnRect := Src.FDrawnRect;
+end;
+
 { TEmbroideryPhotoPainter }
 
 procedure TEmbroideryPhotoPainter.PaintLine(B: TBitmap32;
   ALine: TStitchLine; AColor: TColor32);
+  procedure Offset(var F : TFloatPoint; D : TFloat);
+  begin
+    F.X := F.X * D;
+    F.Y := F.Y * D;
+
+  end;
 var h, x, y : TFloat;
   Cs : TArrayOfColor32;
+  LStart, LFinish : TFloatPoint;
+  R : TFloatRect;
 begin
 
   with ALine do
   begin
+    LStart := Start.Point;
+    LFinish := Finish.Point;
+    Offset(LStart, Multiply);
+    Offset(LFinish, Multiply);
     //IntersectRect(R,R,FloatRect(B.BoundsRect));
     try
-      x := Finish.x - Start.x;
-      y := Finish.y - Start.y;
+      x := LFinish.x - LStart.x;
+      y := LFinish.y - LStart.y;
       h := hypot(x,y);
 
       if h = 0 then exit;
@@ -545,9 +566,9 @@ begin
 
 
       B.StippleCounter := 0;
-      B.LineFSP(Start.x, Start.y, Finish.x, Finish.y);
+      B.LineFSP(LStart.x, LStart.y, LFinish.x, LFinish.y);
       B.StippleCounter := 0;
-      B.LineFSP(Start.x, Start.y, Finish.x, Finish.y);
+      B.LineFSP(LStart.x, LStart.y, LFinish.x, LFinish.y);
     except
       //raise Exception.Create(Format('x:%f y:%f -(%f,%f,%f,%f)',[x,y, Left, Top, Right, Bottom ]));
     end;

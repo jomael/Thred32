@@ -27,7 +27,7 @@ const
   );
   
   //default user color
-  defUseCol: T16Colors =(
+  DEFAULT_USER_COLORS{defUseCol}: T16Colors =(
     $00000000,
     $002dffff,
     $003f87e9,
@@ -46,7 +46,7 @@ const
     $00dbe6e3
   );
 
-  defCustCol : T16Colors =(
+  DEFAULT_CUSTOM_COLORS{defCustCol} : T16Colors =(
     $729674,
     $1a1eb9,
     $427347,
@@ -65,7 +65,7 @@ const
     $7b60ae
   );
 
-  defBakCust : T16Colors =(
+  DEFAULT_BACK_CUSTOM_COLORS{defBakCust} : T16Colors =(
     $a3c5dc,
     $adc7b6,
     $d1fcfb,
@@ -84,7 +84,7 @@ const
     $9acddc
   );
 
-  defBakBit : T16Colors =(
+  DEFAUL_BITMAP_COLORS{defBakBit} : T16Colors =(
 
     $c0d5bf,
     $c8dfee,

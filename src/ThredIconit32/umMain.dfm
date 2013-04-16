@@ -112,10 +112,8 @@ object MainForm: TMainForm
     UOM = uCm
     ZeroPixel = 32
     DPI = 96.000000000000000000
-    TickNumber = 100
-    TickDecimalPoint = 0
-    TickMiddle = True
-    TickDiv = 10
+    TickNumber = 1.000000000000000000
+    PixelsPerUnit = 37.795276641845700000
     Kind = sbHorizontal
   end
   object rullerV: TgmRuller
@@ -133,12 +131,9 @@ object MainForm: TMainForm
     ParentColor = False
     PopupMenu = pmDqDebug
     UOM = uCm
-    ZeroPixel = 0
     DPI = 96.000000000000000000
-    TickNumber = 100
-    TickDecimalPoint = 0
-    TickMiddle = True
-    TickDiv = 10
+    TickNumber = 1.000000000000000000
+    PixelsPerUnit = 37.795276641845700000
     Kind = sbVertical
   end
   object ctrlbr1: TControlBar
@@ -361,6 +356,13 @@ object MainForm: TMainForm
         Left = 241
         Top = 0
         Action = DM.actDqDebug_CntBrk
+      end
+      object btnDeleteFill: TToolButton
+        Left = 264
+        Top = 0
+        Caption = 'btnDeleteFill'
+        ImageIndex = 12
+        OnClick = btnDeleteFillClick
       end
     end
     object pnl1: TPanel
